@@ -47,22 +47,22 @@ export default function HeroSection() {
                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Secure Infrastructure Gate</span>
                         </motion.div>
 
-                        <h1 className="text-6xl md:text-[7rem] font-black tracking-[-0.04em] leading-[0.8] text-foreground mb-8 text-shadow-xl">
-                            VAULT <br />
-                            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">NATIVE.</span>
+                        <h1 className="text-6xl md:text-[5rem] font-black tracking-[-0.04em] leading-[0.8] text-foreground mb-8 text-shadow-xl">
+                            QUERY YOUR DATA WITH<br />
+                            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">CONFIDENCE.</span>
                         </h1>
 
                         <p className="text-xl text-muted-foreground leading-relaxed max-w-xl mb-10 font-medium tracking-tight">
-                            The ultimate orchestration engine for mission-critical database clusters. Secure, traceable, and undeniably powerful.
+                            Accepts, rejects and monitor database queries in realtime. Built for teams who prioritize security and efficiency.
                         </p>
 
                         <div className="flex flex-wrap items-center gap-6">
                             <button className="group relative px-10 py-4.5 bg-primary text-primary-foreground font-black rounded-xl hover:scale-105 transition-all shadow-xl overflow-hidden">
                                 <div className="absolute inset-0 bg-primary-foreground/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-                                <span className="relative z-10 text-base uppercase tracking-widest">Deploy Instance</span>
+                                <span className="relative z-10 text-base uppercase tracking-widest">GET STARTED</span>
                             </button>
                             <button className="px-10 py-4.5 bg-foreground/5 border border-foreground/15 text-foreground font-black rounded-xl hover:bg-foreground/10 transition-all backdrop-blur-2xl shadow-sm">
-                                ARCHITECTURE
+                                LIVE DEMO
                             </button>
                         </div>
                     </motion.div>
@@ -180,8 +180,6 @@ export default function HeroSection() {
                 <div className="mt-12 flex justify-between items-end border-t border-foreground/5 pt-8 pb-4 opacity-40 group-hover:opacity-100 transition-opacity">
                     <div className="flex items-center gap-5">
                         <div className="flex flex-col">
-                            <span className="text-[8px] font-black uppercase tracking-[0.4em] mb-1">Architected by</span>
-                            <span className="text-[10px] font-bold text-foreground">SHUBHAM MESHRAM</span>
                         </div>
                     </div>
                 </div>

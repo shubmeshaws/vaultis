@@ -59,7 +59,7 @@ export default function RegisterPage() {
         {/* Bottom Attribution */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-20 hover:opacity-100 transition-opacity cursor-default">
           <span className="text-[10px] font-black uppercase tracking-[0.5em] text-foreground">
-            Vaultis // Native Intelligence
+            Vaultis - By Shubham Meshram
           </span>
         </div>
       </div>
