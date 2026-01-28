@@ -33,33 +33,13 @@ export default function LandingHeader() {
         >
             <div className="w-full px-12 flex items-center justify-between">
                 {/* Vaultis Advanced Logo */}
-                <Link href="/" className="flex items-center gap-4 group relative">
-                    <div className="relative w-14 h-14 flex items-center justify-center">
-                        {/* Outer Glow */}
-                        <div className="absolute inset-0 bg-primary/30 rounded-[12px] blur-xl group-hover:bg-primary/50 transition-all duration-500 scale-75 group-hover:scale-100" />
-
-                        {/* Animated Logo Layers */}
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-0 border-[1.5px] border-primary/20 rounded-[16px]"
-                        />
-                        <motion.div
-                            animate={{ rotate: -360 }}
-                            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-2 border-[1.5px] border-primary/40 rounded-[12px]"
-                        />
-                        <div className="relative z-10 p-3 bg-background/50 backdrop-blur-md rounded-[12px] border border-foreground/10 group-hover:border-primary/50 transition-colors shadow-sm">
-                            <ShieldCheck className="w-6 h-6 text-primary fill-primary/10" />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col justify-center -mt-1">
-                        <span className="text-2xl font-black tracking-[0.12em] text-foreground leading-none transition-all group-hover:text-primary font-[family-name:var(--font-flexing)]">
+                <Link href="/" className="flex items-center group relative">
+                    <div className="flex flex-col justify-center">
+                        <span className="text-3xl md:text-4xl font-black tracking-[0.2em] text-foreground leading-none transition-all group-hover:text-primary font-[family-name:var(--font-flexing)]">
                             VAULTIS
                         </span>
-                        <span className="text-[8px] font-bold tracking-[0.3em] text-muted-foreground/60 uppercase mt-1 group-hover:text-primary transition-colors">
-                            by shubham meshram
+                        <span className="text-[8px] font-bold tracking-[2.4px] text-muted-foreground/60 uppercase mt-[-10px] ml-[6.2px] group-hover:text-primary transition-colors">
+                            BY SHUBHAM MESHRAM
                         </span>
                     </div>
                 </Link>
