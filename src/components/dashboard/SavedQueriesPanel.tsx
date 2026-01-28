@@ -1,0 +1,155 @@
+'use client'
+
+import React from 'react'
+import { motion } from 'framer-motion'
+import {
+    Play,
+    Edit,
+    Copy,
+    Trash2,
+    Database,
+    Clock,
+    Star,
+    MoreVertical
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+interface SavedQuery {
+    id: string
+    name: string
+    query: string
+    database: string
+    lastExecuted?: string
+    isFavorite?: boolean
+}
+
+interface SavedQueriesPanelProps {
+    queries: SavedQuery[]
+}
+
+export function SavedQueriesPanel({ queries }: SavedQueriesPanelProps) {
+
+    const handleQuickRun = (query: SavedQuery) => {
+        console.log('Quick run:', query.name)
+    }
+
+    const handleEdit = (query: SavedQuery) => {
+        console.log('Edit:', query.name)
+    }
+
+    const handleCopy = (query: SavedQuery) => {
+        console.log('Copy:', query.name)
+    }
+
+    const handleDelete = (query: SavedQuery) => {
+        console.log('Delete:', query.name)
+    }
+
+    return (
+        <div className="space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h3 className="text-lg font-bold text-foreground">Saved Queries</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                        {queries.length} snippet{queries.length !== 1 ? 's' : ''} ready to use
+                    </p>
+                </div>
+            </div>
+
+            {/* Query Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {queries.length === 0 ? (
+                    <div className="col-span-full text-center py-16 px-4 rounded-2xl bg-foreground/[0.02] border border-foreground/5">
+                        <Database className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+                        <p className="text-sm font-medium text-muted-foreground">No saved queries yet</p>
+                        <p className="text-xs text-muted-foreground/70 mt-1">
+                            Save your frequently used queries for quick access
+                        </p>
+                    </div>
+                ) : (
+                    queries.map((query, index) => (
+                        <motion.div
+                            key={query.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="group relative p-5 rounded-xl bg-card/50 backdrop-blur-xl border border-foreground/10 hover:border-indigo-500/30 transition-all hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-1"
+                        >
+                            {/* Favorite Badge */}
+                            {query.isFavorite && (
+                                <div className="absolute top-3 right-3">
+                                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                                </div>
+                            )}
+
+                            {/* Query Info */}
+                            <div className="space-y-3">
+                                <div>
+                                    <h4 className="font-bold text-foreground text-sm mb-1 pr-6">
+                                        {query.name}
+                                    </h4>
+                                    <p className="text-xs font-mono text-muted-foreground line-clamp-2 bg-foreground/5 p-2 rounded border border-foreground/5">
+                                        {query.query}
+                                    </p>
+                                </div>
+
+                                {/* Metadata */}
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                    <div className="flex items-center gap-1.5">
+                                        <Database className="w-3 h-3" />
+                                        <span className="font-medium">{query.database}</span>
+                                    </div>
+                                    {query.lastExecuted && (
+                                        <>
+                                            <div className="w-1 h-1 rounded-full bg-foreground/20" />
+                                            <div className="flex items-center gap-1.5">
+                                                <Clock className="w-3 h-3" />
+                                                <span>{query.lastExecuted}</span>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Quick Actions */}
+                            <div className="mt-4 pt-4 border-t border-foreground/5 flex items-center gap-2">
+                                <button
+                                    onClick={() => handleQuickRun(query)}
+                                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-sm hover:shadow-md"
+                                >
+                                    <Play className="w-3 h-3 fill-current" />
+                                    <span>Run</span>
+                                </button>
+                                <button
+                                    onClick={() => handleEdit(query)}
+                                    className="p-2 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors"
+                                    title="Edit"
+                                >
+                                    <Edit className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                    onClick={() => handleCopy(query)}
+                                    className="p-2 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors"
+                                    title="Copy"
+                                >
+                                    <Copy className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(query)}
+                                    className="p-2 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-colors"
+                                    title="Delete"
+                                >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                            </div>
+
+                            {/* Hover Glow Effect */}
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/0 via-indigo-500/0 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                        </motion.div>
+                    ))
+                )}
+            </div>
+        </div>
+    )
+}
