@@ -31,7 +31,7 @@ export default function LandingHeader() {
                 : 'py-6 bg-transparent'
                 }`}
         >
-            <div className="max-w-7xl mx-auto px-8 flex items-center justify-between">
+            <div className="w-full px-12 flex items-center justify-between">
                 {/* Vaultis Advanced Logo */}
                 <Link href="/" className="flex items-center gap-4 group relative">
                     <div className="relative w-14 h-14 flex items-center justify-center">
@@ -54,25 +54,25 @@ export default function LandingHeader() {
                         </div>
                     </div>
 
-                    <div className="flex flex-col">
-                        <span className="text-2xl font-black tracking-[0.12em] text-foreground leading-[0.8] transition-all group-hover:text-primary font-[family-name:var(--font-flexing)]">
+                    <div className="flex flex-col justify-center -mt-1">
+                        <span className="text-2xl font-black tracking-[0.12em] text-foreground leading-none transition-all group-hover:text-primary font-[family-name:var(--font-flexing)]">
                             VAULTIS
                         </span>
-                        <span className="text-[8px] font-bold tracking-[0.3em] text-muted-foreground/60 uppercase mt-2 group-hover:text-primary transition-colors">
+                        <span className="text-[8px] font-bold tracking-[0.3em] text-muted-foreground/60 uppercase mt-1 group-hover:text-primary transition-colors">
                             by shubham meshram
                         </span>
                     </div>
                 </Link>
 
                 {/* desktop actions */}
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-4">
                     <button
                         onClick={toggleTheme}
                         className="relative p-2.5 rounded-xl bg-foreground/5 border border-foreground/15 text-foreground/60 hover:text-foreground transition-all overflow-hidden group hover:border-primary/30 shadow-sm"
                         aria-label="Toggle theme"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        {theme === 'dark' ? <Sun className="w-4 h-4 relative z-10" /> : <Moon className="w-4 h-4 relative z-10" />}
+                        {theme === 'dark' ? <Sun className="w-5 h-5 relative z-10" /> : <Moon className="w-5 h-5 relative z-10" />}
                     </button>
 
 
