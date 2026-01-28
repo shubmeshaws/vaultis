@@ -1,6 +1,8 @@
 import { getCurrentUser } from '@/lib/auth/middleware'
 import { Card, CardContent } from '@/components/ui/card'
 import { QueryEditor } from '@/components/editor/QueryEditor'
+import { QueryStatusPanel } from '@/components/dashboard/QueryStatusPanel'
+import { QueryResultsTable } from '@/components/dashboard/QueryResultsTable'
 import { Sparkles, History, Save, Play } from 'lucide-react'
 
 export default async function QueriesPage() {
@@ -28,48 +30,40 @@ export default async function QueriesPage() {
       </div>
 
       {/* Main Editor Section */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 space-y-6">
           <QueryEditor />
 
-          {/* Results Area (Mock) */}
-          <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 overflow-hidden shadow-sm">
-            <div className="px-4 py-3 border-b border-foreground/5 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Query Results</span>
-              <span className="text-[10px] font-mono text-muted-foreground">142ms • 12 rows</span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-foreground/5 text-xs uppercase font-bold text-muted-foreground">
-                  <tr>
-                    <th className="px-4 py-3">ID</th>
-                    <th className="px-4 py-3">User</th>
-                    <th className="px-4 py-3">Email</th>
-                    <th className="px-4 py-3">Role</th>
-                    <th className="px-4 py-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-foreground/5">
-                  {[1, 2, 3].map((row) => (
-                    <tr key={row} className="hover:bg-foreground/[0.02] transition-colors">
-                      <td className="px-4 py-3 font-mono text-xs opacity-70">#829{row}</td>
-                      <td className="px-4 py-3 font-bold">Alex Johnson</td>
-                      <td className="px-4 py-3 text-muted-foreground">alex@example.com</td>
-                      <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-500 text-[10px] font-bold uppercase">Admin</span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          <span className="text-xs font-medium">Active</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+          {/* Results Area */}
+          <QueryResultsTable
+            columns={[
+              { key: 'id', label: 'ID', width: 100 },
+              { key: 'name', label: 'User', width: 200 },
+              { key: 'email', label: 'Email', width: 250 },
+              { key: 'role', label: 'Role', width: 120 },
+              { key: 'status', label: 'Status', width: 120 },
+            ]}
+            data={Array.from({ length: 25 }, (_, i) => ({
+              id: `#829${i + 1}`,
+              name: 'Alex Johnson',
+              email: 'alex@example.com',
+              role: 'Admin',
+              status: 'Active'
+            }))}
+            totalRows={25}
+            executionTime="142ms"
+          />
+        </div>
+
+        {/* Status Panel (Sidecar) */}
+        <div className="hidden lg:block lg:col-span-1">
+          <QueryStatusPanel stats={{
+            status: 'success',
+            executionTime: '142ms',
+            rowsAffected: 12,
+            dataSize: '2.4 KB',
+            message: 'Query executed successfully.'
+          }} />
         </div>
       </div>
     </div>
