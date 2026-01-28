@@ -58,7 +58,7 @@ export default function LandingHeader() {
 
                     <Link
                         href="/login"
-                        className="relative px-6 py-2.5 text-[10px] font-black bg-foreground text-background rounded-xl hover:scale-105 transition-all shadow-lg overflow-hidden group active:scale-95"
+                        className="relative px-6 py-2.5 text-[10px] font-black bg-foreground text-background rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 overflow-hidden group active:scale-95"
                     >
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
                         <span className="relative z-10 tracking-[0.1em]">SIGN IN</span>
@@ -66,7 +66,7 @@ export default function LandingHeader() {
 
                     <Link
                         href="/register"
-                        className="relative px-6 py-2.5 text-[10px] font-black bg-foreground text-background rounded-xl hover:scale-105 transition-all shadow-lg overflow-hidden group active:scale-95"
+                        className="relative px-6 py-2.5 text-[10px] font-black bg-foreground text-background rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 overflow-hidden group active:scale-95"
                     >
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
                         <span className="relative z-10 tracking-[0.1em]">SIGN UP</span>

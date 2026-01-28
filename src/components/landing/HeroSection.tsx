@@ -2,11 +2,15 @@
 
 import React, { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion'
-import { Terminal, Shield, Database, Cpu, Globe, Lock, Key, Activity } from 'lucide-react'
+import { Terminal, Shield, Database, Cpu, Globe, Lock, Key, Activity, X, Play } from 'lucide-react'
+import { RegisterForm } from '@/components/auth/RegisterForm'
 
 export default function HeroSection() {
     const containerRef = useRef<HTMLDivElement>(null)
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+
+    const [showVideoModal, setShowVideoModal] = useState(false)
+    const [showSignupModal, setShowSignupModal] = useState(false)
 
     const handleMouseMove = (e: React.MouseEvent) => {
         const { clientX, clientY } = e
@@ -57,12 +61,19 @@ export default function HeroSection() {
                         </p>
 
                         <div className="flex flex-wrap items-center gap-6">
-                            <button className="group relative px-10 py-4.5 bg-primary text-primary-foreground font-black rounded-xl hover:scale-105 transition-all shadow-xl overflow-hidden">
-                                <div className="absolute inset-0 bg-primary-foreground/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-                                <span className="relative z-10 text-base uppercase tracking-widest">GET STARTED</span>
+                            <button
+                                onClick={() => setShowSignupModal(true)}
+                                className="group relative px-10 py-4.5 bg-primary text-primary-foreground font-black rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30 hover:shadow-primary/60 overflow-hidden active:scale-95"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
+                                <span className="relative z-10 text-base uppercase tracking-[0.1em]">GET STARTED</span>
                             </button>
-                            <button className="px-10 py-4.5 bg-foreground/5 border border-foreground/15 text-foreground font-black rounded-xl hover:bg-foreground/10 transition-all backdrop-blur-2xl shadow-sm">
-                                LIVE DEMO
+                            <button
+                                onClick={() => setShowVideoModal(true)}
+                                className="group relative px-10 py-4.5 bg-primary text-primary-foreground font-black rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30 hover:shadow-primary/60 overflow-hidden active:scale-95"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
+                                <span className="relative z-10 text-base uppercase tracking-[0.1em]">LIVE DEMO</span>
                             </button>
                         </div>
                     </motion.div>
@@ -184,6 +195,70 @@ export default function HeroSection() {
                     </div>
                 </div>
             </div>
+
+            {/* Modals */}
+            <AnimatePresence>
+                {showSignupModal && (
+                    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowSignupModal(false)}
+                            className="absolute inset-0 bg-background/80 backdrop-blur-xl"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-4xl bg-background border border-foreground/15 rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+                        >
+                            <button
+                                onClick={() => setShowSignupModal(false)}
+                                className="absolute top-6 right-6 p-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors z-50"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <div className="py-12 px-2">
+                                <RegisterForm />
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+
+                {showVideoModal && (
+                    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowVideoModal(false)}
+                            className="absolute inset-0 bg-background/80 backdrop-blur-xl"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-5xl aspect-video bg-black rounded-[2.5rem] border border-foreground/20 shadow-2xl overflow-hidden"
+                        >
+                            <button
+                                onClick={() => setShowVideoModal(false)}
+                                className="absolute top-6 right-6 p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors z-50"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            {/* In a real scenario, this would be a high-quality demo video */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-primary/20 to-transparent">
+                                <div className="p-8 rounded-full bg-primary/20 border border-primary/30 mb-6 group cursor-pointer hover:bg-primary/30 transition-all">
+                                    <Play className="w-16 h-16 text-primary fill-primary" />
+                                </div>
+                                <h3 className="text-2xl font-black uppercase tracking-[0.2em] text-white italic">Protocol <span className="text-primary">Demo</span></h3>
+                                <p className="text-xs font-bold text-white/40 uppercase tracking-widest mt-2 underline underline-offset-8 decoration-primary/30">Vaultis - Distributed Query Guard</p>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </section>
     )
 }

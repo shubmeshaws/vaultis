@@ -4,6 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/db/prisma'
 import { Role } from './permissions'
 import bcrypt from 'bcryptjs'
+import GitHubProvider from 'next-auth/providers/github'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -15,6 +16,10 @@ export const authOptions: NextAuthOptions = {
     error: '/login',
   },
   providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID ?? '',
+      clientSecret: process.env.GITHUB_SECRET ?? '',
+    }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -26,12 +31,18 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Email and password are required')
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+        // Search by email OR name (username)
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { email: credentials.email },
+              { name: credentials.email }, // Using email field as a generic "login id"
+            ],
+          },
         })
 
         if (!user || !user.password) {
-          throw new Error('Invalid email or password')
+          throw new Error('Invalid credentials')
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -40,7 +51,7 @@ export const authOptions: NextAuthOptions = {
         )
 
         if (!isPasswordValid) {
-          throw new Error('Invalid email or password')
+          throw new Error('Invalid credentials')
         }
 
         return {

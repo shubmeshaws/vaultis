@@ -58,9 +58,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.error('Registration error:', error)
+    console.error('Registration error details:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     )
   }

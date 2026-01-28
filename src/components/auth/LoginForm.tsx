@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().min(1, 'Username or Email is required'),
   password: z.string().min(1, 'Password is required'),
 })
 
@@ -108,7 +108,7 @@ export function LoginForm() {
             <div className="space-y-3">
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="email" className="text-[9px] font-black uppercase tracking-widest text-foreground/60 ml-1">Identity Tag</Label>
+                  <Label htmlFor="email" className="text-[9px] font-black uppercase tracking-widest text-foreground/60 ml-1">username</Label>
                 </div>
                 <Input
                   id="email"
@@ -116,7 +116,7 @@ export function LoginForm() {
                   {...register('email')}
                   disabled={isLoading}
                   className="bg-foreground/[0.04] dark:bg-foreground/[0.06] border-foreground/15 dark:border-foreground/20 focus:border-primary/50 h-11 rounded-xl px-5 text-[12px] font-medium transition-all shadow-sm"
-                  placeholder="admin@test.com"
+                  placeholder="Username or Email"
                 />
                 {errors.email && (
                   <p className="text-[9px] text-destructive font-bold ml-1 uppercase">{errors.email.message}</p>
@@ -125,7 +125,7 @@ export function LoginForm() {
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-[9px] font-black uppercase tracking-widest text-foreground/60 ml-1">Access Cipher</Label>
+                  <Label htmlFor="password" className="text-[9px] font-black uppercase tracking-widest text-foreground/60 ml-1">password</Label>
                   <button type="button" className="text-[8px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors mr-1">Forgot?</button>
                 </div>
                 <Input
