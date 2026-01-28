@@ -35,10 +35,10 @@ export default function LandingHeader() {
                 {/* Vaultis Advanced Logo */}
                 <Link href="/" className="flex items-center group relative">
                     <div className="flex flex-col justify-center">
-                        <span className="text-3xl md:text-4xl font-black tracking-[0.2em] text-foreground leading-none transition-all group-hover:text-primary font-[family-name:var(--font-flexing)]">
+                        <span className="text-3xl md:text-4xl font-black tracking-[0.05em] text-foreground leading-none transition-all group-hover:text-primary font-[family-name:var(--font-flexing)]">
                             VAULTIS
                         </span>
-                        <span className="text-[8px] font-bold tracking-[2.4px] text-muted-foreground/60 uppercase mt-[-10px] ml-[6.2px] group-hover:text-primary transition-colors">
+                        <span className="text-[8px] font-bold tracking-[0.5px] text-muted-foreground/60 uppercase mt-[-10px] ml-[6.2px] group-hover:text-primary transition-colors">
                             BY SHUBHAM MESHRAM
                         </span>
                     </div>
