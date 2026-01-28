@@ -1,150 +1,276 @@
-'use client'
+import { getCurrentUser } from '@/lib/auth/middleware'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { redirect } from 'next/navigation'
+import {
+    Database,
+    Server,
+    CheckCircle,
+    AlertCircle,
+    XCircle,
+    Users,
+    Settings,
+    Zap,
+    ChevronLeft,
+    Shield,
+    Activity
+} from 'lucide-react'
 
-import React, { useState } from 'react'
-import { DatabasesGrid } from '@/components/admin/DatabasesGrid'
-import { Database } from '@/components/admin/DatabaseCard'
-import { DangerousActionModal } from '@/components/ui/DangerousActionModal'
+// Mock database data
+const databases = [
+    {
+        id: '1',
+        name: 'Production DB',
+        type: 'PostgreSQL',
+        version: '15.2',
+        environment: 'production',
+        status: 'healthy',
+        assignedUsers: 12,
+        host: 'prod-db.queryflow.io',
+        lastChecked: '2 mins ago'
+    },
+    {
+        id: '2',
+        name: 'Analytics DB',
+        type: 'MongoDB',
+        version: '6.0',
+        environment: 'production',
+        status: 'healthy',
+        assignedUsers: 8,
+        host: 'analytics.queryflow.io',
+        lastChecked: '5 mins ago'
+    },
+    {
+        id: '3',
+        name: 'Staging DB',
+        type: 'PostgreSQL',
+        version: '15.2',
+        environment: 'staging',
+        status: 'warning',
+        assignedUsers: 5,
+        host: 'staging-db.queryflow.io',
+        lastChecked: '10 mins ago'
+    },
+    {
+        id: '4',
+        name: 'Development DB',
+        type: 'MySQL',
+        version: '8.0',
+        environment: 'development',
+        status: 'healthy',
+        assignedUsers: 15,
+        host: 'dev-db.queryflow.io',
+        lastChecked: '1 min ago'
+    },
+    {
+        id: '5',
+        name: 'Cold Archive',
+        type: 'PostgreSQL',
+        version: '14.8',
+        environment: 'archive',
+        status: 'offline',
+        assignedUsers: 2,
+        host: 'archive.queryflow.io',
+        lastChecked: '2 hours ago'
+    }
+]
 
-const Icons = {
-    Plus: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-        </svg>
-    ),
-    Refresh: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-    ),
-    Shield: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-    ),
-}
+export default async function DatabasesManagementPage() {
+    const user = await getCurrentUser()
 
-export default function DatabasesManagementPage() {
-    const [databases] = useState<Database[]>([
-        {
-            id: 'db-1',
-            name: 'Production Core',
-            type: 'postgres',
-            status: 'healthy',
-            environment: 'production',
-            host: 'pg-prod-01.aws.internal',
-            latency: 12,
-            users: [{ id: '1', name: 'Dexter' }, { id: '2', name: 'James' }, { id: '3', name: 'Debra' }],
-            lastBackup: '2h ago'
-        },
-        {
-            id: 'db-2',
-            name: 'Inventory Engine',
-            type: 'mysql',
-            status: 'healthy',
-            environment: 'production',
-            host: 'mysql-prod-04.aws.internal',
-            latency: 18,
-            users: [{ id: '1', name: 'Dexter' }, { id: '4', name: 'Vince' }],
-            lastBackup: '5h ago'
-        },
-        {
-            id: 'db-3',
-            name: 'User Staging',
-            type: 'postgres',
-            status: 'healthy',
-            environment: 'staging',
-            host: 'pg-stage-02.internal',
-            latency: 45,
-            users: [{ id: '1', name: 'Dexter' }, { id: '2', name: 'James' }],
-            lastBackup: '1d ago'
-        },
-        {
-            id: 'db-4',
-            name: 'Billing Staging',
-            type: 'mongodb',
-            status: 'warning',
-            environment: 'staging',
-            host: 'mongo-stage-01.internal',
-            latency: 124,
-            users: [{ id: '3', name: 'Debra' }],
-            lastBackup: '4h ago'
-        },
-        {
-            id: 'db-5',
-            name: 'Local Scratch',
-            type: 'sqlite',
-            status: 'offline',
-            environment: 'development',
-            host: 'localhost:5432',
-            latency: 0,
-            users: [{ id: '1', name: 'Dexter' }],
-            lastBackup: 'Never'
-        }
-    ])
-
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [selectedDbId, setSelectedDbId] = useState<string | null>(null)
-
-    const handleDisconnectRequest = (id: string) => {
-        setSelectedDbId(id)
-        setIsModalOpen(true)
+    if (!user || user.role !== 'ADMIN') {
+        redirect('/dashboard')
     }
 
-    const handleConfirmDisconnect = () => {
-        if (!selectedDbId) return
-        console.log('Node Disconnected:', selectedDbId)
-        // In a real app, we would trigger a delete/disconnect mutation here
-    }
-
-    const selectedDbName = databases.find(db => db.id === selectedDbId)?.name || 'the selected node'
+    const totalDatabases = databases.length
+    const healthyDatabases = databases.filter(db => db.status === 'healthy').length
+    const totalUsers = databases.reduce((sum, db) => sum + db.assignedUsers, 0)
 
     return (
-        <div className="space-y-10 animate-fade-in pb-20">
-            {/* Page Header */}
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-primary/10 border border-primary/20 text-primary">
-                            <Icons.Shield className="w-6 h-6" />
-                        </div>
-                        <h1 className="text-4xl font-black tracking-tight text-foreground uppercase italic px-1">Cluster <span className="text-primary not-italic">Registry</span></h1>
-                    </div>
-                    <p className="text-muted-foreground font-medium text-lg ml-1">Monitor infrastructure health and manage node access.</p>
-                </div>
+        <div className="space-y-8 p-8 relative min-h-full">
+            {/* Background Glow */}
+            <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
 
+            {/* Header */}
+            <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                    <button className="p-3 rounded-2xl bg-white/5 border border-white/10 text-muted-foreground hover:text-foreground transition-all">
-                        <Icons.Refresh className="w-5 h-5" />
-                    </button>
-                    <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest shadow-[0_8px_32px_rgba(var(--primary),0.3)] hover:shadow-[0_12px_48px_rgba(var(--primary),0.5)] transition-all">
-                        <Icons.Plus className="w-4 h-4" />
-                        Provision Cluster
-                    </button>
+                    <a
+                        href="/admin"
+                        className="p-2 rounded-lg hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </a>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-emerald-500">
+                                Admin Panel
+                            </div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Database Management</p>
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground">Database Registry</h1>
+                        <p className="text-sm text-muted-foreground font-medium mt-1">
+                            Monitor connections, manage access, and ensure system reliability
+                        </p>
+                    </div>
                 </div>
-            </header>
 
-            {/* Registry Grid */}
-            <div className="relative">
-                <DatabasesGrid
-                    databases={databases}
-                    onTestConnection={(id) => console.log('Testing signal', id)}
-                    onEditPermissions={(id) => console.log('Edit permissions', id)}
-                    onDisconnect={handleDisconnectRequest}
-                />
+                {/* Stats Overview */}
+                <div className="grid gap-4 md:grid-cols-3">
+                    <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 shadow-sm">
+                        <CardHeader className="pb-2">
+                            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Total Databases</CardDescription>
+                            <CardTitle className="text-3xl font-black text-foreground">{totalDatabases}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-2">
+                                <Database className="w-4 h-4 text-indigo-500" />
+                                <p className="text-xs font-medium text-muted-foreground">Connected instances</p>
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                <DangerousActionModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onConfirm={handleConfirmDisconnect}
-                    title="Disconnect Infrastructure Node"
-                    description={`You are about to disconnect "${selectedDbName}". This will sever all active platform connections and terminate background sync processes immediately.`}
-                    confirmKeyword="DISCONNECT"
-                    actionLabel="Confirm Disconnection"
-                />
+                    <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 shadow-sm">
+                        <CardHeader className="pb-2">
+                            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Healthy Status</CardDescription>
+                            <CardTitle className="text-3xl font-black text-foreground">{healthyDatabases}/{totalDatabases}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-2">
+                                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                <p className="text-xs font-medium text-muted-foreground">Operational databases</p>
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                {/* Atmosphere */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-                <div className="absolute bottom-40 left-0 w-[400px] h-[400px] bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
+                    <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 shadow-sm">
+                        <CardHeader className="pb-2">
+                            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Total Access</CardDescription>
+                            <CardTitle className="text-3xl font-black text-foreground">{totalUsers}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-2">
+                                <Users className="w-4 h-4 text-cyan-500" />
+                                <p className="text-xs font-medium text-muted-foreground">Assigned users</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+
+            {/* Database Cards Grid */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {databases.map((db) => (
+                    <Card
+                        key={db.id}
+                        className={`bg-card/50 backdrop-blur-xl border-foreground/10 hover:border-foreground/20 transition-all shadow-sm group relative overflow-hidden ${db.status === 'offline' ? 'opacity-60' : ''
+                            }`}
+                    >
+                        {/* Environment Tag */}
+                        <div className="absolute top-4 right-4">
+                            <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider ${db.environment === 'production'
+                                    ? 'bg-red-500/10 text-red-500 border border-red-500/20'
+                                    : db.environment === 'staging'
+                                        ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                                        : db.environment === 'development'
+                                            ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
+                                            : 'bg-gray-500/10 text-gray-500 border border-gray-500/20'
+                                }`}>
+                                {db.environment}
+                            </span>
+                        </div>
+
+                        <CardHeader className="pb-3">
+                            <div className="flex items-start gap-3">
+                                <div className={`p-3 rounded-xl ${db.type === 'PostgreSQL'
+                                        ? 'bg-blue-500/10 text-blue-500'
+                                        : db.type === 'MongoDB'
+                                            ? 'bg-green-500/10 text-green-500'
+                                            : 'bg-orange-500/10 text-orange-500'
+                                    }`}>
+                                    <Database className="w-5 h-5" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <CardTitle className="text-lg font-bold truncate">{db.name}</CardTitle>
+                                    <CardDescription className="text-xs mt-0.5">
+                                        {db.type} {db.version}
+                                    </CardDescription>
+                                </div>
+                            </div>
+                        </CardHeader>
+
+                        <CardContent className="space-y-4">
+                            {/* Connection Health */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Connection Health</span>
+                                    {db.status === 'healthy' ? (
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                            <span className="text-xs font-bold text-emerald-500">Healthy</span>
+                                        </div>
+                                    ) : db.status === 'warning' ? (
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                                            <span className="text-xs font-bold text-amber-500">Warning</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-2 h-2 rounded-full bg-red-500" />
+                                            <span className="text-xs font-bold text-red-500">Offline</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="h-1.5 w-full bg-foreground/5 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full rounded-full ${db.status === 'healthy'
+                                                ? 'bg-emerald-500 w-full'
+                                                : db.status === 'warning'
+                                                    ? 'bg-amber-500 w-[60%]'
+                                                    : 'bg-red-500 w-[20%]'
+                                            }`}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Host & Users */}
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Server className="w-3.5 h-3.5" />
+                                    <span className="font-mono truncate">{db.host}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Users className="w-3.5 h-3.5" />
+                                    <span className="font-medium">{db.assignedUsers} assigned users</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Activity className="w-3.5 h-3.5" />
+                                    <span>Last checked {db.lastChecked}</span>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex items-center gap-2 pt-2 border-t border-foreground/5">
+                                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all">
+                                    <Zap className="w-3 h-3" />
+                                    Test Connection
+                                </button>
+                                <button className="p-2 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors" title="Edit permissions">
+                                    <Shield className="w-4 h-4" />
+                                </button>
+                                <button className="p-2 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors" title="Settings">
+                                    <Settings className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </CardContent>
+
+                        {/* Subtle Glow Effect */}
+                        <div className={`absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none ${db.status === 'healthy'
+                                ? 'bg-gradient-to-br from-emerald-500/5 to-transparent'
+                                : db.status === 'warning'
+                                    ? 'bg-gradient-to-br from-amber-500/5 to-transparent'
+                                    : 'bg-gradient-to-br from-red-500/5 to-transparent'
+                            }`} />
+                    </Card>
+                ))}
             </div>
         </div>
     )
