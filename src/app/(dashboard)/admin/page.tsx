@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@/lib/auth/middleware'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { prisma } from '@/lib/db/prisma'
-import { Users, Shield, Server, Activity, ArrowUpRight, Search, Settings, AlertTriangle, ChevronRight } from 'lucide-react'
+import { Users, Shield, Server, Activity, ArrowUpRight, Search, Settings, AlertTriangle, ChevronRight, Database, Zap, TrendingUp, TrendingDown } from 'lucide-react'
 
 export default async function AdminPage() {
   const user = await getCurrentUser()
@@ -14,10 +14,16 @@ export default async function AdminPage() {
     orderBy: { createdAt: 'desc' }
   })
 
+  // Mock operational data
+  const activeQueries = 24
+  const riskyOperations = 3
+  const systemHealth = 98
+
   return (
     <div className="space-y-8 p-8 relative min-h-full">
       {/* Background Glows */}
-      <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -z-10 pointer-events-none animate-pulse" />
+      <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
 
       {/* Admin Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-foreground/5 pb-6">
@@ -29,6 +35,7 @@ export default async function AdminPage() {
             <p className="text-xs text-muted-foreground uppercase tracking-wider">System Administration</p>
           </div>
           <h1 className="text-4xl font-black tracking-tighter text-foreground">Command Center</h1>
+          <p className="text-sm text-muted-foreground font-medium">Real-time operational oversight and control</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -43,35 +50,119 @@ export default async function AdminPage() {
         </div>
       </div>
 
-      {/* Core Vitals */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {[
-          { title: "Total Users", value: userCount, label: "Registered Accounts", icon: Users, color: "text-blue-500" },
-          { title: "Privileged Access", value: adminCount, label: "Administrators", icon: Shield, color: "text-purple-500" },
-          { title: "System Health", value: "98%", label: "Operational Status", icon: Server, color: "text-green-500" },
-        ].map((stat, i) => (
-          <Card key={i} className="bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-primary/20 transition-all overflow-hidden relative group shadow-sm">
-            <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity ${stat.color}`}>
-              <stat.icon className="w-24 h-24" />
+      {/* Core Vitals - Enhanced with Charts */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Total Users */}
+        <Card className="bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-cyan-500/30 transition-all overflow-hidden relative group shadow-sm">
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-cyan-500">
+            <Users className="w-24 h-24" />
+          </div>
+          <CardHeader className="pb-2">
+            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Total Users</CardDescription>
+            <CardTitle className="text-4xl font-black text-foreground">{userCount}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-cyan-500" />
+              <p className="text-xs font-medium text-muted-foreground">Registered Accounts</p>
             </div>
-            <CardHeader className="pb-2">
-              <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">{stat.title}</CardDescription>
-              <CardTitle className="text-4xl font-black text-foreground">{stat.value}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${stat.color.replace('text-', 'bg-')}`} />
-                <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+            {/* Mini Trend Chart */}
+            <div className="flex items-end gap-1 h-8">
+              {[40, 55, 45, 70, 60, 80, 75, 90].map((h, i) => (
+                <div key={i} className="flex-1 bg-cyan-500/20 rounded-t" style={{ height: `${h}%` }} />
+              ))}
+            </div>
+            <div className="flex items-center gap-1 mt-2 text-xs text-cyan-500 font-bold">
+              <TrendingUp className="w-3 h-3" />
+              <span>+12% this month</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Active Queries */}
+        <Card className="bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-indigo-500/30 transition-all overflow-hidden relative group shadow-sm">
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-indigo-500">
+            <Database className="w-24 h-24" />
+          </div>
+          <CardHeader className="pb-2">
+            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Active Queries</CardDescription>
+            <CardTitle className="text-4xl font-black text-foreground">{activeQueries}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+              <p className="text-xs font-medium text-muted-foreground">Running Operations</p>
+            </div>
+            {/* Mini Trend Chart */}
+            <div className="flex items-end gap-1 h-8">
+              {[60, 45, 70, 55, 80, 65, 75, 60].map((h, i) => (
+                <div key={i} className="flex-1 bg-indigo-500/20 rounded-t" style={{ height: `${h}%` }} />
+              ))}
+            </div>
+            <div className="flex items-center gap-1 mt-2 text-xs text-indigo-500 font-bold">
+              <Activity className="w-3 h-3" />
+              <span>Normal load</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Risky Operations */}
+        <Card className="bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-amber-500/30 transition-all overflow-hidden relative group shadow-sm">
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-amber-500">
+            <AlertTriangle className="w-24 h-24" />
+          </div>
+          <CardHeader className="pb-2">
+            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Risky Operations</CardDescription>
+            <CardTitle className="text-4xl font-black text-foreground">{riskyOperations}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-amber-500" />
+              <p className="text-xs font-medium text-muted-foreground">Requires Attention</p>
+            </div>
+            {/* Mini Trend Chart */}
+            <div className="flex items-end gap-1 h-8">
+              {[20, 35, 25, 40, 30, 45, 35, 30].map((h, i) => (
+                <div key={i} className="flex-1 bg-amber-500/20 rounded-t" style={{ height: `${h}%` }} />
+              ))}
+            </div>
+            <div className="flex items-center gap-1 mt-2 text-xs text-amber-500 font-bold">
+              <TrendingDown className="w-3 h-3" />
+              <span>-8% vs yesterday</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* System Health */}
+        <Card className="bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-emerald-500/30 transition-all overflow-hidden relative group shadow-sm">
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-emerald-500">
+            <Server className="w-24 h-24" />
+          </div>
+          <CardHeader className="pb-2">
+            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">System Health</CardDescription>
+            <CardTitle className="text-4xl font-black text-foreground">{systemHealth}%</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <p className="text-xs font-medium text-muted-foreground">Operational Status</p>
+            </div>
+            {/* Health Bar */}
+            <div className="h-8 w-full bg-foreground/5 rounded-lg overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-lg" style={{ width: `${systemHealth}%` }} />
+            </div>
+            <div className="flex items-center gap-1 mt-2 text-xs text-emerald-500 font-bold">
+              <Zap className="w-3 h-3" />
+              <span>All systems operational</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
         {/* User Management Panel */}
-        <Card className="md:col-span-2 border-foreground/10 bg-foreground/[0.02]">
-          <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="md:col-span-2 border-foreground/10 bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-foreground/5 pb-4">
             <div className="space-y-1">
               <CardTitle className="text-lg font-bold">Recent Registrations</CardTitle>
               <CardDescription>Latest users to join the platform</CardDescription>
@@ -80,10 +171,10 @@ export default async function AdminPage() {
               Manage All <ArrowUpRight className="w-3 h-3" />
             </a>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="pt-6">
+            <div className="space-y-3">
               {recentUsers.map(u => (
-                <div key={u.id} className="flex items-center justify-between p-3 rounded-xl bg-background/50 border border-foreground/5 hover:border-primary/20 transition-all group">
+                <div key={u.id} className="flex items-center justify-between p-4 rounded-xl bg-background/50 border border-foreground/5 hover:border-primary/20 transition-all group">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center text-xs font-black text-muted-foreground uppercase">
                       {u.email?.substring(0, 2)}
@@ -94,7 +185,7 @@ export default async function AdminPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider ${u.role === 'ADMIN' ? 'bg-purple-500/10 text-purple-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                    <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider ${u.role === 'ADMIN' ? 'bg-purple-500/10 text-purple-500 border border-purple-500/20' : 'bg-cyan-500/10 text-cyan-500 border border-cyan-500/20'}`}>
                       {u.role}
                     </span>
                     <button className="opacity-0 group-hover:opacity-100 p-2 hover:bg-foreground/5 rounded-lg transition-all">
@@ -109,28 +200,29 @@ export default async function AdminPage() {
 
         {/* System Alerts / Quick Config */}
         <div className="space-y-6">
-          <Card className="border-red-500/20 bg-red-500/5">
+          {/* Privileged Access */}
+          <Card className="border-purple-500/20 bg-purple-500/5 backdrop-blur-xl shadow-sm">
             <CardHeader>
               <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
-                <span className="text-xs font-black text-red-500 uppercase tracking-widest">System Alerts</span>
+                <Shield className="w-5 h-5 text-purple-500" />
+                <span className="text-xs font-black text-purple-500 uppercase tracking-widest">Privileged Access</span>
               </div>
-              <CardTitle className="text-lg font-bold">Database Load</CardTitle>
-              <CardDescription>No critical issues detected</CardDescription>
+              <CardTitle className="text-3xl font-black">{adminCount}</CardTitle>
+              <CardDescription>Active administrators</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-2 w-full bg-red-500/10 rounded-full overflow-hidden">
-                <div className="h-full w-[25%] bg-red-500 rounded-full" />
+              <div className="h-2 w-full bg-purple-500/10 rounded-full overflow-hidden">
+                <div className="h-full bg-purple-500 rounded-full" style={{ width: `${(adminCount / userCount) * 100}%` }} />
               </div>
-              <p className="text-xs text-red-500/80 mt-2 font-medium text-right">25% Capacity</p>
+              <p className="text-xs text-purple-500/80 mt-2 font-medium text-right">{((adminCount / userCount) * 100).toFixed(1)}% of total users</p>
             </CardContent>
           </Card>
 
-          <Card className="border-foreground/10 bg-foreground/[0.02]">
-            <CardHeader>
+          <Card className="border-foreground/10 bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl shadow-sm">
+            <CardHeader className="border-b border-foreground/5 pb-4">
               <CardTitle className="text-base font-bold">Quick Configurations</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="pt-4 space-y-1">
               {['General Settings', 'API Keys', 'Audit Logs', 'Security Policies'].map((link, i) => (
                 <a key={i} href="#" className="flex items-center justify-between p-3 rounded-lg hover:bg-foreground/5 transition-colors group">
                   <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">{link}</span>
