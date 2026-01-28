@@ -1,124 +1,244 @@
-'use client'
+import { getCurrentUser } from '@/lib/auth/middleware'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { prisma } from '@/lib/db/prisma'
+import { redirect } from 'next/navigation'
+import {
+    Users,
+    Shield,
+    Search,
+    Filter,
+    Edit,
+    Trash2,
+    Lock,
+    Unlock,
+    Database,
+    CheckCircle,
+    XCircle,
+    AlertCircle,
+    ChevronLeft
+} from 'lucide-react'
 
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import { UserTable, User, UserRole, UserStatus } from '@/components/admin/UserTable'
-import { PermissionEditor } from '@/components/admin/PermissionEditor'
+export default async function UsersManagementPage() {
+    const user = await getCurrentUser()
 
-const Icons = {
-    Search: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-    ),
-    UserAdd: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-        </svg>
-    ),
-    Filter: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-    ),
-}
-
-export default function UsersManagementPage() {
-    const [users, setUsers] = useState<User[]>([
-        { id: '1', name: 'Dexter Morgan', email: 'dexter@queryflow.io', role: 'Admin', status: 'Active', access: ['Production DB', 'Inventory DB', 'Marketing DB'], lastActive: '2m ago' },
-        { id: '2', name: 'James Doakes', email: 'doakes@queryflow.io', role: 'Developer', status: 'Active', access: ['Inventory DB', 'Analytics DB'], lastActive: '15m ago' },
-        { id: '3', name: 'Debra Morgan', email: 'deb@queryflow.io', role: 'Analyst', status: 'Active', access: ['Marketing DB', 'Billing DB'], lastActive: '1h ago' },
-        { id: '4', name: 'Vince Masuka', email: 'masuka@queryflow.io', role: 'Viewer', status: 'Pending', access: [], lastActive: 'Never' },
-        { id: '5', name: 'Angel Batista', email: 'batista@queryflow.io', role: 'Developer', status: 'Suspended', access: ['Production DB'], lastActive: '3d ago' },
-    ])
-
-    const [isEditorOpen, setIsEditorOpen] = useState(false)
-    const [selectedUser, setSelectedUser] = useState<User | null>(null)
-    const [searchQuery, setSearchQuery] = useState('')
-
-    const handleEditPermissions = (user: User) => {
-        setSelectedUser(user)
-        setIsEditorOpen(true)
+    if (!user || user.role !== 'ADMIN') {
+        redirect('/dashboard')
     }
 
-    const handleSavePermissions = (userId: string, newAccess: string[]) => {
-        setUsers(prev => prev.map(u => u.id === userId ? { ...u, access: newAccess } : u))
-    }
+    // Fetch all users with their details
+    const users = await prisma.user.findMany({
+        orderBy: { createdAt: 'desc' }
+    })
 
-    const filteredUsers = users.filter(u =>
-        u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.email.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    const totalUsers = users.length
+    const activeUsers = users.filter(u => u.emailVerified).length
+    const adminUsers = users.filter(u => u.role === 'ADMIN').length
 
     return (
-        <div className="space-y-10 animate-fade-in pb-20">
-            {/* Page Header */}
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-primary/10 border border-primary/20 text-primary">
-                            <Icons.UserAdd className="w-6 h-6" />
-                        </div>
-                        <h1 className="text-4xl font-black tracking-tight text-foreground uppercase italic px-1">User <span className="text-primary not-italic">Identity</span></h1>
-                    </div>
-                    <p className="text-muted-foreground font-medium text-lg ml-1">Manage platform access, roles and security policies.</p>
-                </div>
+        <div className="space-y-8 p-8 relative min-h-full">
+            {/* Background Glow */}
+            <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
 
+            {/* Header */}
+            <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                    <div className="relative">
-                        <Icons.Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <input
-                            type="text"
-                            placeholder="Search by name or email..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-12 pr-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-sm font-medium focus:outline-none focus:border-primary/50 transition-all w-80 shadow-2xl"
-                        />
+                    <a
+                        href="/admin"
+                        className="p-2 rounded-lg hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </a>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="px-2 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-500">
+                                Admin Panel
+                            </div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider">User Management</p>
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground">User Directory</h1>
+                        <p className="text-sm text-muted-foreground font-medium mt-1">
+                            Manage user accounts, roles, and database permissions
+                        </p>
                     </div>
-                    <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest shadow-[0_8px_32px_rgba(var(--primary),0.3)] hover:shadow-[0_12px_48px_rgba(var(--primary),0.5)] transition-all">
-                        <Icons.UserAdd className="w-4 h-4" />
-                        Create User
-                    </button>
                 </div>
-            </header>
 
-            {/* Control Bar */}
-            <div className="flex items-center justify-between gap-4 px-1">
-                <div className="flex items-center gap-4">
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all">
-                        <Icons.Filter className="w-3.5 h-3.5" />
-                        All Roles
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all">
-                        <Icons.Filter className="w-3.5 h-3.5" />
-                        Status: Any
-                    </button>
-                </div>
-                <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-50">
-                    Showing {filteredUsers.length} Users
+                {/* Stats Overview */}
+                <div className="grid gap-4 md:grid-cols-3">
+                    <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 shadow-sm">
+                        <CardHeader className="pb-2">
+                            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Total Users</CardDescription>
+                            <CardTitle className="text-3xl font-black text-foreground">{totalUsers}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-2">
+                                <Users className="w-4 h-4 text-cyan-500" />
+                                <p className="text-xs font-medium text-muted-foreground">Registered accounts</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 shadow-sm">
+                        <CardHeader className="pb-2">
+                            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Active Users</CardDescription>
+                            <CardTitle className="text-3xl font-black text-foreground">{activeUsers}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-2">
+                                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                <p className="text-xs font-medium text-muted-foreground">Verified accounts</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 shadow-sm">
+                        <CardHeader className="pb-2">
+                            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Administrators</CardDescription>
+                            <CardTitle className="text-3xl font-black text-foreground">{adminUsers}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-2">
+                                <Shield className="w-4 h-4 text-purple-500" />
+                                <p className="text-xs font-medium text-muted-foreground">Privileged access</p>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
 
-            {/* User Table Section */}
-            <div className="relative">
-                <UserTable
-                    users={filteredUsers}
-                    onEditPermissions={handleEditPermissions}
-                    onEditRole={(user) => console.log('Edit role', user.id)}
-                    onToggleStatus={(user) => console.log('Toggle status', user.id)}
-                />
+            {/* User Management Table */}
+            <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 shadow-sm overflow-hidden">
+                <CardHeader className="border-b border-foreground/5 pb-4">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <CardTitle className="text-lg font-bold">All Users</CardTitle>
+                            <CardDescription>Manage roles, permissions, and account status</CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <input
+                                    type="text"
+                                    placeholder="Search users..."
+                                    className="h-10 pl-10 pr-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                                />
+                            </div>
+                            <button className="h-10 px-4 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+                                <Filter className="w-4 h-4" />
+                                Filter
+                            </button>
+                        </div>
+                    </div>
+                </CardHeader>
 
-                {/* Subtle Background Glows */}
-                <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
-                <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
-            </div>
+                <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-foreground/[0.02] border-b border-foreground/5">
+                                <tr>
+                                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">User</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">Role</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">Database Access</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">Status</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">Joined</th>
+                                    <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-muted-foreground">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-foreground/5">
+                                {users.map((u) => (
+                                    <tr key={u.id} className="hover:bg-foreground/[0.02] transition-colors group">
+                                        {/* User Info */}
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center text-xs font-black text-muted-foreground uppercase">
+                                                    {u.email?.substring(0, 2)}
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-bold text-foreground">{u.name || 'Unnamed User'}</p>
+                                                    <p className="text-xs text-muted-foreground">{u.email}</p>
+                                                </div>
+                                            </div>
+                                        </td>
 
-            <PermissionEditor
-                user={selectedUser}
-                isOpen={isEditorOpen}
-                onClose={() => setIsEditorOpen(false)}
-                onSave={handleSavePermissions}
-            />
+                                        {/* Role */}
+                                        <td className="px-6 py-4">
+                                            <select
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${u.role === 'ADMIN'
+                                                        ? 'bg-purple-500/10 text-purple-500 border-purple-500/20 hover:bg-purple-500/20'
+                                                        : 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20 hover:bg-cyan-500/20'
+                                                    }`}
+                                                defaultValue={u.role}
+                                            >
+                                                <option value="USER">User</option>
+                                                <option value="ADMIN">Admin</option>
+                                            </select>
+                                        </td>
+
+                                        {/* Database Access */}
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <Database className="w-4 h-4 text-indigo-500" />
+                                                <span className="text-sm font-medium text-foreground">
+                                                    {u.role === 'ADMIN' ? 'All Databases' : 'Production'}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        {/* Status */}
+                                        <td className="px-6 py-4">
+                                            {u.emailVerified ? (
+                                                <div className="flex items-center gap-2">
+                                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                                    <span className="text-xs font-bold text-emerald-500">Active</span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-2">
+                                                    <AlertCircle className="w-4 h-4 text-amber-500" />
+                                                    <span className="text-xs font-bold text-amber-500">Pending</span>
+                                                </div>
+                                            )}
+                                        </td>
+
+                                        {/* Joined Date */}
+                                        <td className="px-6 py-4">
+                                            <span className="text-sm text-muted-foreground">
+                                                {new Date(u.createdAt).toLocaleDateString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                })}
+                                            </span>
+                                        </td>
+
+                                        {/* Actions */}
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    className="p-2 rounded-lg hover:bg-indigo-500/10 text-muted-foreground hover:text-indigo-500 transition-colors"
+                                                    title="Edit permissions"
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    className="p-2 rounded-lg hover:bg-amber-500/10 text-muted-foreground hover:text-amber-500 transition-colors"
+                                                    title={u.emailVerified ? "Suspend account" : "Activate account"}
+                                                >
+                                                    {u.emailVerified ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                                                </button>
+                                                <button
+                                                    className="p-2 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors"
+                                                    title="Delete user"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }
