@@ -81,6 +81,9 @@ model Database {
   host        String?
   port        Int?
   type        String?
+  environment String?
+  username    String?
+  password    String?
   groups      Group[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

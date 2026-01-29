@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { SimpleConfirmationModal } from '@/components/ui/SimpleConfirmationModal'
+import { Portal } from '@/components/ui/Portal'
 import {
     updateUserRole,
     deleteUser,
@@ -682,148 +683,150 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                         type="danger"
                     />
 
-                    <AnimatePresence>
-                        {isCreateUserOpen && (
-                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-24">
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="absolute inset-0 bg-black/60 backdrop-blur-md"
-                                    onClick={() => setIsCreateUserOpen(false)}
-                                />
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.95, y: 30 }}
-                                    className="relative z-10 w-full max-w-3xl bg-background rounded-3xl shadow-2xl border border-foreground/10"
-                                    style={{ zoom: 0.9 }}
-                                >
-                                    <div className="absolute top-4 right-4 z-20">
-                                        <button onClick={() => setIsCreateUserOpen(false)} className="p-2 hover:bg-foreground/5 rounded-full transition-colors">
-                                            <X className="w-5 h-5 text-muted-foreground" />
-                                        </button>
-                                    </div>
-                                    <div className="p-6">
-                                        <div className="text-center mb-4">
-                                            <h2 className="text-xl font-black tracking-tight">CREATE <span className="text-primary">ACCOUNT</span></h2>
-                                            <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-1">Join the QueryX Network</p>
+                    <Portal>
+                        <AnimatePresence>
+                            {isCreateUserOpen && (
+                                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-24">
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                                        onClick={() => setIsCreateUserOpen(false)}
+                                    />
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95, y: 30 }}
+                                        className="relative z-10 w-full max-w-3xl bg-background rounded-3xl shadow-2xl border border-foreground/10"
+                                        style={{ zoom: 0.9 }}
+                                    >
+                                        <div className="absolute top-4 right-4 z-20">
+                                            <button onClick={() => setIsCreateUserOpen(false)} className="p-2 hover:bg-foreground/5 rounded-full transition-colors">
+                                                <X className="w-5 h-5 text-muted-foreground" />
+                                            </button>
                                         </div>
+                                        <div className="p-6">
+                                            <div className="text-center mb-4">
+                                                <h2 className="text-xl font-black tracking-tight">CREATE <span className="text-primary">ACCOUNT</span></h2>
+                                                <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-1">Join the QueryX Network</p>
+                                            </div>
 
-                                        <form onSubmit={async (e) => {
-                                            e.preventDefault()
-                                            const formData = new FormData(e.currentTarget)
-                                            const data = {
-                                                firstName: formData.get('firstName') as string,
-                                                lastName: formData.get('lastName') as string,
-                                                name: formData.get('name') as string,
-                                                email: formData.get('email') as string,
-                                                password: formData.get('password') as string,
-                                                confirmPassword: formData.get('confirmPassword') as string,
-                                                securityQuestion1: formData.get('securityQuestion1') as string,
-                                                securityAnswer1: formData.get('securityAnswer1') as string,
-                                                securityQuestion2: formData.get('securityQuestion2') as string,
-                                                securityAnswer2: formData.get('securityAnswer2') as string,
-                                            }
+                                            <form onSubmit={async (e) => {
+                                                e.preventDefault()
+                                                const formData = new FormData(e.currentTarget)
+                                                const data = {
+                                                    firstName: formData.get('firstName') as string,
+                                                    lastName: formData.get('lastName') as string,
+                                                    name: formData.get('name') as string,
+                                                    email: formData.get('email') as string,
+                                                    password: formData.get('password') as string,
+                                                    confirmPassword: formData.get('confirmPassword') as string,
+                                                    securityQuestion1: formData.get('securityQuestion1') as string,
+                                                    securityAnswer1: formData.get('securityAnswer1') as string,
+                                                    securityQuestion2: formData.get('securityQuestion2') as string,
+                                                    securityAnswer2: formData.get('securityAnswer2') as string,
+                                                }
 
-                                            try {
-                                                const response = await fetch('/api/auth/register', {
-                                                    method: 'POST',
-                                                    headers: { 'Content-Type': 'application/json' },
-                                                    body: JSON.stringify(data),
-                                                })
-                                                const result = await response.json()
-
-                                                if (response.ok) {
-                                                    const mappedNewUser = { ...result.user, access: ['Production DB'], groups: [] } as User
-                                                    setUsers(prev => [mappedNewUser, ...prev])
-                                                    toast({
-                                                        title: 'Account Provisioned',
-                                                        description: `${result.user.name || result.user.email} has been successfully registered.`,
-                                                        type: 'success'
+                                                try {
+                                                    const response = await fetch('/api/auth/register', {
+                                                        method: 'POST',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify(data),
                                                     })
-                                                    setIsCreateUserOpen(false)
-                                                } else {
+                                                    const result = await response.json()
+
+                                                    if (response.ok) {
+                                                        const mappedNewUser = { ...result.user, access: ['Production DB'], groups: [] } as User
+                                                        setUsers(prev => [mappedNewUser, ...prev])
+                                                        toast({
+                                                            title: 'Success',
+                                                            description: 'User account created successfully.',
+                                                            type: 'success'
+                                                        })
+                                                        setIsCreateUserOpen(false)
+                                                    } else {
+                                                        toast({
+                                                            title: 'Error',
+                                                            description: result.error || 'Please try again.',
+                                                            type: 'error'
+                                                        })
+                                                    }
+                                                } catch (err) {
                                                     toast({
-                                                        title: 'Registration Failed',
-                                                        description: result.error || 'Please try again.',
+                                                        title: 'Error',
+                                                        description: 'An error occurred. Please try again.',
                                                         type: 'error'
                                                     })
                                                 }
-                                            } catch (err) {
-                                                toast({
-                                                    title: 'Error',
-                                                    description: 'An error occurred. Please try again.',
-                                                    type: 'error'
-                                                })
-                                            }
-                                        }} className="space-y-3">
-                                            <div className="grid grid-cols-3 gap-3">
-                                                <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">First Name</label>
-                                                    <input name="firstName" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="John" />
+                                            }} className="space-y-3">
+                                                <div className="grid grid-cols-3 gap-3">
+                                                    <div className="space-y-1">
+                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">First Name</label>
+                                                        <input name="firstName" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="John" />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Last Name</label>
+                                                        <input name="lastName" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="Doe" />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Username</label>
+                                                        <input name="name" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="johndoe" />
+                                                    </div>
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Last Name</label>
-                                                    <input name="lastName" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="Doe" />
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Username</label>
-                                                    <input name="name" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="johndoe" />
-                                                </div>
-                                            </div>
 
-                                            <div className="grid grid-cols-3 gap-3">
-                                                <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Email</label>
-                                                    <input name="email" type="email" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="john@example.com" />
+                                                <div className="grid grid-cols-3 gap-3">
+                                                    <div className="space-y-1">
+                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Email</label>
+                                                        <input name="email" type="email" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="john@example.com" />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Password</label>
+                                                        <input name="password" type="password" required minLength={8} className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="••••••••" />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Confirm</label>
+                                                        <input name="confirmPassword" type="password" required minLength={8} className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="••••••••" />
+                                                    </div>
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Password</label>
-                                                    <input name="password" type="password" required minLength={8} className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="••••••••" />
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Confirm</label>
-                                                    <input name="confirmPassword" type="password" required minLength={8} className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="••••••••" />
-                                                </div>
-                                            </div>
 
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Security Question 1</label>
-                                                    <select name="securityQuestion1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
-                                                        <option value="">Select a question</option>
-                                                        <option value="What was your first pet's name?">What was your first pet's name?</option>
-                                                        <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-                                                        <option value="What city were you born in?">What city were you born in?</option>
-                                                    </select>
-                                                    <input name="securityAnswer1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs mt-1" placeholder="Your answer" />
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div className="space-y-1">
+                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Security Question 1</label>
+                                                        <select name="securityQuestion1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
+                                                            <option value="">Select a question</option>
+                                                            <option value="What was your first pet's name?">What was your first pet's name?</option>
+                                                            <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                                                            <option value="What city were you born in?">What city were you born in?</option>
+                                                        </select>
+                                                        <input name="securityAnswer1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs mt-1" placeholder="Your answer" />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Security Question 2</label>
+                                                        <select name="securityQuestion2" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
+                                                            <option value="">Select a question</option>
+                                                            <option value="What was the model of your first car?">What was the model of your first car?</option>
+                                                            <option value="What was the name of your elementary school?">What was the name of your elementary school?</option>
+                                                        </select>
+                                                        <input name="securityAnswer2" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs mt-1" placeholder="Your answer" />
+                                                    </div>
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Security Question 2</label>
-                                                    <select name="securityQuestion2" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
-                                                        <option value="">Select a question</option>
-                                                        <option value="What was the model of your first car?">What was the model of your first car?</option>
-                                                        <option value="What was the name of your elementary school?">What was the name of your elementary school?</option>
-                                                    </select>
-                                                    <input name="securityAnswer2" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs mt-1" placeholder="Your answer" />
-                                                </div>
-                                            </div>
 
-                                            <div className="flex gap-3 pt-3">
-                                                <button type="submit" className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all">
-                                                    Create Account
-                                                </button>
-                                                <button type="button" onClick={() => setIsCreateUserOpen(false)} className="flex-1 h-10 bg-foreground/5 border border-foreground/10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-foreground/10 transition-all">
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )}
-                    </AnimatePresence>
+                                                <div className="flex gap-3 pt-3">
+                                                    <button type="submit" className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all">
+                                                        Create Account
+                                                    </button>
+                                                    <button type="button" onClick={() => setIsCreateUserOpen(false)} className="flex-1 h-10 bg-foreground/5 border border-foreground/10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-foreground/10 transition-all">
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </motion.div>
+                                </div>
+                            )}
+                        </AnimatePresence>
+                    </Portal>
 
 
                 </div>
@@ -955,164 +958,166 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
     useScrollLock(isOpen)
 
     return (
-        <AnimatePresence>
-            {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-24">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
-                    />
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="relative w-full max-w-4xl bg-background border border-foreground/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
-                        style={{ zoom: 0.9 }}
-                    >
-                        <div className="p-6 border-b border-foreground/5 flex items-center justify-between shrink-0">
-                            <div>
-                                <h2 className="text-xl font-black tracking-tight text-foreground">Create User Group</h2>
-                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Access Control</p>
-                            </div>
-                            <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded-lg transition-colors">
-                                <X className="w-5 h-5 text-muted-foreground" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row h-full overflow-hidden">
-                            {/* Left Column: Details */}
-                            <div className="p-6 space-y-4 flex-1 overflow-y-auto custom-scrollbar border-r border-foreground/5">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Group Name</label>
-                                    <input
-                                        required
-                                        type="text"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                        placeholder="e.g. Analytics Team"
-                                    />
+        <Portal>
+            <AnimatePresence>
+                {isOpen && (
+                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={onClose}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-4xl bg-background border border-foreground/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                            style={{ zoom: 0.9 }}
+                        >
+                            <div className="p-6 border-b border-foreground/5 flex items-center justify-between shrink-0">
+                                <div>
+                                    <h2 className="text-xl font-black tracking-tight text-foreground">Create User Group</h2>
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Access Control</p>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Description</label>
-                                    <textarea
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 min-h-[120px]"
-                                        placeholder="What this group manages..."
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="w-full h-12 bg-primary text-primary-foreground rounded-xl font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all shadow-lg shadow-primary/20 mt-8"
-                                >
-                                    {isLoading ? 'Creating Group...' : 'Create Group'}
+                                <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded-lg transition-colors">
+                                    <X className="w-5 h-5 text-muted-foreground" />
                                 </button>
                             </div>
-
-                            {/* Right Column: Relations */}
-                            <div className="p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar bg-foreground/[0.02]">
-                                {/* Database Selection */}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Default Databases</label>
-                                    <div className="relative mb-2">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <form onSubmit={handleSubmit} className="flex flex-col md:flex-row h-full overflow-hidden">
+                                {/* Left Column: Details */}
+                                <div className="p-6 space-y-4 flex-1 overflow-y-auto custom-scrollbar border-r border-foreground/5">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Group Name</label>
                                         <input
+                                            required
                                             type="text"
-                                            value={dbSearchQuery}
-                                            onChange={(e) => setDbSearchQuery(e.target.value)}
-                                            placeholder="Search databases..."
-                                            className="w-full h-9 pl-10 pr-9 bg-foreground/5 border border-foreground/10 rounded-lg text-xs focus:outline-none focus:border-primary/50"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                            placeholder="e.g. Analytics Team"
                                         />
-                                        {dbSearchQuery && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setDbSearchQuery('')}
-                                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-foreground/10 rounded transition-colors"
-                                            >
-                                                <X className="w-3 h-3 text-muted-foreground" />
-                                            </button>
-                                        )}
                                     </div>
-                                    <div className="max-h-48 overflow-y-auto border border-foreground/10 rounded-xl p-2 bg-foreground/5 space-y-1">
-                                        {filteredDatabases.map(db => (
-                                            <label key={db.id} className="flex items-center gap-2 p-2 hover:bg-foreground/5 rounded-lg cursor-pointer transition-colors">
-                                                <input
-                                                    type="checkbox"
-                                                    className="w-4 h-4 rounded border-foreground/20 text-primary focus:ring-primary"
-                                                    checked={selectedDatabases.includes(db.id)}
-                                                    onChange={(e) => {
-                                                        if (e.target.checked) setSelectedDatabases([...selectedDatabases, db.id])
-                                                        else setSelectedDatabases(selectedDatabases.filter(id => id !== db.id))
-                                                    }}
-                                                />
-                                                <span className="text-sm font-medium">{db.name}</span>
-                                            </label>
-                                        ))}
-                                        {filteredDatabases.length === 0 && (
-                                            <p className="text-xs text-muted-foreground p-2 italic">
-                                                {dbSearchQuery ? 'No databases match your search' : 'No databases available'}
-                                            </p>
-                                        )}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Description</label>
+                                        <textarea
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            className="w-full px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 min-h-[120px]"
+                                            placeholder="What this group manages..."
+                                        />
                                     </div>
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="w-full h-12 bg-primary text-primary-foreground rounded-xl font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all shadow-lg shadow-primary/20 mt-8"
+                                    >
+                                        {isLoading ? 'Creating Group...' : 'Create Group'}
+                                    </button>
                                 </div>
 
-                                {/* Member Selection */}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Add Members</label>
-                                    <div className="relative mb-2">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                        <input
-                                            type="text"
-                                            value={userSearchQuery}
-                                            onChange={(e) => setUserSearchQuery(e.target.value)}
-                                            placeholder="Search users..."
-                                            className="w-full h-9 pl-10 pr-9 bg-foreground/5 border border-foreground/10 rounded-lg text-xs focus:outline-none focus:border-primary/50"
-                                        />
-                                        {userSearchQuery && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setUserSearchQuery('')}
-                                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-foreground/10 rounded transition-colors"
-                                            >
-                                                <X className="w-3 h-3 text-muted-foreground" />
-                                            </button>
-                                        )}
+                                {/* Right Column: Relations */}
+                                <div className="p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar bg-foreground/[0.02]">
+                                    {/* Database Selection */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Default Databases</label>
+                                        <div className="relative mb-2">
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <input
+                                                type="text"
+                                                value={dbSearchQuery}
+                                                onChange={(e) => setDbSearchQuery(e.target.value)}
+                                                placeholder="Search databases..."
+                                                className="w-full h-9 pl-10 pr-9 bg-foreground/5 border border-foreground/10 rounded-lg text-xs focus:outline-none focus:border-primary/50"
+                                            />
+                                            {dbSearchQuery && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setDbSearchQuery('')}
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-foreground/10 rounded transition-colors"
+                                                >
+                                                    <X className="w-3 h-3 text-muted-foreground" />
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="max-h-48 overflow-y-auto border border-foreground/10 rounded-xl p-2 bg-foreground/5 space-y-1">
+                                            {filteredDatabases.map(db => (
+                                                <label key={db.id} className="flex items-center gap-2 p-2 hover:bg-foreground/5 rounded-lg cursor-pointer transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="w-4 h-4 rounded border-foreground/20 text-primary focus:ring-primary"
+                                                        checked={selectedDatabases.includes(db.id)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) setSelectedDatabases([...selectedDatabases, db.id])
+                                                            else setSelectedDatabases(selectedDatabases.filter(id => id !== db.id))
+                                                        }}
+                                                    />
+                                                    <span className="text-sm font-medium">{db.name}</span>
+                                                </label>
+                                            ))}
+                                            {filteredDatabases.length === 0 && (
+                                                <p className="text-xs text-muted-foreground p-2 italic">
+                                                    {dbSearchQuery ? 'No databases match your search' : 'No databases available'}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="max-h-48 overflow-y-auto border border-foreground/10 rounded-xl p-2 bg-foreground/5 space-y-1">
-                                        {filteredUsers.map(user => (
-                                            <label key={user.id} className="flex items-center gap-2 p-2 hover:bg-foreground/5 rounded-lg cursor-pointer transition-colors">
-                                                <input
-                                                    type="checkbox"
-                                                    className="w-4 h-4 rounded border-foreground/20 text-primary focus:ring-primary"
-                                                    checked={selectedUsers.includes(user.id)}
-                                                    onChange={(e) => {
-                                                        if (e.target.checked) setSelectedUsers([...selectedUsers, user.id])
-                                                        else setSelectedUsers(selectedUsers.filter(id => id !== user.id))
-                                                    }}
-                                                />
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-medium">{user.name || user.email}</span>
-                                                    <span className="text-[10px] text-muted-foreground">{user.email}</span>
-                                                </div>
-                                            </label>
-                                        ))}
-                                        {filteredUsers.length === 0 && (
-                                            <p className="text-xs text-muted-foreground p-2 italic">
-                                                {userSearchQuery ? 'No users match your search' : 'No users available'}
-                                            </p>
-                                        )}
+
+                                    {/* Member Selection */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Add Members</label>
+                                        <div className="relative mb-2">
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <input
+                                                type="text"
+                                                value={userSearchQuery}
+                                                onChange={(e) => setUserSearchQuery(e.target.value)}
+                                                placeholder="Search users..."
+                                                className="w-full h-9 pl-10 pr-9 bg-foreground/5 border border-foreground/10 rounded-lg text-xs focus:outline-none focus:border-primary/50"
+                                            />
+                                            {userSearchQuery && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setUserSearchQuery('')}
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-foreground/10 rounded transition-colors"
+                                                >
+                                                    <X className="w-3 h-3 text-muted-foreground" />
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="max-h-48 overflow-y-auto border border-foreground/10 rounded-xl p-2 bg-foreground/5 space-y-1">
+                                            {filteredUsers.map(user => (
+                                                <label key={user.id} className="flex items-center gap-2 p-2 hover:bg-foreground/5 rounded-lg cursor-pointer transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="w-4 h-4 rounded border-foreground/20 text-primary focus:ring-primary"
+                                                        checked={selectedUsers.includes(user.id)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) setSelectedUsers([...selectedUsers, user.id])
+                                                            else setSelectedUsers(selectedUsers.filter(id => id !== user.id))
+                                                        }}
+                                                    />
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-medium">{user.name || user.email}</span>
+                                                        <span className="text-[10px] text-muted-foreground">{user.email}</span>
+                                                    </div>
+                                                </label>
+                                            ))}
+                                            {filteredUsers.length === 0 && (
+                                                <p className="text-xs text-muted-foreground p-2 italic">
+                                                    {userSearchQuery ? 'No users match your search' : 'No users available'}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
-                    </motion.div>
-                </div>
-            )}
-        </AnimatePresence>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        </Portal>
     )
 }
 
@@ -1167,148 +1172,150 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
     useScrollLock(isOpen)
 
     return (
-        <AnimatePresence>
-            {isOpen && group && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-24">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
-                    />
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="relative w-full max-w-lg bg-background border border-foreground/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
-                        style={{ zoom: 0.9 }}
-                    >
-                        <div className="p-6 border-b border-foreground/5 flex items-center justify-between shrink-0">
-                            <div>
-                                <h2 className="text-xl font-black tracking-tight text-foreground">Manage Access</h2>
-                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{group.name}</p>
-                            </div>
-                            <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded-lg transition-colors">
-                                <X className="w-5 h-5 text-muted-foreground" />
-                            </button>
-                        </div>
-
-                        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
-                            {/* Database Access */}
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Database Permissions</label>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">{selectedDatabases.length} Selected</span>
+        <Portal>
+            <AnimatePresence>
+                {isOpen && group && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-24">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={onClose}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-lg bg-background border border-foreground/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                            style={{ zoom: 0.9 }}
+                        >
+                            <div className="p-6 border-b border-foreground/5 flex items-center justify-between shrink-0">
+                                <div>
+                                    <h2 className="text-xl font-black tracking-tight text-foreground">Manage Access</h2>
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{group.name}</p>
                                 </div>
-                                <div className="relative mb-2">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                    <input
-                                        type="text"
-                                        value={dbSearchQuery}
-                                        onChange={(e) => setDbSearchQuery(e.target.value)}
-                                        placeholder="Search databases..."
-                                        className="w-full h-9 pl-10 pr-9 bg-foreground/5 border border-foreground/10 rounded-lg text-xs focus:outline-none focus:border-primary/50"
-                                    />
-                                    {dbSearchQuery && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setDbSearchQuery('')}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-foreground/10 rounded transition-colors"
-                                        >
-                                            <X className="w-3 h-3 text-muted-foreground" />
-                                        </button>
-                                    )}
-                                </div>
-                                <div className="max-h-48 overflow-y-auto border border-foreground/10 rounded-xl p-2 bg-foreground/5 space-y-1">
-                                    {filteredDatabases.map(db => (
-                                        <label key={db.id} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${selectedDatabases.includes(db.id) ? 'bg-primary/10 border border-primary/20' : 'hover:bg-foreground/5 border border-transparent'}`}>
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${selectedDatabases.includes(db.id) ? 'bg-primary border-primary' : 'border-foreground/30'}`}>
-                                                {selectedDatabases.includes(db.id) && <Check className="w-3 h-3 text-primary-foreground" />}
-                                            </div>
-                                            <input
-                                                type="checkbox"
-                                                className="hidden"
-                                                checked={selectedDatabases.includes(db.id)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) setSelectedDatabases([...selectedDatabases, db.id])
-                                                    else setSelectedDatabases(selectedDatabases.filter(id => id !== db.id))
-                                                }}
-                                            />
-                                            <span className="text-sm font-bold">{db.name}</span>
-                                        </label>
-                                    ))}
-                                    {filteredDatabases.length === 0 && (
-                                        <p className="text-xs text-muted-foreground p-2 italic">
-                                            {dbSearchQuery ? 'No databases match your search' : 'No databases available'}
-                                        </p>
-                                    )}
-                                </div>
+                                <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded-lg transition-colors">
+                                    <X className="w-5 h-5 text-muted-foreground" />
+                                </button>
                             </div>
 
-                            {/* Member Management */}
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Group Members</label>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">{selectedUsers.length} Selected</span>
+                            <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
+                                {/* Database Access */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Database Permissions</label>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-primary">{selectedDatabases.length} Selected</span>
+                                    </div>
+                                    <div className="relative mb-2">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <input
+                                            type="text"
+                                            value={dbSearchQuery}
+                                            onChange={(e) => setDbSearchQuery(e.target.value)}
+                                            placeholder="Search databases..."
+                                            className="w-full h-9 pl-10 pr-9 bg-foreground/5 border border-foreground/10 rounded-lg text-xs focus:outline-none focus:border-primary/50"
+                                        />
+                                        {dbSearchQuery && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setDbSearchQuery('')}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-foreground/10 rounded transition-colors"
+                                            >
+                                                <X className="w-3 h-3 text-muted-foreground" />
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="max-h-48 overflow-y-auto border border-foreground/10 rounded-xl p-2 bg-foreground/5 space-y-1">
+                                        {filteredDatabases.map(db => (
+                                            <label key={db.id} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${selectedDatabases.includes(db.id) ? 'bg-primary/10 border border-primary/20' : 'hover:bg-foreground/5 border border-transparent'}`}>
+                                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${selectedDatabases.includes(db.id) ? 'bg-primary border-primary' : 'border-foreground/30'}`}>
+                                                    {selectedDatabases.includes(db.id) && <Check className="w-3 h-3 text-primary-foreground" />}
+                                                </div>
+                                                <input
+                                                    type="checkbox"
+                                                    className="hidden"
+                                                    checked={selectedDatabases.includes(db.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) setSelectedDatabases([...selectedDatabases, db.id])
+                                                        else setSelectedDatabases(selectedDatabases.filter(id => id !== db.id))
+                                                    }}
+                                                />
+                                                <span className="text-sm font-bold">{db.name}</span>
+                                            </label>
+                                        ))}
+                                        {filteredDatabases.length === 0 && (
+                                            <p className="text-xs text-muted-foreground p-2 italic">
+                                                {dbSearchQuery ? 'No databases match your search' : 'No databases available'}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="relative mb-2">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                    <input
-                                        type="text"
-                                        value={userSearchQuery}
-                                        onChange={(e) => setUserSearchQuery(e.target.value)}
-                                        placeholder="Search users..."
-                                        className="w-full h-9 pl-10 pr-9 bg-foreground/5 border border-foreground/10 rounded-lg text-xs focus:outline-none focus:border-primary/50"
-                                    />
-                                    {userSearchQuery && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setUserSearchQuery('')}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-foreground/10 rounded transition-colors"
-                                        >
-                                            <X className="w-3 h-3 text-muted-foreground" />
-                                        </button>
-                                    )}
-                                </div>
-                                <div className="max-h-48 overflow-y-auto border border-foreground/10 rounded-xl p-2 bg-foreground/5 space-y-1">
-                                    {filteredUsers.map(user => (
-                                        <label key={user.id} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${selectedUsers.includes(user.id) ? 'bg-primary/10 border border-primary/20' : 'hover:bg-foreground/5 border border-transparent'}`}>
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${selectedUsers.includes(user.id) ? 'bg-primary border-primary' : 'border-foreground/30'}`}>
-                                                {selectedUsers.includes(user.id) && <Check className="w-3 h-3 text-primary-foreground" />}
-                                            </div>
-                                            <input
-                                                type="checkbox"
-                                                className="hidden"
-                                                checked={selectedUsers.includes(user.id)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) setSelectedUsers([...selectedUsers, user.id])
-                                                    else setSelectedUsers(selectedUsers.filter(id => id !== user.id))
-                                                }}
-                                            />
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-bold">{user.name || user.email}</span>
-                                                <span className="text-[10px] text-muted-foreground">{user.email}</span>
-                                            </div>
-                                        </label>
-                                    ))}
+
+                                {/* Member Management */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Group Members</label>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-primary">{selectedUsers.length} Selected</span>
+                                    </div>
+                                    <div className="relative mb-2">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <input
+                                            type="text"
+                                            value={userSearchQuery}
+                                            onChange={(e) => setUserSearchQuery(e.target.value)}
+                                            placeholder="Search users..."
+                                            className="w-full h-9 pl-10 pr-9 bg-foreground/5 border border-foreground/10 rounded-lg text-xs focus:outline-none focus:border-primary/50"
+                                        />
+                                        {userSearchQuery && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setUserSearchQuery('')}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-foreground/10 rounded transition-colors"
+                                            >
+                                                <X className="w-3 h-3 text-muted-foreground" />
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="max-h-48 overflow-y-auto border border-foreground/10 rounded-xl p-2 bg-foreground/5 space-y-1">
+                                        {filteredUsers.map(user => (
+                                            <label key={user.id} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${selectedUsers.includes(user.id) ? 'bg-primary/10 border border-primary/20' : 'hover:bg-foreground/5 border border-transparent'}`}>
+                                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${selectedUsers.includes(user.id) ? 'bg-primary border-primary' : 'border-foreground/30'}`}>
+                                                    {selectedUsers.includes(user.id) && <Check className="w-3 h-3 text-primary-foreground" />}
+                                                </div>
+                                                <input
+                                                    type="checkbox"
+                                                    className="hidden"
+                                                    checked={selectedUsers.includes(user.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) setSelectedUsers([...selectedUsers, user.id])
+                                                        else setSelectedUsers(selectedUsers.filter(id => id !== user.id))
+                                                    }}
+                                                />
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold">{user.name || user.email}</span>
+                                                    <span className="text-[10px] text-muted-foreground">{user.email}</span>
+                                                </div>
+                                            </label>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="p-6 border-t border-foreground/5 shrink-0">
-                            <button
-                                onClick={handleSave}
-                                disabled={isLoading}
-                                className="w-full h-12 bg-primary text-primary-foreground rounded-xl font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all shadow-lg shadow-primary/20"
-                            >
-                                {isLoading ? 'Saving Changes...' : 'Save Changes'}
-                            </button>
-                        </div>
-                    </motion.div>
-                </div>
-            )}
-        </AnimatePresence>
+                            <div className="p-6 border-t border-foreground/5 shrink-0">
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isLoading}
+                                    className="w-full h-12 bg-primary text-primary-foreground rounded-xl font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all shadow-lg shadow-primary/20"
+                                >
+                                    {isLoading ? 'Saving Changes...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        </Portal>
     )
 }
 

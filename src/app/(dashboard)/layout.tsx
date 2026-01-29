@@ -90,7 +90,7 @@ export default async function DashboardLayout({
           <CommandPaletteRegistry />
 
           {/* Main Floating Content Area */}
-          <main className="flex-1 lg:pl-56 p-4 lg:p-5 transition-all duration-300">
+          <main className="flex-1 lg:ml-56 p-4 lg:p-8 transition-all duration-300">
             <div className="h-full rounded-[2.5rem] bg-foreground/[0.02] dark:bg-black/40 border border-foreground/5 dark:border-white/5 backdrop-blur-2xl shadow-sm dark:shadow-2xl overflow-hidden relative">
               {/* Inner Glass Highlights - Dark Mode */}
               <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 dark:opacity-100" />

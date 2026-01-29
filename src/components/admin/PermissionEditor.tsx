@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Portal } from '../ui/Portal'
 interface User {
     id: string
     name: string | null
@@ -58,99 +59,101 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
     }
 
     return (
-        <AnimatePresence>
-            {isOpen && user && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-24">
-                    {/* Backdrop */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
-                    />
+        <Portal>
+            <AnimatePresence>
+                {isOpen && user && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-24">
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={onClose}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                        />
 
-                    {/* Modal */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="relative w-full max-w-md z-10"
-                        style={{ zoom: 0.9 }}
-                    >
-                        <div className="bg-card border border-foreground/10 rounded-3xl overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.5)] flex flex-col max-h-[85vh]">
-                            {/* Header */}
-                            <div className="px-6 py-5 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02] shrink-0">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-xl bg-primary/10 border border-primary/20 text-primary">
-                                        <Icons.Shield className="w-5 h-5" />
+                        {/* Modal */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-md z-10"
+                            style={{ zoom: 0.9 }}
+                        >
+                            <div className="bg-card border border-foreground/10 rounded-3xl overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.5)] flex flex-col max-h-[85vh]">
+                                {/* Header */}
+                                <div className="px-6 py-5 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02] shrink-0">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-xl bg-primary/10 border border-primary/20 text-primary">
+                                            <Icons.Shield className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-black text-foreground">Permissions</h3>
+                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Editing for {user.name}</p>
+                                        </div>
                                     </div>
+                                    <button
+                                        onClick={onClose}
+                                        className="p-2 rounded-xl hover:bg-foreground/5 text-muted-foreground transition-colors"
+                                    >
+                                        <Icons.Close className="w-5 h-5" />
+                                    </button>
+                                </div>
+
+                                {/* Body */}
+                                <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
                                     <div>
-                                        <h3 className="text-lg font-black text-foreground">Permissions</h3>
-                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Editing for {user.name}</p>
+                                        <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4">Database Access Grants</h4>
+                                        <div className="space-y-2">
+                                            {databases.map((db) => (
+                                                <button
+                                                    key={db}
+                                                    onClick={() => toggleAccess(db)}
+                                                    className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${selectedAccess.includes(db)
+                                                        ? 'bg-primary/10 border-primary/30 text-foreground'
+                                                        : 'bg-foreground/[0.03] border-foreground/5 text-muted-foreground hover:border-foreground/20'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <Icons.Database className={`w-4 h-4 transition-colors ${selectedAccess.includes(db) ? 'text-primary' : 'opacity-50'}`} />
+                                                        <span className="text-sm font-bold">{db}</span>
+                                                    </div>
+                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${selectedAccess.includes(db)
+                                                        ? 'bg-primary border-primary'
+                                                        : 'border-foreground/10'
+                                                        }`}>
+                                                        {selectedAccess.includes(db) && <Icons.Save className="w-3 h-3 text-primary-foreground" />}
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={onClose}
-                                    className="p-2 rounded-xl hover:bg-foreground/5 text-muted-foreground transition-colors"
-                                >
-                                    <Icons.Close className="w-5 h-5" />
-                                </button>
-                            </div>
 
-                            {/* Body */}
-                            <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
-                                <div>
-                                    <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4">Database Access Grants</h4>
-                                    <div className="space-y-2">
-                                        {databases.map((db) => (
-                                            <button
-                                                key={db}
-                                                onClick={() => toggleAccess(db)}
-                                                className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${selectedAccess.includes(db)
-                                                    ? 'bg-primary/10 border-primary/30 text-foreground'
-                                                    : 'bg-foreground/[0.03] border-foreground/5 text-muted-foreground hover:border-foreground/20'
-                                                    }`}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Icons.Database className={`w-4 h-4 transition-colors ${selectedAccess.includes(db) ? 'text-primary' : 'opacity-50'}`} />
-                                                    <span className="text-sm font-bold">{db}</span>
-                                                </div>
-                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${selectedAccess.includes(db)
-                                                    ? 'bg-primary border-primary'
-                                                    : 'border-foreground/10'
-                                                    }`}>
-                                                    {selectedAccess.includes(db) && <Icons.Save className="w-3 h-3 text-primary-foreground" />}
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
+                                {/* Footer */}
+                                <div className="px-6 py-5 border-t border-foreground/5 bg-foreground/[0.02] flex items-center gap-3 shrink-0">
+                                    <button
+                                        onClick={onClose}
+                                        className="flex-1 py-3 px-4 rounded-2xl bg-foreground/5 border border-foreground/10 text-sm font-black uppercase tracking-widest text-muted-foreground hover:bg-foreground/10 transition-all font-sans"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            onSave?.(user.id, selectedAccess)
+                                            onClose()
+                                        }}
+                                        className="flex-[2] py-3 px-4 rounded-2xl bg-primary text-primary-foreground text-sm font-black uppercase tracking-widest shadow-[0_8px_32px_rgba(var(--primary),0.3)] hover:shadow-[0_12px_48px_rgba(var(--primary),0.5)] transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <Icons.Save className="w-4 h-4" />
+                                        Apply Changes
+                                    </button>
                                 </div>
                             </div>
-
-                            {/* Footer */}
-                            <div className="px-6 py-5 border-t border-foreground/5 bg-foreground/[0.02] flex items-center gap-3 shrink-0">
-                                <button
-                                    onClick={onClose}
-                                    className="flex-1 py-3 px-4 rounded-2xl bg-foreground/5 border border-foreground/10 text-sm font-black uppercase tracking-widest text-muted-foreground hover:bg-foreground/10 transition-all font-sans"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        onSave?.(user.id, selectedAccess)
-                                        onClose()
-                                    }}
-                                    className="flex-[2] py-3 px-4 rounded-2xl bg-primary text-primary-foreground text-sm font-black uppercase tracking-widest shadow-[0_8px_32px_rgba(var(--primary),0.3)] hover:shadow-[0_12px_48px_rgba(var(--primary),0.5)] transition-all flex items-center justify-center gap-2"
-                                >
-                                    <Icons.Save className="w-4 h-4" />
-                                    Apply Changes
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
-                </div>
-            )}
-        </AnimatePresence>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        </Portal>
     )
 }
