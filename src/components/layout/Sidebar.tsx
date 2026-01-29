@@ -25,17 +25,34 @@ import { signOut } from 'next-auth/react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { DatabaseSelector, DatabaseOption } from '@/components/dashboard/DatabaseSelector'
+import { getUserDatabases } from '@/lib/actions/databaseActions'
+import { useDatabase } from '@/contexts/DatabaseContext'
 
 export function Sidebar() {
     const pathname = usePathname()
     const { user, isAdmin } = useAuth()
     const { theme, setTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
-    const [selectedDbId, setSelectedDbId] = useState('db-prod')
+    const { selectedDbId, setSelectedDbId, databases, setDatabases } = useDatabase()
 
     useEffect(() => {
         setMounted(true)
-    }, [])
+        const fetchDbs = async () => {
+            const result = await getUserDatabases()
+            if (result.success && result.databases) {
+                const formattedDbs: DatabaseOption[] = result.databases.map((db: any) => ({
+                    id: db.id,
+                    name: db.name,
+                    type: (db.type?.toLowerCase() as any) || 'postgres',
+                    region: db.environment || 'us-east-1',
+                    status: db.isLocked ? 'locked' : 'online',
+                    permission: db.isLocked ? 'no_access' : (isAdmin ? 'admin' : 'read_write')
+                }))
+                setDatabases(formattedDbs)
+            }
+        }
+        fetchDbs()
+    }, [isAdmin, user, setDatabases])
 
     const links = [
         { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -56,11 +73,7 @@ export function Sidebar() {
         { href: '/settings', label: 'Settings', icon: Settings },
     )
 
-    const databases: DatabaseOption[] = [
-        { id: 'db-prod', name: 'Production DB', type: 'postgres', region: 'us-east-1', status: 'online', permission: 'admin' },
-        { id: 'db-stage', name: 'Staging Cluster', type: 'mongo', region: 'eu-west-1', status: 'online', permission: 'read_write' },
-        { id: 'db-archive', name: 'Cold Archive', type: 'mysql', region: 'ap-south-1', status: 'locked', permission: 'no_access' },
-    ]
+    // Mock databases removed
 
     const toggleTheme = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark')

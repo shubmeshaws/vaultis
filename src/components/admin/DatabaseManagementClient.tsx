@@ -18,11 +18,13 @@ import {
     ArrowLeft,
     Server,
     Globe,
-    Cpu
+    Cpu,
+    Lock,
+    Unlock
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Portal } from '@/components/ui/Portal'
-import { createDatabase, updateDatabase, deleteDatabase, testConnection } from '@/lib/actions/databaseActions'
+import { createDatabase, updateDatabase, deleteDatabase, testConnection, toggleDatabaseLock } from '@/lib/actions/databaseActions'
 import { useScrollLock } from '@/hooks/use-scroll-lock'
 import { useToast } from '@/contexts/ToastContext'
 
@@ -36,6 +38,7 @@ interface Database {
     environment: string | null
     username: string | null
     password: string | null
+    isLocked: boolean
     createdAt: Date
     updatedAt: Date
     _count?: {
@@ -88,6 +91,17 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
         toast({ title: 'Database deleted successfully', type: 'success' })
     }
 
+    const handleToggleLock = async (db: Database) => {
+        const newLockState = !db.isLocked
+        const result = await toggleDatabaseLock(db.id, newLockState)
+        if (result.success) {
+            setDatabases(databases.map(d => d.id === db.id ? { ...d, isLocked: newLockState } : d))
+            toast({ title: `Database ${newLockState ? 'locked' : 'unlocked'} successfully`, type: 'success' })
+        } else {
+            toast({ title: 'Failed to update lock status', description: result.error, type: 'error' })
+        }
+    }
+
     return (
         <div className="space-y-8">
             {/* Action Bar */}
@@ -118,7 +132,14 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                         key={db.id}
                         className="bg-card/50 backdrop-blur-xl border-foreground/10 hover:border-foreground/20 transition-all shadow-sm group relative overflow-hidden"
                     >
-                        <div className="absolute top-4 right-4 flex items-center gap-1">
+                        <div className="absolute top-4 right-4 flex items-center gap-1 z-20">
+                            <button
+                                onClick={() => handleToggleLock(db)}
+                                className={`p-2 rounded-lg transition-colors ${db.isLocked ? 'text-red-500 hover:bg-red-500/10' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}
+                                title={db.isLocked ? "Unlock Database" : "Lock Database"}
+                            >
+                                {db.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                            </button>
                             <button
                                 onClick={() => {
                                     setSelectedDatabase(db)
@@ -157,6 +178,15 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                             </div>
                         </CardHeader>
 
+                        {db.isLocked && (
+                            <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
+                                <div className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full flex items-center gap-2">
+                                    <Lock className="w-4 h-4 text-red-500" />
+                                    <span className="text-xs font-black uppercase tracking-widest text-red-500">Access Locked</span>
+                                </div>
+                            </div>
+                        )}
+
                         <CardContent className="space-y-6">
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -187,27 +217,29 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                     </Card>
                 ))}
 
-                {filteredDatabases.length === 0 && (
-                    <div className="col-span-full py-24 flex flex-col items-center justify-center text-center space-y-4 bg-foreground/[0.02] border border-dashed border-foreground/10 rounded-3xl">
-                        <div className="p-4 rounded-full bg-foreground/5">
-                            <DatabaseIcon className="w-12 h-12 text-muted-foreground/20" />
+                {
+                    filteredDatabases.length === 0 && (
+                        <div className="col-span-full py-24 flex flex-col items-center justify-center text-center space-y-4 bg-foreground/[0.02] border border-dashed border-foreground/10 rounded-3xl">
+                            <div className="p-4 rounded-full bg-foreground/5">
+                                <DatabaseIcon className="w-12 h-12 text-muted-foreground/20" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-black text-foreground">No databases found</h3>
+                                <p className="text-sm text-muted-foreground">Try adjusting your search or add a new connection</p>
+                            </div>
+                            <button
+                                onClick={() => setIsAddModalOpen(true)}
+                                className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                            >
+                                Provision New Database
+                            </button>
                         </div>
-                        <div>
-                            <h3 className="text-xl font-black text-foreground">No databases found</h3>
-                            <p className="text-sm text-muted-foreground">Try adjusting your search or add a new connection</p>
-                        </div>
-                        <button
-                            onClick={() => setIsAddModalOpen(true)}
-                            className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20"
-                        >
-                            Provision New Database
-                        </button>
-                    </div>
-                )}
-            </div>
+                    )
+                }
+            </div >
 
             {/* Modals */}
-            <AddDatabaseModal
+            < AddDatabaseModal
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
                 onSuccess={handleAddSuccess}
@@ -229,7 +261,7 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                     />
                 </>
             )}
-        </div>
+        </div >
     )
 }
 
@@ -245,6 +277,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
         port: '',
         username: '',
         password: '',
+        databaseName: '',
     })
     const [isLoading, setIsLoading] = useState(false)
     const [isTesting, setIsTesting] = useState(false)
@@ -462,6 +495,16 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                                         className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
                                                     />
                                                 </div>
+                                                <div className="space-y-2 col-span-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.databaseName}
+                                                        onChange={(e) => setFormData({ ...formData, databaseName: e.target.value })}
+                                                        placeholder={selectedType === 'PostgreSQL' ? 'postgres' : 'main_db'}
+                                                        className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                    />
+                                                </div>
                                                 <div className="col-span-2 pt-2">
                                                     <button
                                                         type="button"
@@ -522,6 +565,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
         port: database.port?.toString() || '',
         username: database.username || '',
         password: database.password || '',
+        databaseName: database.databaseName || '',
         type: database.type || 'PostgreSQL'
     })
     const [isLoading, setIsLoading] = useState(false)
@@ -633,6 +677,16 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                                 type="password"
                                                 value={formData.password}
                                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                            />
+                                        </div>
+                                        <div className="space-y-2 col-span-2">
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
+                                            <input
+                                                type="text"
+                                                value={formData.databaseName}
+                                                onChange={(e) => setFormData({ ...formData, databaseName: e.target.value })}
+                                                placeholder="e.g. postgres"
                                                 className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
                                             />
                                         </div>

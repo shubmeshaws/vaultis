@@ -8,13 +8,66 @@ import { DownloadHistoryPanel } from '@/components/dashboard/DownloadHistoryPane
 import { SavedQueriesPanel } from '@/components/dashboard/SavedQueriesPanel'
 import { Sparkles } from 'lucide-react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { useDatabase } from '@/contexts/DatabaseContext'
+import { executeQuery } from '@/lib/actions/queryActions'
+import { useToast } from '@/contexts/ToastContext'
 
 type TabType = 'editor' | 'saved' | 'history'
 
 export function QueriesPageClient() {
+    const { toast } = useToast()
+    const { selectedDb } = useDatabase()
     const searchParams = useSearchParams()
     const router = useRouter()
     const activeTab = (searchParams.get('tab') as TabType) || 'editor'
+
+    const [queryResults, setQueryResults] = useState<{
+        data: any[]
+        columns: { key: string, label: string }[]
+        totalRows: number
+        executionTime: string
+        status: 'idle' | 'loading' | 'success' | 'error'
+        message: string
+    }>({
+        data: [],
+        columns: [],
+        totalRows: 0,
+        executionTime: '0ms',
+        status: 'idle',
+        message: ''
+    })
+
+    const handleRunQuery = async (query: string) => {
+        if (!selectedDb) {
+            toast({ title: 'No database selected', type: 'error' })
+            return
+        }
+
+        setQueryResults(prev => ({ ...prev, status: 'loading' }))
+        const startTime = performance.now()
+
+        const result = await executeQuery(selectedDb.id, query)
+        const endTime = performance.now()
+        const executionTime = `${Math.round(endTime - startTime)}ms`
+
+        if (result.success) {
+            setQueryResults({
+                data: result.data || [],
+                columns: result.columns || [],
+                totalRows: result.totalRows || 0,
+                executionTime,
+                status: 'success',
+                message: 'Query executed successfully.'
+            })
+        } else {
+            setQueryResults(prev => ({
+                ...prev,
+                status: 'error',
+                message: result.error || 'Failed to execute query'
+            }))
+            toast({ title: 'Query failed', description: result.error, type: 'error' })
+        }
+    }
 
     const setActiveTab = (tab: TabType) => {
         const params = new URLSearchParams(searchParams.toString())
@@ -72,26 +125,16 @@ export function QueriesPageClient() {
                 <div className="grid lg:grid-cols-4 gap-6">
                     {/* Main Workspace */}
                     <div className="lg:col-span-3 space-y-6 order-2 lg:order-1">
-                        <QueryEditor />
+                        <QueryEditor onRun={handleRunQuery} />
 
                         {/* Results Area */}
                         <QueryResultsTable
-                            columns={[
-                                { key: 'id', label: 'ID', width: 100 },
-                                { key: 'name', label: 'User', width: 200 },
-                                { key: 'email', label: 'Email', width: 250 },
-                                { key: 'role', label: 'Role', width: 120 },
-                                { key: 'status', label: 'Status', width: 120 },
+                            columns={queryResults.columns.length > 0 ? queryResults.columns : [
+                                { key: 'empty', label: 'No Results', width: 200 }
                             ]}
-                            data={Array.from({ length: 25 }, (_, i) => ({
-                                id: `#829${i + 1}`,
-                                name: 'Alex Johnson',
-                                email: 'alex@example.com',
-                                role: 'Admin',
-                                status: 'Active'
-                            }))}
-                            totalRows={25}
-                            executionTime="142ms"
+                            data={queryResults.data}
+                            totalRows={queryResults.totalRows}
+                            executionTime={queryResults.executionTime}
                         />
                     </div>
 
@@ -99,11 +142,11 @@ export function QueriesPageClient() {
                     <div className="lg:col-span-1 space-y-6 order-1 lg:order-2">
                         {/* Status Panel */}
                         <QueryStatusPanel stats={{
-                            status: 'success',
-                            executionTime: '142ms',
-                            rowsAffected: 12,
-                            dataSize: '2.4 KB',
-                            message: 'Query executed successfully.'
+                            status: queryResults.status === 'idle' ? 'success' : queryResults.status as any,
+                            executionTime: queryResults.executionTime,
+                            rowsAffected: queryResults.totalRows,
+                            dataSize: 'N/A',
+                            message: queryResults.message || 'Ready to execute query.'
                         }} />
 
                         {/* Download History - Now always visible or accessible above results on mobile/tablet */}

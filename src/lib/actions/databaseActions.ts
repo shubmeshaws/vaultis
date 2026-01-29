@@ -3,6 +3,9 @@
 import { prisma } from '@/lib/db/prisma'
 import { revalidatePath } from 'next/cache'
 
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth/config'
+
 export async function getDatabases() {
     try {
         const databases = await prisma.database.findMany({
@@ -20,6 +23,38 @@ export async function getDatabases() {
     }
 }
 
+export async function getUserDatabases() {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.email) return { success: false, error: 'Unauthorized' }
+
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+            include: { groups: { include: { databases: true } } }
+        })
+
+        if (!user) return { success: false, error: 'User not found' }
+
+        let databases
+
+        if (user.role === 'ADMIN') {
+            databases = await prisma.database.findMany({
+                orderBy: { name: 'asc' }
+            })
+        } else {
+            // Flatten databases from all groups
+            const groupDbs = user.groups.flatMap(g => g.databases)
+            // Remove duplicates
+            databases = Array.from(new Map(groupDbs.map(db => [db.id, db])).values())
+        }
+
+        return { success: true, databases }
+    } catch (error: any) {
+        console.error('Error fetching user databases:', error)
+        return { success: false, error: 'Failed to fetch user databases' }
+    }
+}
+
 export async function createDatabase(data: {
     name: string
     description?: string
@@ -29,6 +64,7 @@ export async function createDatabase(data: {
     environment?: string
     username?: string
     password?: string
+    databaseName?: string
 }) {
     try {
         const database = await prisma.database.create({
@@ -41,6 +77,7 @@ export async function createDatabase(data: {
                 environment: data.environment,
                 username: data.username,
                 password: data.password,
+                databaseName: data.databaseName,
             },
         })
 
@@ -61,6 +98,8 @@ export async function updateDatabase(id: string, data: {
     environment?: string
     username?: string
     password?: string
+    isLocked?: boolean
+    databaseName?: string
 }) {
     try {
         const database = await prisma.database.update({
@@ -74,10 +113,13 @@ export async function updateDatabase(id: string, data: {
                 environment: data.environment,
                 username: data.username,
                 password: data.password,
+                isLocked: data.isLocked,
+                databaseName: data.databaseName,
             },
         })
 
         revalidatePath('/admin/databases')
+        revalidatePath('/dashboard') // Revalidate sidebar
         return { success: true, database }
     } catch (error: any) {
         console.error('Error updating database:', error)
@@ -96,6 +138,7 @@ export async function testConnection(data: {
     type: string
     username?: string
     password?: string
+    databaseName?: string
 }) {
     if (!data.host) return { success: false, error: 'Hostname is required' }
 
@@ -107,7 +150,7 @@ export async function testConnection(data: {
                     port: data.port || 5432,
                     user: data.username,
                     password: data.password,
-                    database: 'postgres', // default db to test connection
+                    database: data.databaseName || 'postgres',
                     connectionTimeoutMillis: 5000,
                 })
                 await client.connect()
@@ -169,5 +212,21 @@ export async function deleteDatabase(id: string) {
     } catch (error: any) {
         console.error('Error deleting database:', error)
         return { success: false, error: 'Failed to delete database' }
+    }
+}
+
+export async function toggleDatabaseLock(id: string, isLocked: boolean) {
+    try {
+        const database = await prisma.database.update({
+            where: { id },
+            data: { isLocked },
+        })
+
+        revalidatePath('/admin/databases')
+        revalidatePath('/dashboard') // Revalidate sidebar
+        return { success: true, database }
+    } catch (error: any) {
+        console.error('Error toggling database lock:', error)
+        return { success: false, error: 'Failed to update lock status' }
     }
 }

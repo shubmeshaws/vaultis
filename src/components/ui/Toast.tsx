@@ -32,10 +32,10 @@ const toastConfig = {
     },
     error: {
         icon: AlertCircle,
-        color: 'text-rose-400',
-        bg: 'bg-rose-500/5',
-        border: 'border-rose-500/20',
-        glow: 'shadow-[0_0_20px_rgba(244,63,94,0.1)]',
+        color: 'text-red-500',
+        bg: 'bg-red-500/20',
+        border: 'border-red-500/50',
+        glow: 'shadow-[0_0_30px_rgba(239,68,68,0.3)]',
         label: 'Error'
     },
     warning: {

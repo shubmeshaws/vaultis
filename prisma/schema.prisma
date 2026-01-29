@@ -84,6 +84,8 @@ model Database {
   environment String?
   username    String?
   password    String?
+  databaseName String?
+  isLocked    Boolean  @default(false)
   groups      Group[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

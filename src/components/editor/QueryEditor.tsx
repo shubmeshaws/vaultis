@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react'
 import Editor from 'react-simple-code-editor'
 import { highlight, languages } from 'prismjs'
 import 'prismjs/components/prism-sql'
-import { Play, AlertTriangle, Command, Save, Share2 } from 'lucide-react'
+import { Play, AlertTriangle, Command, Save, Share2, Database } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useDatabase } from '@/contexts/DatabaseContext'
 
 interface QueryEditorProps {
     initialValue?: string
@@ -14,6 +15,7 @@ interface QueryEditorProps {
 }
 
 export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
+    const { selectedDb } = useDatabase()
     const [code, setCode] = useState(initialValue || 'SELECT * FROM users LIMIT 10;')
     const [isDestructive, setIsDestructive] = useState(false)
     const [isRunning, setIsRunning] = useState(false)
@@ -67,7 +69,17 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
                             <div className="w-2 h-2 rounded-full bg-amber-500/40 border border-amber-500/60" />
                             <div className="w-2 h-2 rounded-full bg-emerald-500/40 border border-emerald-500/60" />
                         </div>
-                        <span className="text-[9px] font-mono text-foreground/40 dark:text-white/30 ml-2 uppercase tracking-widest font-black">SQL Editor</span>
+                        <div className="h-3 w-px bg-foreground/10 dark:bg-white/10 mx-2" />
+                        <span className="text-[9px] font-mono text-foreground/40 dark:text-white/30 uppercase tracking-widest font-black">SQL Editor</span>
+                        {selectedDb && (
+                            <>
+                                <div className="h-1 w-1 rounded-full bg-foreground/20 dark:bg-white/20 mx-1" />
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+                                    <Database className="w-2.5 h-2.5 text-indigo-500" />
+                                    <span className="text-[9px] font-bold text-indigo-500/80 tracking-tight">{selectedDb.name}</span>
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Quick Access Toolbar */}

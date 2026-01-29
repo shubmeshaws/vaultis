@@ -39,6 +39,15 @@ export function DatabaseSelector({ databases, selectedId, onSelect }: DatabaseSe
 
     const selectedDb = databases.find(d => d.id === selectedId) || databases[0]
 
+    if (!selectedDb) {
+        return (
+            <div className="w-full h-11 px-4 bg-foreground/[0.04] dark:bg-white/5 border border-foreground/10 dark:border-white/5 rounded-xl flex items-center gap-3 text-xs text-muted-foreground italic">
+                <Database className="w-4 h-4 opacity-50" />
+                <span>No databases found</span>
+            </div>
+        )
+    }
+
     const getStatusColor = (status: DbStatus) => {
         switch (status) {
             case 'online': return 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
