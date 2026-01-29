@@ -1,7 +1,15 @@
 'use client'
 
 import React from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
+import {
+    CheckCircle2,
+    AlertCircle,
+    AlertTriangle,
+    Info,
+    X
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
 
@@ -13,100 +21,102 @@ export interface ToastProps {
     onDismiss: (id: string) => void
 }
 
-const Icons = {
-    Success: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-    ),
-    Error: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-    ),
-    Warning: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-    ),
-    Info: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-    ),
-    X: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    ),
+const toastConfig = {
+    success: {
+        icon: CheckCircle2,
+        color: 'text-emerald-400',
+        bg: 'bg-emerald-500/5',
+        border: 'border-emerald-500/20',
+        glow: 'shadow-[0_0_20px_rgba(16,185,129,0.1)]',
+        label: 'Success'
+    },
+    error: {
+        icon: AlertCircle,
+        color: 'text-rose-400',
+        bg: 'bg-rose-500/5',
+        border: 'border-rose-500/20',
+        glow: 'shadow-[0_0_20px_rgba(244,63,94,0.1)]',
+        label: 'Error'
+    },
+    warning: {
+        icon: AlertTriangle,
+        color: 'text-amber-400',
+        bg: 'bg-amber-500/5',
+        border: 'border-amber-500/20',
+        glow: 'shadow-[0_0_20px_rgba(245,158,11,0.1)]',
+        label: 'Warning'
+    },
+    info: {
+        icon: Info,
+        color: 'text-indigo-400',
+        bg: 'bg-indigo-500/5',
+        border: 'border-indigo-500/20',
+        glow: 'shadow-[0_0_20px_rgba(99,102,241,0.1)]',
+        label: 'Info'
+    }
 }
 
 export function Toast({ id, type, title, description, onDismiss }: ToastProps) {
-    const getStyles = (type: ToastType) => {
-        switch (type) {
-            case 'success':
-                return {
-                    bg: 'bg-emerald-500/10',
-                    border: 'border-emerald-500/20',
-                    iconBg: 'bg-emerald-500/20',
-                    iconColor: 'text-emerald-500',
-                    shadow: 'shadow-[0_8px_30px_rgba(16,185,129,0.1)]'
-                }
-            case 'error':
-                return {
-                    bg: 'bg-red-500/10',
-                    border: 'border-red-500/20',
-                    iconBg: 'bg-red-500/20',
-                    iconColor: 'text-red-500',
-                    shadow: 'shadow-[0_8px_30px_rgba(239,68,68,0.1)]'
-                }
-            case 'warning':
-                return {
-                    bg: 'bg-amber-500/10',
-                    border: 'border-amber-500/20',
-                    iconBg: 'bg-amber-500/20',
-                    iconColor: 'text-amber-500',
-                    shadow: 'shadow-[0_8px_30px_rgba(245,158,11,0.1)]'
-                }
-            case 'info':
-                return {
-                    bg: 'bg-blue-500/10',
-                    border: 'border-blue-500/20',
-                    iconBg: 'bg-blue-500/20',
-                    iconColor: 'text-blue-500',
-                    shadow: 'shadow-[0_8px_30px_rgba(59,130,246,0.1)]'
-                }
-        }
-    }
-
-    const styles = getStyles(type)
-    const Icon = Icons[type === 'success' ? 'Success' : type === 'error' ? 'Error' : type === 'warning' ? 'Warning' : 'Info']
+    const config = toastConfig[type]
+    const Icon = config.icon
 
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
-            className={`relative w-96 p-4 rounded-xl border bg-[#0F1115]/95 backdrop-blur-xl flex items-start gap-4 shadow-2xl ${styles.border}`}
+            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+            className={cn(
+                "relative w-80 lg:w-96 overflow-hidden rounded-2xl border backdrop-blur-2xl px-5 py-4 flex items-start gap-4 transition-colors",
+                "bg-[#05050A]/60 ring-1 ring-white/5 shadow-2xl",
+                config.border,
+                config.glow
+            )}
         >
-            <div className={`p-2 rounded-lg shrink-0 ${styles.iconBg} ${styles.iconColor}`}>
+            {/* Subtle Gradient Background */}
+            <div className={cn(
+                "absolute inset-0 opacity-[0.03] pointer-events-none transition-opacity",
+                config.bg
+            )} />
+
+            {/* Icon Section */}
+            <div className={cn(
+                "p-2 rounded-xl flex items-center justify-center transition-all",
+                "bg-white/5 border border-white/5",
+                config.color
+            )}>
                 <Icon className="w-5 h-5" />
             </div>
-            <div className="flex-1 pt-1">
-                <h4 className={`text-sm font-black tracking-tight ${styles.iconColor} uppercase`}>{title}</h4>
+
+            {/* Content Section */}
+            <div className="flex-1 min-w-0 py-0.5">
+                <div className="flex items-center gap-2 mb-0.5">
+                    <span className={cn("text-[10px] font-black uppercase tracking-[0.2em]", config.color)}>
+                        {config.label}
+                    </span>
+                    <div className="h-px flex-1 bg-white/5" />
+                </div>
+                <h4 className="text-sm font-bold text-white tracking-tight leading-tight">
+                    {title}
+                </h4>
                 {description && (
-                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed font-medium">
+                    <p className="mt-1.5 text-xs text-white/40 leading-relaxed font-medium">
                         {description}
                     </p>
                 )}
             </div>
+
+            {/* Close Button */}
             <button
                 onClick={() => onDismiss(id)}
-                className="p-1 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-white/10 transition-colors"
+                className="group relative p-1.5 rounded-lg text-white/20 hover:text-white hover:bg-white/5 transition-all"
             >
-                <Icons.X className="w-4 h-4" />
+                <X className="w-4 h-4" />
             </button>
+
+            {/* Inner Glow Border - Highlight */}
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
         </motion.div>
     )
 }

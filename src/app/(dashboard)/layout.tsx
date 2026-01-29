@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth/middleware'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { CommandPaletteRegistry } from '@/components/layout/CommandPaletteRegistry'
 
 export default async function DashboardLayout({
   children,
@@ -31,6 +32,9 @@ export default async function DashboardLayout({
       {/* Shell Structure */}
       <div className="relative z-10 flex min-h-screen">
         <Sidebar />
+
+        {/* Command Palette */}
+        <CommandPaletteRegistry />
 
         {/* Main Floating Content Area */}
         <main className="flex-1 lg:pl-72 p-4 lg:p-6 transition-all duration-300">

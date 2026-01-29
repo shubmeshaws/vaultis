@@ -1,50 +1,33 @@
 'use client'
 
-import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+    Search,
+    Database,
+    Play,
+    Users,
+    Shield,
+    Activity,
+    FileText,
+    Settings,
+    LayoutDashboard,
+    ChevronRight,
+    Command,
+    Terminal,
+    Sparkles
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface CommandAction {
     id: string
-    title: string
-    description: string
-    category: 'Navigation' | 'Databases' | 'Tools' | 'Forensics'
-    icon: React.ReactNode
-    shortcut?: string
-    onSelect: () => void
-}
-
-const Icons = {
-    Search: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-    ),
-    Terminal: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-    ),
-    Database: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
-        </svg>
-    ),
-    Layout: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-        </svg>
-    ),
-    Shield: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-    ),
-    History: ({ className }: { className?: string }) => (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-    ),
+    label: string
+    description?: string
+    icon: React.ComponentType<{ className?: string }>
+    category: 'navigation' | 'database' | 'query' | 'admin'
+    action: () => void
+    keywords?: string[]
 }
 
 interface CommandPaletteProps {
@@ -53,223 +36,325 @@ interface CommandPaletteProps {
 }
 
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
-    const [query, setQuery] = useState('')
-    const [selectedIndex, setSelectedIndex] = useState(0)
-    const listRef = useRef<HTMLDivElement>(null)
     const router = useRouter()
+    const [searchQuery, setSearchQuery] = useState('')
+    const [selectedIndex, setSelectedIndex] = useState(0)
+    const inputRef = useRef<HTMLInputElement>(null)
 
-    const actions: CommandAction[] = useMemo(() => [
-        {
-            id: 'nav-overview',
-            title: 'Overview Dashboard',
-            description: 'Navigate to platform telemetry and metrics.',
-            category: 'Navigation',
-            icon: <Icons.Layout className="w-4 h-4" />,
-            onSelect: () => router.push('/dashboard')
-        },
-        {
-            id: 'nav-queries',
-            title: 'SQL Analytics',
-            description: 'Execute and manage database queries.',
-            category: 'Navigation',
-            icon: <Icons.Terminal className="w-4 h-4" />,
-            onSelect: () => router.push('/queries')
-        },
-        {
-            id: 'admin-users',
-            title: 'Identity Management',
-            description: 'Admin: Manage users and platform access.',
-            category: 'Navigation',
-            icon: <Icons.Shield className="w-4 h-4" />,
-            onSelect: () => router.push('/admin/users')
-        },
-        {
-            id: 'admin-db',
-            title: 'Infrastructure Registry',
-            description: 'Admin: Manage clusters and node health.',
-            category: 'Navigation',
-            icon: <Icons.Database className="w-4 h-4" />,
-            onSelect: () => router.push('/admin/databases')
-        },
-        {
-            id: 'admin-audit',
-            title: 'Forensic Audit Log',
-            description: 'Admin: Trace platform activity and session history.',
-            category: 'Forensics',
-            icon: <Icons.History className="w-4 h-4" />,
-            onSelect: () => router.push('/admin/audit')
-        },
-        {
-            id: 'tool-new-query',
-            title: 'Create Forensic Workspace',
-            description: 'Initialize a new investigation query.',
-            category: 'Tools',
-            icon: <Icons.Terminal className="w-4 h-4" />,
-            shortcut: 'N',
-            onSelect: () => router.push('/queries/new')
-        }
-    ], [router])
-
-    const filteredActions = useMemo(() => {
-        if (!query) return actions
-        return actions.filter(action =>
-            action.title.toLowerCase().includes(query.toLowerCase()) ||
-            action.description.toLowerCase().includes(query.toLowerCase()) ||
-            action.category.toLowerCase().includes(query.toLowerCase())
-        )
-    }, [query, actions])
-
+    // Reset state when opening/closing
     useEffect(() => {
-        setSelectedIndex(0)
-    }, [query])
-
-    useEffect(() => {
-        if (!isOpen) {
-            setQuery('')
+        if (isOpen) {
+            setSearchQuery('')
             setSelectedIndex(0)
+            setTimeout(() => inputRef.current?.focus(), 50)
         }
     }, [isOpen])
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'ArrowDown') {
-            e.preventDefault()
-            setSelectedIndex(i => Math.min(i + 1, filteredActions.length - 1))
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault()
-            setSelectedIndex(i => Math.max(i - 1, 0))
-        } else if (e.key === 'Enter') {
-            e.preventDefault()
-            if (filteredActions[selectedIndex]) {
-                filteredActions[selectedIndex].onSelect()
+    // Define all available commands
+    const commands: CommandAction[] = [
+        // Navigation
+        {
+            id: 'nav-dashboard',
+            label: 'Go to Dashboard',
+            description: 'View system overview and metrics',
+            icon: LayoutDashboard,
+            category: 'navigation',
+            action: () => router.push('/dashboard'),
+            keywords: ['home', 'overview']
+        },
+        {
+            id: 'nav-queries',
+            label: 'Go to Query Explorer',
+            description: 'Write and execute SQL queries',
+            icon: Terminal,
+            category: 'navigation',
+            action: () => router.push('/queries'),
+            keywords: ['sql', 'editor', 'write', 'terminal']
+        },
+        {
+            id: 'nav-admin',
+            label: 'Go to Command Center',
+            description: 'Full system administration',
+            icon: Shield,
+            category: 'navigation',
+            action: () => router.push('/admin'),
+            keywords: ['settings', 'control', 'admin']
+        },
+        {
+            id: 'nav-users',
+            label: 'Manage Users',
+            description: 'User accounts, roles and permissions',
+            icon: Users,
+            category: 'admin',
+            action: () => router.push('/admin/users'),
+            keywords: ['accounts', 'permissions', 'roles']
+        },
+        {
+            id: 'nav-databases',
+            label: 'Manage Databases',
+            description: 'Database connections and health status',
+            icon: Database,
+            category: 'admin',
+            action: () => router.push('/admin/databases'),
+            keywords: ['connections', 'instances']
+        },
+        {
+            id: 'nav-audit',
+            label: 'View Audit Logs',
+            description: 'Forensic query history and access logs',
+            icon: Activity,
+            category: 'admin',
+            action: () => router.push('/admin/audit-logs'),
+            keywords: ['logs', 'history', 'forensic']
+        },
+        // Database Actions
+        {
+            id: 'db-production',
+            label: 'Switch to Production DB',
+            description: 'PostgreSQL 15.2 • Region: us-east-1',
+            icon: Database,
+            category: 'database',
+            action: () => {
+                console.log('Switched to Production DB')
+            },
+            keywords: ['prod', 'postgres']
+        },
+        {
+            id: 'db-staging',
+            label: 'Switch to Staging DB',
+            description: 'PostgreSQL 15.2 • Region: eu-west-1',
+            icon: Database,
+            category: 'database',
+            action: () => {
+                console.log('Switched to Staging DB')
+            },
+            keywords: ['stage', 'postgres']
+        },
+        {
+            id: 'db-analytics',
+            label: 'Switch to Analytics DB',
+            description: 'MongoDB 6.0 • Region: ap-south-1',
+            icon: Database,
+            category: 'database',
+            action: () => {
+                console.log('Switched to Analytics DB')
+            },
+            keywords: ['mongo', 'analytics']
+        },
+        // Query Actions
+        {
+            id: 'query-run',
+            label: 'Run Current Query',
+            description: 'Execute the active SQL in editor',
+            icon: Play,
+            category: 'query',
+            action: () => {
+                console.log('Running query')
+            },
+            keywords: ['execute', 'run', 'play']
+        },
+        {
+            id: 'query-new',
+            label: 'New Query Template',
+            description: 'Start a fresh workspace',
+            icon: Sparkles,
+            category: 'query',
+            action: () => router.push('/queries'),
+            keywords: ['create', 'fresh', 'template']
+        }
+    ]
+
+    // Filter commands based on search query
+    const filteredCommands = commands.filter(cmd => {
+        const query = searchQuery.toLowerCase()
+        return (
+            cmd.label.toLowerCase().includes(query) ||
+            cmd.description?.toLowerCase().includes(query) ||
+            cmd.keywords?.some(k => k.includes(query))
+        )
+    })
+
+    // Group commands by category
+    const groupedCommands = filteredCommands.reduce((acc, cmd) => {
+        if (!acc[cmd.category]) acc[cmd.category] = []
+        acc[cmd.category].push(cmd)
+        return acc
+    }, {} as Record<string, CommandAction[]>)
+
+    const categoryLabels = {
+        navigation: 'Navigation',
+        database: 'Databases',
+        query: 'Query Actions',
+        admin: 'Administration'
+    }
+
+    // Handle internal keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (!isOpen) return
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                setSelectedIndex(prev => Math.min(prev + 1, filteredCommands.length - 1))
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                setSelectedIndex(prev => Math.max(prev - 1, 0))
+            } else if (e.key === 'Enter') {
+                e.preventDefault()
+                if (filteredCommands[selectedIndex]) {
+                    executeCommand(filteredCommands[selectedIndex])
+                }
+            } else if (e.key === 'Escape') {
+                e.preventDefault()
                 onClose()
             }
         }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [isOpen, filteredCommands, selectedIndex, onClose])
+
+    const executeCommand = (command: CommandAction) => {
+        command.action()
+        onClose()
     }
 
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh] p-4">
+                <div className="fixed inset-0 z-[999] flex items-start justify-center pt-[15vh] px-4 pointer-events-none">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-[#05050A]/80 backdrop-blur-md pointer-events-auto"
                         onClick={onClose}
-                        className="absolute inset-0 bg-black/60 backdrop-blur-2xl"
                     />
 
-                    {/* Palette */}
+                    {/* Command Palette */}
                     <motion.div
-                        initial={{ scale: 0.95, opacity: 0, y: -20 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.95, opacity: 0, y: -20 }}
-                        className="relative w-full max-w-2xl bg-[#0F1115]/90 border border-[#2D313A] rounded-2xl overflow-hidden shadow-2xl"
+                        initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                        className="relative w-full max-w-2xl bg-black/40 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden pointer-events-auto ring-1 ring-white/5"
                     >
-                        {/* Search Bar */}
-                        <div className="relative border-b border-[#1C1F26] bg-white/[0.02]">
-                            <Icons.Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                        {/* Inner Gradient Glow */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none" />
+
+                        {/* Search Input */}
+                        <div className="flex items-center gap-4 px-6 py-5 border-b border-white/5 relative z-10">
+                            <Search className="w-5 h-5 text-white/40" />
                             <input
-                                autoFocus
+                                ref={inputRef}
                                 type="text"
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                placeholder="Command or fuzzy search..."
-                                className="w-full pl-16 pr-6 py-6 bg-transparent text-xl font-medium text-foreground placeholder:text-muted-foreground/30 focus:outline-none"
+                                placeholder="What do you want to do? (e.g. 'run query')"
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value)
+                                    setSelectedIndex(0)
+                                }}
+                                className="flex-1 bg-transparent text-lg font-medium text-white focus:outline-none placeholder:text-white/20"
                             />
-                            <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                                <span className="px-1.5 py-0.5 rounded-md bg-white/10 border border-white/10 text-[10px] font-black font-mono text-muted-foreground uppercase opacity-50">ESC</span>
-                                <span className="text-muted-foreground/20 text-sm">/</span>
-                                <span className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">Quit</span>
+                            <div className="flex items-center gap-1.5">
+                                <kbd className="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-black text-white/40 tracking-wider">
+                                    ESC
+                                </kbd>
                             </div>
                         </div>
 
                         {/* Results */}
-                        <div className="max-h-[60vh] overflow-y-auto no-scrollbar py-4" ref={listRef}>
-                            {filteredActions.length > 0 ? (
-                                <div className="space-y-4 px-4">
-                                    {['Navigation', 'Databases', 'Tools', 'Forensics'].map(category => {
-                                        const categoryActions = filteredActions.filter(a => a.category === category)
-                                        if (categoryActions.length === 0) return null
-
-                                        return (
-                                            <div key={category} className="space-y-2">
-                                                <h5 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{category}</h5>
-                                                <div className="space-y-1">
-                                                    {categoryActions.map((action) => {
-                                                        const globalIndex = filteredActions.findIndex(a => a.id === action.id)
-                                                        const isSelected = globalIndex === selectedIndex
-
-                                                        return (
-                                                            <div
-                                                                key={action.id}
-                                                                onClick={() => {
-                                                                    action.onSelect()
-                                                                    onClose()
-                                                                }}
-                                                                className={`group flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all ${isSelected
-                                                                    ? 'bg-primary/20 border border-primary/30'
-                                                                    : 'hover:bg-white/5 border border-transparent'
-                                                                    }`}
-                                                            >
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className={`p-2.5 rounded-xl transition-all ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-white/5 text-muted-foreground group-hover:bg-white/10'
-                                                                        }`}>
-                                                                        {action.icon}
-                                                                    </div>
-                                                                    <div>
-                                                                        <div className={`text-sm font-black tracking-tight ${isSelected ? 'text-primary' : 'text-foreground'}`}>
-                                                                            {action.title}
-                                                                        </div>
-                                                                        <div className="text-xs text-muted-foreground group-hover:text-muted-foreground/80">
-                                                                            {action.description}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                {action.shortcut && (
-                                                                    <div className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black font-mono text-muted-foreground opacity-40 group-hover:opacity-100 transition-opacity uppercase">
-                                                                        {action.shortcut}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        )
-                                                    })}
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
+                        <div className="max-h-[50vh] overflow-y-auto custom-scrollbar relative z-10">
+                            {filteredCommands.length === 0 ? (
+                                <div className="px-6 py-16 text-center">
+                                    <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5">
+                                        <Search className="w-5 h-5 text-white/20" />
+                                    </div>
+                                    <p className="text-white/40 font-medium">No commands found for &quot;{searchQuery}&quot;</p>
+                                    <p className="text-xs text-white/20 mt-1">Try searching for &quot;admin&quot; or &quot;database&quot;</p>
                                 </div>
                             ) : (
-                                <div className="py-20 text-center flex flex-col items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-muted-foreground/20">
-                                        <Icons.Search className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-black text-foreground uppercase tracking-widest italic">No matches found</p>
-                                        <p className="text-xs text-muted-foreground mt-1 font-medium italic opacity-50">Try searching for navigational keywords or platform tools.</p>
-                                    </div>
+                                <div className="py-3">
+                                    {Object.entries(groupedCommands).map(([category, cmds]) => (
+                                        <div key={category} className="mb-4 last:mb-0">
+                                            <div className="px-6 py-2">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400/60">
+                                                    {categoryLabels[category as keyof typeof categoryLabels]}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-0.5 px-3">
+                                                {cmds.map((cmd) => {
+                                                    const globalIndex = filteredCommands.indexOf(cmd)
+                                                    const isSelected = globalIndex === selectedIndex
+                                                    const Icon = cmd.icon
+
+                                                    return (
+                                                        <button
+                                                            key={cmd.id}
+                                                            onClick={() => executeCommand(cmd)}
+                                                            onMouseEnter={() => setSelectedIndex(globalIndex)}
+                                                            className={cn(
+                                                                "w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all relative group",
+                                                                isSelected
+                                                                    ? "bg-indigo-500/20 shadow-[inset_0_0_20px_rgba(99,102,241,0.1)] border border-indigo-500/30"
+                                                                    : "hover:bg-white/[0.03] border border-transparent"
+                                                            )}
+                                                        >
+                                                            <div className={cn(
+                                                                "w-10 h-10 rounded-lg flex items-center justify-center transition-all",
+                                                                isSelected
+                                                                    ? "bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.5)]"
+                                                                    : "bg-white/5 text-white/40"
+                                                            )}>
+                                                                <Icon className="w-5 h-5" />
+                                                            </div>
+                                                            <div className="flex-1 text-left min-w-0">
+                                                                <p className={cn(
+                                                                    "text-sm font-bold transition-colors",
+                                                                    isSelected ? "text-white" : "text-white/70"
+                                                                )}>
+                                                                    {cmd.label}
+                                                                </p>
+                                                                {cmd.description && (
+                                                                    <p className="text-xs text-white/30 truncate mt-0.5">
+                                                                        {cmd.description}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                            {isSelected && (
+                                                                <motion.div
+                                                                    layoutId="arrow"
+                                                                    className="text-indigo-400"
+                                                                >
+                                                                    <ChevronRight className="w-4 h-4" />
+                                                                </motion.div>
+                                                            )}
+                                                        </button>
+                                                    )
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 bg-white/[0.02] border-t border-white/5 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-1.5 grayscale opacity-50">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">System Ready</span>
+                        <div className="px-6 py-4 border-t border-white/5 bg-white/[0.02] flex items-center justify-between relative z-10">
+                            <div className="flex items-center gap-5 text-[10px] font-bold text-white/20 uppercase tracking-widest">
+                                <div className="flex items-center gap-2">
+                                    <kbd className="px-1.5 py-1 rounded bg-white/5 border border-white/10 font-mono text-white/40 font-black">↑↓</kbd>
+                                    <span>Navigate</span>
                                 </div>
-                            </div>
-                            <div className="flex items-center gap-4 text-[10px] font-mono font-black text-muted-foreground uppercase tracking-widest opacity-40">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="px-1 py-0.5 rounded bg-white/10">↑↓</span>
-                                    <span>Browse</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="px-1 py-0.5 rounded bg-white/10">ENTER</span>
+                                <div className="flex items-center gap-2">
+                                    <kbd className="px-1.5 py-1 rounded bg-white/5 border border-white/10 font-mono text-white/40 font-black">↵</kbd>
                                     <span>Select</span>
                                 </div>
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-indigo-400/40 uppercase tracking-widest">
+                                <Command className="w-3 h-3" />
+                                <span>+ K to toggle</span>
                             </div>
                         </div>
                     </motion.div>

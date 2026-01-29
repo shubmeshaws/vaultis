@@ -11,18 +11,21 @@ export function useCommandPalette() {
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            // Cmd+K or Ctrl+K
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
                 e.preventDefault()
                 toggle()
             }
-            if (e.key === 'Escape') {
+
+            // Allow closing with Escape (redundant but safe)
+            if (e.key === 'Escape' && isOpen) {
                 close()
             }
         }
 
         window.addEventListener('keydown', handleKeyDown)
         return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [toggle, close])
+    }, [toggle, close, isOpen])
 
     return { isOpen, open, close, toggle }
 }
