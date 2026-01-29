@@ -80,7 +80,9 @@ export default async function DatabasesPage() {
                 </div>
             </div>
 
-            <DatabaseManagementClient initialDatabases={databases as any} />
+            <div style={{ zoom: 0.9 }}>
+                <DatabaseManagementClient initialDatabases={databases as any} />
+            </div>
         </div>
     )
 }

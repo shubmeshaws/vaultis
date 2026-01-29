@@ -6,6 +6,7 @@ import mysql from 'mysql2/promise'
 import { MongoClient } from 'mongodb'
 import { createClient as createRedisClient } from 'redis'
 import { getCurrentUser } from '@/lib/auth/middleware'
+import { getClientIP, getUserAgent } from '@/lib/utils/clientInfo'
 import { revalidatePath } from 'next/cache'
 
 export async function executeQuery(databaseId: string, sql: string) {
@@ -75,7 +76,7 @@ export async function executeQuery(databaseId: string, sql: string) {
 
     // Record History
     try {
-        await prisma.queryHistory.create({
+        await (prisma.queryHistory as any).create({
             data: {
                 sql,
                 userId: user.id,
@@ -83,7 +84,9 @@ export async function executeQuery(databaseId: string, sql: string) {
                 executionTime,
                 status: result.success ? 'success' : 'error',
                 rowsAffected: result.totalRows || 0,
-                errorMessage: result.error
+                errorMessage: result.error,
+                ipAddress: getClientIP(),
+                userAgent: getUserAgent()
             }
         })
     } catch (historyError) {

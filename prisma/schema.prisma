@@ -121,6 +121,8 @@ model QueryHistory {
   status        String   @default("success") // success, error
   rowsAffected  Int?
   errorMessage  String?
+  ipAddress     String?
+  userAgent     String?
   createdAt     DateTime @default(now())
 
   @@index([userId])
