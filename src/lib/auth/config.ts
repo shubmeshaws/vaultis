@@ -65,12 +65,30 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id
         token.role = (user as any).role
         token.isActive = (user as any).isActive
       }
+
+      // If we are triggered by an update, specific check for client-side update() calls
+      if (trigger === "update" && session) {
+        // handle manual session updates if necessary
+      }
+
+      // Always fetch fresh user data to ensure role/active status is current
+      if (token.sub) {
+        const freshUser = await prisma.user.findUnique({
+          where: { id: token.sub },
+        }) as any // Cast to any to handle potentially stale type definitions for isActive
+
+        if (freshUser) {
+          token.isActive = freshUser.isActive
+          token.role = freshUser.role
+        }
+      }
+
       return token
     },
     async session({ session, token }) {

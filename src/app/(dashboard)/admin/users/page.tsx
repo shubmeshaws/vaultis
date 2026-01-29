@@ -45,11 +45,11 @@ export default async function UsersManagementPage() {
 
     return (
         <div className="min-h-screen space-y-8">
-            <div className="max-w-7xl mx-auto space-y-8">
+            <div className="max-w-6xl mx-auto space-y-7">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                     <div>
-                        <h1 className="text-4xl font-black tracking-tight text-foreground uppercase italic leading-none">
+                        <h1 className="text-2xl font-black tracking-tight text-foreground uppercase italic leading-none">
                             Identity & Access
                         </h1>
                         <p className="text-sm text-muted-foreground mt-2 font-medium tracking-wide">
