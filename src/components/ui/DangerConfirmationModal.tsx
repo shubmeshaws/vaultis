@@ -48,7 +48,7 @@ export function DangerConfirmationModal({
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pb-24">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/70 backdrop-blur-md"
@@ -156,8 +156,8 @@ export function DangerConfirmationModal({
                         onClick={handleConfirm}
                         disabled={inputValue !== confirmationText || isConfirming}
                         className={`px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${inputValue === confirmationText && !isConfirming
-                                ? 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-500/20'
-                                : 'bg-foreground/5 text-muted-foreground cursor-not-allowed'
+                            ? 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-500/20'
+                            : 'bg-foreground/5 text-muted-foreground cursor-not-allowed'
                             }`}
                     >
                         {isConfirming ? 'Processing...' : `Confirm ${actionName}`}

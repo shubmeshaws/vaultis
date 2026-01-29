@@ -59,42 +59,42 @@ export default async function UsersManagementPage() {
                 </div>
 
                 {/* Stats Overview */}
-                <div className="grid gap-4 md:grid-cols-3">
-                    <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-2xl overflow-hidden">
-                        <CardHeader className="pb-2">
-                            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Total Users</CardDescription>
-                            <CardTitle className="text-3xl font-black text-foreground">{totalUsers}</CardTitle>
+                <div className="grid gap-3 md:grid-cols-3">
+                    <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-xl overflow-hidden">
+                        <CardHeader className="pb-1 pt-4 px-4">
+                            <CardDescription className="uppercase tracking-widest text-[9px] font-bold text-muted-foreground">Total Users</CardDescription>
+                            <CardTitle className="text-2xl font-black text-foreground">{totalUsers}</CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="px-4 pb-4 pt-1">
                             <div className="flex items-center gap-2">
-                                <Users className="w-4 h-4 text-cyan-500" />
-                                <p className="text-xs font-medium text-muted-foreground">Registered accounts</p>
+                                <Users className="w-3.5 h-3.5 text-cyan-500" />
+                                <p className="text-[10px] font-medium text-muted-foreground">Registered accounts</p>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-2xl overflow-hidden">
-                        <CardHeader className="pb-2">
-                            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Access Enabled</CardDescription>
-                            <CardTitle className="text-3xl font-black text-foreground">{activeUsers}</CardTitle>
+                    <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-xl overflow-hidden">
+                        <CardHeader className="pb-1 pt-4 px-4">
+                            <CardDescription className="uppercase tracking-widest text-[9px] font-bold text-muted-foreground">Access Enabled</CardDescription>
+                            <CardTitle className="text-2xl font-black text-foreground">{activeUsers}</CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="px-4 pb-4 pt-1">
                             <div className="flex items-center gap-2">
-                                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                <p className="text-xs font-medium text-muted-foreground">Users with platform access</p>
+                                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                                <p className="text-[10px] font-medium text-muted-foreground">Users with platform access</p>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-2xl overflow-hidden">
-                        <CardHeader className="pb-2">
-                            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Administrators</CardDescription>
-                            <CardTitle className="text-3xl font-black text-foreground">{adminUsers}</CardTitle>
+                    <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-xl overflow-hidden">
+                        <CardHeader className="pb-1 pt-4 px-4">
+                            <CardDescription className="uppercase tracking-widest text-[9px] font-bold text-muted-foreground">Administrators</CardDescription>
+                            <CardTitle className="text-2xl font-black text-foreground">{adminUsers}</CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="px-4 pb-4 pt-1">
                             <div className="flex items-center gap-2">
-                                <Shield className="w-4 h-4 text-purple-500" />
-                                <p className="text-xs font-medium text-muted-foreground">Privileged access</p>
+                                <Shield className="w-3.5 h-3.5 text-purple-500" />
+                                <p className="text-[10px] font-medium text-muted-foreground">Privileged access</p>
                             </div>
                         </CardContent>
                     </Card>

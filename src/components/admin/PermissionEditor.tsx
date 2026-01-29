@@ -60,14 +60,14 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
     return (
         <AnimatePresence>
             {isOpen && user && (
-                <>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-24">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
                     />
 
                     {/* Modal */}
@@ -75,11 +75,12 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50 p-1"
+                        className="relative w-full max-w-md z-10"
+                        style={{ zoom: 0.9 }}
                     >
-                        <div className="bg-card border border-white/10 rounded-3xl overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.5)]">
+                        <div className="bg-card border border-foreground/10 rounded-3xl overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.5)] flex flex-col max-h-[85vh]">
                             {/* Header */}
-                            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                            <div className="px-6 py-5 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02] shrink-0">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 rounded-xl bg-primary/10 border border-primary/20 text-primary">
                                         <Icons.Shield className="w-5 h-5" />
@@ -91,14 +92,14 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
                                 </div>
                                 <button
                                     onClick={onClose}
-                                    className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground transition-colors"
+                                    className="p-2 rounded-xl hover:bg-foreground/5 text-muted-foreground transition-colors"
                                 >
                                     <Icons.Close className="w-5 h-5" />
                                 </button>
                             </div>
 
                             {/* Body */}
-                            <div className="p-6 space-y-6">
+                            <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
                                 <div>
                                     <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4">Database Access Grants</h4>
                                     <div className="space-y-2">
@@ -108,7 +109,7 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
                                                 onClick={() => toggleAccess(db)}
                                                 className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${selectedAccess.includes(db)
                                                     ? 'bg-primary/10 border-primary/30 text-foreground'
-                                                    : 'bg-white/[0.03] border-white/5 text-muted-foreground hover:border-white/20'
+                                                    : 'bg-foreground/[0.03] border-foreground/5 text-muted-foreground hover:border-foreground/20'
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-3">
@@ -117,7 +118,7 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
                                                 </div>
                                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${selectedAccess.includes(db)
                                                     ? 'bg-primary border-primary'
-                                                    : 'border-white/10'
+                                                    : 'border-foreground/10'
                                                     }`}>
                                                     {selectedAccess.includes(db) && <Icons.Save className="w-3 h-3 text-primary-foreground" />}
                                                 </div>
@@ -128,10 +129,10 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
                             </div>
 
                             {/* Footer */}
-                            <div className="px-6 py-5 border-t border-white/5 bg-white/[0.02] flex items-center gap-3">
+                            <div className="px-6 py-5 border-t border-foreground/5 bg-foreground/[0.02] flex items-center gap-3 shrink-0">
                                 <button
                                     onClick={onClose}
-                                    className="flex-1 py-3 px-4 rounded-2xl bg-white/5 border border-white/10 text-sm font-black uppercase tracking-widest text-muted-foreground hover:bg-white/10 transition-all font-sans"
+                                    className="flex-1 py-3 px-4 rounded-2xl bg-foreground/5 border border-foreground/10 text-sm font-black uppercase tracking-widest text-muted-foreground hover:bg-foreground/10 transition-all font-sans"
                                 >
                                     Cancel
                                 </button>
@@ -148,7 +149,7 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
                             </div>
                         </div>
                     </motion.div>
-                </>
+                </div>
             )}
         </AnimatePresence>
     )
