@@ -14,7 +14,9 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/contexts/ToastContext'
+
 import { useDatabase } from '@/contexts/DatabaseContext'
+import { InputModal } from '@/components/ui/InputModal'
 
 interface Column {
     key: string
@@ -41,7 +43,12 @@ export function QueryResultsTable({
     const { toast } = useToast()
     const [currentPage, setCurrentPage] = useState(1)
     const rowsPerPage = 10
+
     const totalPages = Math.ceil(totalRows / rowsPerPage)
+
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false)
+    const [exportFormat, setExportFormat] = useState<'csv' | 'json' | 'excel' | null>(null)
+    const [pendingFilename, setPendingFilename] = useState('')
 
     const startRow = (currentPage - 1) * rowsPerPage + 1
     const endRow = Math.min(currentPage * rowsPerPage, totalRows)
@@ -70,7 +77,7 @@ export function QueryResultsTable({
         })
     }
 
-    const handleExport = (format: 'csv' | 'json' | 'excel') => {
+    const handleExportRequest = (format: 'csv' | 'json' | 'excel') => {
         if (!data || data.length === 0) {
             toast({ title: 'No data to export', type: 'warning' })
             return
@@ -88,13 +95,21 @@ export function QueryResultsTable({
         const dateStr = istDate.toISOString().split('T')[0]
         const timeStr = istDate.toISOString().split('T')[1].split('.')[0].replace(/:/g, '-')
 
-        const finalFilename = `${dbName}_${tableName}_${dateStr}_${timeStr}_IST`
+        const defaultFilename = `${dbName}_${tableName}_${dateStr}_${timeStr}_IST`
+
+        setPendingFilename(defaultFilename)
+        setExportFormat(format)
+        setIsExportModalOpen(true)
+    }
+
+    const handleConfirmExport = (customFilename: string) => {
+        if (!exportFormat) return
 
         let content = ''
-        let filename = finalFilename
+        let filename = customFilename || pendingFilename
         let mimeType = 'text/plain'
 
-        if (format === 'json') {
+        if (exportFormat === 'json') {
             content = JSON.stringify(data, null, 2)
             filename += '.json'
             mimeType = 'application/json'
@@ -109,7 +124,7 @@ export function QueryResultsTable({
                 }).join(',')
             ).join('\n')
             content = `${headers}\n${rows}`
-            filename += format === 'csv' ? '.csv' : '.xlsx' // For XLSX we use CSV content for now but give it the extension as a hint
+            filename += exportFormat === 'csv' ? '.csv' : '.xlsx'
             mimeType = 'text/csv'
         }
 
@@ -123,49 +138,50 @@ export function QueryResultsTable({
         document.body.removeChild(link)
         URL.revokeObjectURL(url)
 
-        toast({ title: 'Export successful', description: `Data saved as ${format.toUpperCase()}`, type: 'success' })
+        toast({ title: 'Export successful', description: `Data saved as ${exportFormat.toUpperCase()}`, type: 'success' })
+        setIsExportModalOpen(false)
     }
 
     return (
         <div className="relative rounded-2xl overflow-hidden bg-card/50 backdrop-blur-xl border border-foreground/30 shadow-sm">
             {/* Header Bar */}
-            <div className="px-5 py-3 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02]">
+            <div className="px-5 py-3 border-b border-white/10 flex items-center justify-between bg-indigo-600 text-white">
                 <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Query Results</span>
-                    <div className="h-3 w-px bg-foreground/10" />
+                    <span className="text-xs font-bold uppercase tracking-wider opacity-90">Query Results</span>
+                    <div className="h-3 w-px bg-white/20" />
                     <span className="text-[10px] font-mono text-muted-foreground">{executionTime} • {totalRows} rows</span>
                 </div>
 
                 {/* Export Actions */}
                 <div className="flex items-center gap-1">
                     <button
-                        onClick={() => handleExport('csv')}
-                        className="p-1.5 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors group relative"
+                        onClick={() => handleExportRequest('csv')}
+                        className="p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors group relative"
                         title="Export as CSV"
                     >
                         <Download className="w-3.5 h-3.5" />
-                        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">CSV</span>
+                        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-foreground bg-background px-2 py-1 rounded shadow-lg">CSV</span>
                     </button>
                     <button
-                        onClick={() => handleExport('json')}
-                        className="p-1.5 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors group relative"
+                        onClick={() => handleExportRequest('json')}
+                        className="p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors group relative"
                         title="Export as JSON"
                     >
                         <FileJson className="w-3.5 h-3.5" />
-                        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">JSON</span>
+                        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-foreground bg-background px-2 py-1 rounded shadow-lg">JSON</span>
                     </button>
                     <button
-                        onClick={() => handleExport('excel')}
-                        className="p-1.5 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors group relative"
+                        onClick={() => handleExportRequest('excel')}
+                        className="p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors group relative"
                         title="Export as Excel"
                     >
                         <FileSpreadsheet className="w-3.5 h-3.5" />
-                        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">XLSX</span>
+                        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-foreground bg-background px-2 py-1 rounded shadow-lg">XLSX</span>
                     </button>
                     <div className="h-4 w-px bg-foreground/10 mx-1" />
                     <button
                         onClick={handleCopy}
-                        className="p-1.5 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors"
                         title="Copy to clipboard"
                     >
                         <Copy className="w-3.5 h-3.5" />
@@ -198,7 +214,7 @@ export function QueryResultsTable({
 
                     {/* Table Body */}
                     <tbody className="divide-y divide-foreground/5">
-                        {data.map((row, rowIndex) => (
+                        {data.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map((row, rowIndex) => (
                             <motion.tr
                                 key={rowIndex}
                                 initial={{ opacity: 0 }}
@@ -317,6 +333,17 @@ export function QueryResultsTable({
                     background: rgba(255, 255, 255, 0.2);
                 }
             `}</style>
+
+            <InputModal
+                isOpen={isExportModalOpen}
+                onClose={() => setIsExportModalOpen(false)}
+                onConfirm={handleConfirmExport}
+                title="Export Results"
+                description={`Enter a filename for your ${exportFormat?.toUpperCase()} export.`}
+                placeholder="filename"
+                defaultValue={pendingFilename}
+                confirmText="Download"
+            />
         </div>
     )
 }

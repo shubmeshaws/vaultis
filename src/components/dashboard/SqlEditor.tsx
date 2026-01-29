@@ -127,7 +127,7 @@ export function SqlEditor({ initialValue = '', onRun }: SqlEditorProps) {
                             <div className="w-2 h-2 rounded-full bg-amber-500/40" />
                             <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
                         </div>
-                        <div className="h-3 w-[1px] bg-foreground/20 dark:bg-white/10" />
+                        <div className="h-3 w-[1px] bg-foreground/20 dark:bg-white/40" />
                         <div className="flex items-center gap-2 text-[10px] font-black text-foreground/60 dark:text-muted-foreground uppercase tracking-widest">
                             <EditorIcons.Terminal className="w-2.5 h-2.5" />
                             SQL Editor

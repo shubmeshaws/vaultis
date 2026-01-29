@@ -117,7 +117,7 @@ export function QueryStatusPanel({ stats }: QueryStatusPanelProps) {
             {/* Metrics Grid */}
             <div className="grid grid-cols-2 gap-3">
                 {/* Execution Time */}
-                <div className="p-4 rounded-xl bg-black/40 border border-white/5 backdrop-blur-md flex flex-col gap-2 group hover:border-white/10 transition-colors">
+                <div className="p-4 rounded-xl bg-foreground/5 border border-foreground/5 backdrop-blur-md flex flex-col gap-2 group hover:border-foreground/10 transition-colors">
                     <div className="flex items-center gap-2 text-muted-foreground">
                         <Clock className="w-3.5 h-3.5" />
                         <span className="text-[10px] font-bold uppercase tracking-wider">Duration</span>
@@ -132,7 +132,7 @@ export function QueryStatusPanel({ stats }: QueryStatusPanelProps) {
                 </div>
 
                 {/* Rows Affected */}
-                <div className="p-4 rounded-xl bg-black/40 border border-white/5 backdrop-blur-md flex flex-col gap-2 group hover:border-white/10 transition-colors">
+                <div className="p-4 rounded-xl bg-foreground/5 border border-foreground/5 backdrop-blur-md flex flex-col gap-2 group hover:border-foreground/10 transition-colors">
                     <div className="flex items-center gap-2 text-muted-foreground">
                         <Database className="w-3.5 h-3.5" />
                         <span className="text-[10px] font-bold uppercase tracking-wider">Affected</span>

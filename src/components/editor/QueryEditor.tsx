@@ -12,7 +12,7 @@ import { useSearchParams } from 'next/navigation'
 
 interface QueryEditorProps {
     initialValue?: string
-    onRun?: (query: string) => void
+    onRun?: (query: string) => Promise<void> | void
     onSave?: (query: string) => void
     onShare?: (query: string) => void
     onCancel?: () => void
@@ -24,6 +24,12 @@ export function QueryEditor({ initialValue = '', onRun, onSave, onShare, onCance
     const urlQuery = searchParams.get('q')
 
     const [code, setCode] = useState(urlQuery || initialValue || 'SELECT * FROM users LIMIT 10;')
+
+    // Sync with URL query param changes
+    useEffect(() => {
+        if (urlQuery) setCode(urlQuery)
+    }, [urlQuery])
+
     const [isDestructive, setIsDestructive] = useState(false)
     const [isRunning, setIsRunning] = useState(false)
 
@@ -40,9 +46,17 @@ export function QueryEditor({ initialValue = '', onRun, onSave, onShare, onCance
         }
     }
 
-    const handleRun = () => {
+    const handleRun = async () => {
         setIsRunning(true)
-        if (onRun) onRun(code).finally(() => setIsRunning(false))
+        if (onRun) {
+            try {
+                await onRun(code)
+            } finally {
+                setIsRunning(false)
+            }
+        } else {
+            setIsRunning(false)
+        }
     }
 
     const handleStop = () => {
@@ -87,6 +101,10 @@ export function QueryEditor({ initialValue = '', onRun, onSave, onShare, onCance
                                 <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
                                     <Database className="w-2.5 h-2.5 text-indigo-500" />
                                     <span className="text-[9px] font-bold text-indigo-500/80 tracking-tight">{selectedDb.name}</span>
+                                </div>
+                                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 ml-1">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="text-[8px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Connected</span>
                                 </div>
                             </>
                         )}

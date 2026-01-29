@@ -28,19 +28,19 @@ interface SavedQueriesPanelProps {
     queries: SavedQuery[]
     onDelete?: (id: string) => void
     onToggleFavorite?: (id: string, current: boolean) => void
-    onExecute?: (query: string) => void
+    onRun?: (query: string) => void
+    onEdit?: (query: string) => void
 }
 
-export function SavedQueriesPanel({ queries, onDelete, onToggleFavorite, onExecute }: SavedQueriesPanelProps) {
+export function SavedQueriesPanel({ queries, onDelete, onToggleFavorite, onRun, onEdit }: SavedQueriesPanelProps) {
     const { toast } = useToast()
 
     const handleQuickRun = (query: SavedQuery) => {
-        onExecute?.(query.query)
+        onRun?.(query.query)
     }
 
     const handleEdit = (query: SavedQuery) => {
-        // Edit functionality could be implemented by setting the editor code and switching tabs
-        onExecute?.(query.query)
+        onEdit?.(query.query)
     }
 
     const handleCopy = (query: SavedQuery) => {
@@ -50,9 +50,7 @@ export function SavedQueriesPanel({ queries, onDelete, onToggleFavorite, onExecu
     }
 
     const handleDelete = (query: SavedQuery) => {
-        if (confirm(`Are you sure you want to delete "${query.name}"?`)) {
-            onDelete?.(query.id)
-        }
+        onDelete?.(query.id)
     }
 
     const handleToggleFavorite = (query: SavedQuery) => {

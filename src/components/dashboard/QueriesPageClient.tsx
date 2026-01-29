@@ -11,6 +11,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useDatabase } from '@/contexts/DatabaseContext'
 import { executeQuery, saveQuery, getSavedQueries, deleteSavedQuery, toggleFavoriteQuery, getQueryHistory } from '@/lib/actions/queryActions'
 import { useToast } from '@/contexts/ToastContext'
+import { InputModal } from '@/components/ui/InputModal'
+import { SimpleConfirmationModal } from '@/components/ui/SimpleConfirmationModal'
 
 type TabType = 'editor' | 'saved' | 'history'
 
@@ -42,6 +44,10 @@ export function QueriesPageClient() {
     const [savedQueries, setSavedQueries] = useState<any[]>([])
     const [history, setHistory] = useState<any[]>([])
     const [isSaving, setIsSaving] = useState(false)
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false)
+    const [pendingSaveQuery, setPendingSaveQuery] = useState('')
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [queryToDelete, setQueryToDelete] = useState<string | null>(null)
     const activeQueryRef = useRef<boolean>(false)
 
     const fetchSavedQueries = useCallback(async () => {
@@ -118,20 +124,20 @@ export function QueriesPageClient() {
         }
     }
 
-    const handleSaveQuery = async (query: string) => {
+    const handleSaveQueryRequest = (query: string) => {
         if (!selectedDb) {
             toast({ title: 'No database selected', type: 'error' })
             return
         }
-        setIsSaving(true)
-        const name = prompt('Enter a name for this query:', 'My Query')
-        if (!name) {
-            setIsSaving(false)
-            return
-        }
+        setPendingSaveQuery(query)
+        setIsSaveModalOpen(true)
+    }
 
-        const result = await saveQuery(selectedDb.id, name, query)
+    const handleConfirmSaveQuery = async (name: string) => {
+        setIsSaving(true)
+        const result = await saveQuery(selectedDb!.id, name, pendingSaveQuery)
         setIsSaving(false)
+        setIsSaveModalOpen(false)
 
         if (result.success) {
             toast({ title: 'Query saved', type: 'success' })
@@ -141,11 +147,23 @@ export function QueriesPageClient() {
         }
     }
 
-    const handleDeleteSaved = async (id: string) => {
-        const res = await deleteSavedQuery(id)
+    const handleDeleteSavedRequest = (id: string) => {
+        setQueryToDelete(id)
+        setIsDeleteModalOpen(true)
+    }
+
+    const handleConfirmDeleteSaved = async () => {
+        if (!queryToDelete) return
+
+        const res = await deleteSavedQuery(queryToDelete)
+        setIsDeleteModalOpen(false)
+        setQueryToDelete(null)
+
         if (res.success) {
             toast({ title: 'Deleted successfully', type: 'success' })
             fetchSavedQueries()
+        } else {
+            toast({ title: 'Failed to delete', description: res.error, type: 'error' })
         }
     }
 
@@ -216,39 +234,41 @@ export function QueriesPageClient() {
 
             {/* Tab Content */}
             {activeTab === 'editor' && (
-                <div className="grid lg:grid-cols-4 gap-6">
-                    {/* Main Workspace */}
-                    <div className="lg:col-span-3 space-y-6 order-2 lg:order-1">
-                        <QueryEditor
-                            onRun={handleRunQuery}
-                            onSave={handleSaveQuery}
-                            onShare={handleShareQuery}
-                            onCancel={handleCancelQuery}
-                        />
+                <div className="space-y-6">
+                    <div className="grid lg:grid-cols-4 gap-6">
+                        {/* Main Workspace */}
+                        <div className="lg:col-span-3">
+                            <QueryEditor
+                                onRun={handleRunQuery}
+                                onSave={handleSaveQueryRequest}
+                                onShare={handleShareQuery}
+                                onCancel={handleCancelQuery}
+                            />
+                        </div>
 
-                        {/* Results Area */}
-                        <QueryResultsTable
-                            columns={queryResults.columns.length > 0 ? queryResults.columns : [
-                                { key: 'empty', label: 'No Results', width: 200 }
-                            ]}
-                            data={queryResults.data}
-                            totalRows={queryResults.totalRows}
-                            executionTime={queryResults.executionTime}
-                            sql={queryResults.sql}
-                        />
+                        {/* Sidecar (Status) */}
+                        <div className="lg:col-span-1">
+                            {/* Status Panel */}
+                            <QueryStatusPanel stats={{
+                                status: queryResults.status === 'loading' ? 'running' : (queryResults.status === 'idle' ? 'idle' : queryResults.status as any),
+                                executionTime: queryResults.executionTime,
+                                rowsAffected: queryResults.totalRows,
+                                dataSize: 'N/A',
+                                message: queryResults.message || (queryResults.status === 'loading' ? 'Executing query...' : 'Ready to execute query.')
+                            }} />
+                        </div>
                     </div>
 
-                    {/* Sidecar (Status) */}
-                    <div className="lg:col-span-1 space-y-6 order-1 lg:order-2">
-                        {/* Status Panel */}
-                        <QueryStatusPanel stats={{
-                            status: queryResults.status === 'loading' ? 'running' : (queryResults.status === 'idle' ? 'idle' : queryResults.status as any),
-                            executionTime: queryResults.executionTime,
-                            rowsAffected: queryResults.totalRows,
-                            dataSize: 'N/A',
-                            message: queryResults.message || (queryResults.status === 'loading' ? 'Executing query...' : 'Ready to execute query.')
-                        }} />
-                    </div>
+                    {/* Results Area */}
+                    <QueryResultsTable
+                        columns={queryResults.columns.length > 0 ? queryResults.columns : [
+                            { key: 'empty', label: 'No Results', width: 200 }
+                        ]}
+                        data={queryResults.data}
+                        totalRows={queryResults.totalRows}
+                        executionTime={queryResults.executionTime}
+                        sql={queryResults.sql}
+                    />
                 </div>
             )}
 
@@ -262,13 +282,16 @@ export function QueriesPageClient() {
                         lastExecuted: new Date(q.updatedAt).toLocaleString(),
                         isFavorite: q.isFavorite
                     }))}
-                    onDelete={handleDeleteSaved}
+                    onDelete={handleDeleteSavedRequest}
                     onToggleFavorite={handleToggleFavorite}
-                    onExecute={(query: string) => {
+                    onRun={(query: string) => {
                         setActiveTab('editor')
-                        // We might need to pass the query to the editor somehow, 
-                        // but for now let's just trigger useSearchParams to handle it or similar
-                        // A better way is state lift-up or using the URL.
+                        handleRunQuery(query)
+                    }}
+                    onEdit={(query: string) => {
+                        setActiveTab('editor')
+                        // Just switch tab and populate editor via URL param (handled by QueryEditor potentially, or we force it here)
+                        // A better way is to set URL which controls state
                         const params = new URLSearchParams(searchParams.toString())
                         params.set('q', query)
                         router.push(`?${params.toString()}`)
@@ -314,6 +337,25 @@ export function QueriesPageClient() {
                     )}
                 </div>
             )}
+            <InputModal
+                isOpen={isSaveModalOpen}
+                onClose={() => setIsSaveModalOpen(false)}
+                onConfirm={handleConfirmSaveQuery}
+                title="Save Query"
+                description="Give your query a descriptive name to easily find it later."
+                placeholder="e.g. Monthly Revenue Report"
+                confirmText={isSaving ? "Saving..." : "Save Query"}
+            />
+
+            <SimpleConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleConfirmDeleteSaved}
+                title="Delete Saved Query"
+                description="Are you sure you want to delete this query? This action cannot be undone."
+                type="danger"
+                confirmText="Delete Query"
+            />
         </div>
     )
 }
