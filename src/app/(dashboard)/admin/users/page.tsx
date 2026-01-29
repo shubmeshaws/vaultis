@@ -1,13 +1,7 @@
 import { getCurrentUser } from '@/lib/auth/middleware'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { prisma } from '@/lib/db/prisma'
 import { redirect } from 'next/navigation'
-import {
-    Users,
-    Shield,
-    CheckCircle,
-    ChevronLeft
-} from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { UserManagementClient } from '@/components/admin/UserManagementClient'
 import { getGroups, getDatabases } from '@/lib/actions/userActions'
 
@@ -40,10 +34,6 @@ export default async function UsersManagementPage() {
         access: ['Production DB'], // Default mock access
     }))
 
-    const totalUsers = users.length
-    const activeUsers = users.filter((u: any) => u.isActive).length
-    const adminUsers = users.filter((u: any) => u.role === 'ADMIN').length
-
     return (
         <div className="min-h-screen space-y-8">
             <div className="max-w-6xl mx-auto space-y-7">
@@ -69,47 +59,7 @@ export default async function UsersManagementPage() {
                     </div>
                 </div>
 
-                {/* Stats Overview */}
-                <div className="grid gap-3 md:grid-cols-3">
-                    <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-xl overflow-hidden">
-                        <CardHeader className="pb-1 pt-4 px-4">
-                            <CardDescription className="uppercase tracking-widest text-[9px] font-bold text-muted-foreground">Total Users</CardDescription>
-                            <CardTitle className="text-2xl font-black text-foreground">{totalUsers}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="px-4 pb-4 pt-1">
-                            <div className="flex items-center gap-2">
-                                <Users className="w-3.5 h-3.5 text-cyan-500" />
-                                <p className="text-[10px] font-medium text-muted-foreground">Registered accounts</p>
-                            </div>
-                        </CardContent>
-                    </Card>
 
-                    <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-xl overflow-hidden">
-                        <CardHeader className="pb-1 pt-4 px-4">
-                            <CardDescription className="uppercase tracking-widest text-[9px] font-bold text-muted-foreground">Access Enabled</CardDescription>
-                            <CardTitle className="text-2xl font-black text-foreground">{activeUsers}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="px-4 pb-4 pt-1">
-                            <div className="flex items-center gap-2">
-                                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                                <p className="text-[10px] font-medium text-muted-foreground">Users with platform access</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-xl overflow-hidden">
-                        <CardHeader className="pb-1 pt-4 px-4">
-                            <CardDescription className="uppercase tracking-widest text-[9px] font-bold text-muted-foreground">Administrators</CardDescription>
-                            <CardTitle className="text-2xl font-black text-foreground">{adminUsers}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="px-4 pb-4 pt-1">
-                            <div className="flex items-center gap-2">
-                                <Shield className="w-3.5 h-3.5 text-purple-500" />
-                                <p className="text-[10px] font-medium text-muted-foreground">Privileged access</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
 
                 <UserManagementClient
                     initialUsers={mappedUsers as any}
