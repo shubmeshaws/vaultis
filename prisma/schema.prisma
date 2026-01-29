@@ -54,6 +54,8 @@ model User {
   accounts          Account[]
   sessions          Session[]
   groups            Group[]
+  savedQueries      SavedQuery[]
+  queryHistory      QueryHistory[]
 }
 
 model VerificationToken {
@@ -87,8 +89,42 @@ model Database {
   databaseName String?
   isLocked    Boolean  @default(false)
   groups      Group[]
+  savedQueries SavedQuery[]
+  queryHistory QueryHistory[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model SavedQuery {
+  id          String   @id @default(cuid())
+  name        String
+  sql         String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  databaseId  String
+  database    Database @relation(fields: [databaseId], references: [id], onDelete: Cascade)
+  isFavorite  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model QueryHistory {
+  id            String   @id @default(cuid())
+  sql           String
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  databaseId    String
+  database      Database @relation(fields: [databaseId], references: [id], onDelete: Cascade)
+  executionTime String?
+  status        String   @default("success") // success, error
+  rowsAffected  Int?
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([databaseId])
 }
 
 enum Role {

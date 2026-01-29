@@ -8,15 +8,22 @@ import { Play, AlertTriangle, Command, Save, Share2, Database } from 'lucide-rea
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useDatabase } from '@/contexts/DatabaseContext'
+import { useSearchParams } from 'next/navigation'
 
 interface QueryEditorProps {
     initialValue?: string
     onRun?: (query: string) => void
+    onSave?: (query: string) => void
+    onShare?: (query: string) => void
+    onCancel?: () => void
 }
 
-export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
+export function QueryEditor({ initialValue = '', onRun, onSave, onShare, onCancel }: QueryEditorProps) {
     const { selectedDb } = useDatabase()
-    const [code, setCode] = useState(initialValue || 'SELECT * FROM users LIMIT 10;')
+    const searchParams = useSearchParams()
+    const urlQuery = searchParams.get('q')
+
+    const [code, setCode] = useState(urlQuery || initialValue || 'SELECT * FROM users LIMIT 10;')
     const [isDestructive, setIsDestructive] = useState(false)
     const [isRunning, setIsRunning] = useState(false)
 
@@ -35,9 +42,12 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
 
     const handleRun = () => {
         setIsRunning(true)
-        if (onRun) onRun(code)
-        // Simulate execution delay
-        setTimeout(() => setIsRunning(false), 800)
+        if (onRun) onRun(code).finally(() => setIsRunning(false))
+    }
+
+    const handleStop = () => {
+        setIsRunning(false)
+        if (onCancel) onCancel()
     }
 
     // Custom SQL Highlighter with Danger Zone detection
@@ -95,10 +105,16 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
                             </motion.div>
                         )}
                         <div className="h-3 w-px bg-foreground/10 dark:bg-white/10 mx-1" />
-                        <button className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/10 text-foreground/30 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors">
+                        <button
+                            onClick={() => onSave?.(code)}
+                            className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/10 text-foreground/30 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"
+                        >
                             <Save className="w-3 h-3" />
                         </button>
-                        <button className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/10 text-foreground/30 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors">
+                        <button
+                            onClick={() => onShare?.(code)}
+                            className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/10 text-foreground/30 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"
+                        >
                             <Share2 className="w-3 h-3" />
                         </button>
                     </div>
@@ -128,26 +144,30 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
 
                     {/* Floating Action Button */}
                     <motion.button
-                        onClick={handleRun}
+                        onClick={isRunning ? handleStop : handleRun}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className={cn(
                             "absolute bottom-6 right-6 px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg transition-all z-20 group/run",
                             isDestructive
                                 ? "bg-red-500 hover:bg-red-600 text-white shadow-red-500/20"
-                                : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/30"
+                                : isRunning
+                                    ? "bg-rose-500 hover:bg-rose-600 text-white shadow-rose-500/30"
+                                    : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/30"
                         )}
                     >
                         {isRunning ? (
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <div className="w-3.5 h-3.5 rounded-sm bg-white animate-pulse" />
                         ) : (
                             <Play className="w-3.5 h-3.5 fill-current" />
                         )}
-                        <span className="tracking-wide">{isDestructive ? 'EXECUTE DANGER' : 'RUN QUERY'}</span>
-                        <div className="ml-1 pl-2 border-l border-white/20 text-[9px] font-mono opacity-60 flex items-center gap-0.5">
-                            <Command className="w-2.5 h-2.5" />
-                            <span>Ent</span>
-                        </div>
+                        <span className="tracking-wide">{isRunning ? 'STOP' : (isDestructive ? 'EXECUTE DANGER' : 'RUN QUERY')}</span>
+                        {!isRunning && (
+                            <div className="ml-1 pl-2 border-l border-white/20 text-[9px] font-mono opacity-60 flex items-center gap-0.5">
+                                <Command className="w-2.5 h-2.5" />
+                                <span>Ent</span>
+                            </div>
+                        )}
                     </motion.button>
                 </div>
 

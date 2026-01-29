@@ -13,6 +13,8 @@ import {
     Copy
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useToast } from '@/contexts/ToastContext'
+import { useDatabase } from '@/contexts/DatabaseContext'
 
 interface Column {
     key: string
@@ -25,30 +27,109 @@ interface QueryResultsTableProps {
     data: any[]
     totalRows?: number
     executionTime?: string
+    sql?: string
 }
 
 export function QueryResultsTable({
     columns,
     data,
     totalRows = data.length,
-    executionTime = '0ms'
+    executionTime = '0ms',
+    sql = ''
 }: QueryResultsTableProps) {
+    const { selectedDb } = useDatabase()
+    const { toast } = useToast()
     const [currentPage, setCurrentPage] = useState(1)
     const rowsPerPage = 10
     const totalPages = Math.ceil(totalRows / rowsPerPage)
 
     const startRow = (currentPage - 1) * rowsPerPage + 1
     const endRow = Math.min(currentPage * rowsPerPage, totalRows)
+    const handleCopy = () => {
+        if (!data || data.length === 0) {
+            toast({ title: 'No data to copy', type: 'warning' })
+            return
+        }
+
+        // Format as Markdown Table
+        const headerRow = `| ${columns.map(c => c.label).join(' | ')} |`
+        const separatorRow = `| ${columns.map(() => '---').join(' | ')} |`
+        const dataRows = data.map(row =>
+            `| ${columns.map(col => {
+                const val = row[col.key]
+                return typeof val === 'object' ? JSON.stringify(val) : String(val ?? '')
+            }).join(' | ')} |`
+        ).join('\n')
+
+        const tableText = `${headerRow}\n${separatorRow}\n${dataRows}`
+
+        navigator.clipboard.writeText(tableText).then(() => {
+            toast({ title: 'Copied to clipboard', description: `${totalRows} rows copied in table format`, type: 'success' })
+        }).catch(err => {
+            toast({ title: 'Failed to copy', description: err.message, type: 'error' })
+        })
+    }
 
     const handleExport = (format: 'csv' | 'json' | 'excel') => {
-        console.log(`Exporting as ${format}...`)
-        // Mock export functionality
+        if (!data || data.length === 0) {
+            toast({ title: 'No data to export', type: 'warning' })
+            return
+        }
+
+        // Extract table name from SQL
+        const tableMatch = sql.match(/FROM\s+([a-zA-Z0-9_".]+)/i)
+        const tableName = tableMatch ? tableMatch[1].replace(/["']/g, '') : 'results'
+        const dbName = selectedDb?.name?.replace(/\s+/g, '_') || 'database'
+
+        // Date in IST
+        const now = new Date()
+        const istOffset = 5.5 * 60 * 60 * 1000
+        const istDate = new Date(now.getTime() + istOffset)
+        const dateStr = istDate.toISOString().split('T')[0]
+        const timeStr = istDate.toISOString().split('T')[1].split('.')[0].replace(/:/g, '-')
+
+        const finalFilename = `${dbName}_${tableName}_${dateStr}_${timeStr}_IST`
+
+        let content = ''
+        let filename = finalFilename
+        let mimeType = 'text/plain'
+
+        if (format === 'json') {
+            content = JSON.stringify(data, null, 2)
+            filename += '.json'
+            mimeType = 'application/json'
+        } else {
+            const headers = columns.map(c => c.label).join(',')
+            const rows = data.map(row =>
+                columns.map(col => {
+                    const val = row[col.key]
+                    if (val === null || val === undefined) return ''
+                    const str = typeof val === 'object' ? JSON.stringify(val) : String(val)
+                    return `"${str.replace(/"/g, '""')}"`
+                }).join(',')
+            ).join('\n')
+            content = `${headers}\n${rows}`
+            filename += format === 'csv' ? '.csv' : '.xlsx' // For XLSX we use CSV content for now but give it the extension as a hint
+            mimeType = 'text/csv'
+        }
+
+        const blob = new Blob([content], { type: mimeType })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = filename
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+
+        toast({ title: 'Export successful', description: `Data saved as ${format.toUpperCase()}`, type: 'success' })
     }
 
     return (
-        <div className="relative rounded-2xl overflow-hidden bg-card/50 backdrop-blur-xl border border-foreground/10 shadow-sm">
+        <div className="relative rounded-2xl overflow-hidden bg-card/50 backdrop-blur-xl border border-foreground/30 shadow-sm">
             {/* Header Bar */}
-            <div className="px-4 py-3 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02]">
+            <div className="px-5 py-3 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02]">
                 <div className="flex items-center gap-3">
                     <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Query Results</span>
                     <div className="h-3 w-px bg-foreground/10" />
@@ -83,6 +164,7 @@ export function QueryResultsTable({
                     </button>
                     <div className="h-4 w-px bg-foreground/10 mx-1" />
                     <button
+                        onClick={handleCopy}
                         className="p-1.5 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors"
                         title="Copy to clipboard"
                     >

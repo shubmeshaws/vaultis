@@ -13,6 +13,7 @@ import {
     MoreVertical
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useToast } from '@/contexts/ToastContext'
 
 interface SavedQuery {
     id: string
@@ -25,24 +26,37 @@ interface SavedQuery {
 
 interface SavedQueriesPanelProps {
     queries: SavedQuery[]
+    onDelete?: (id: string) => void
+    onToggleFavorite?: (id: string, current: boolean) => void
+    onExecute?: (query: string) => void
 }
 
-export function SavedQueriesPanel({ queries }: SavedQueriesPanelProps) {
+export function SavedQueriesPanel({ queries, onDelete, onToggleFavorite, onExecute }: SavedQueriesPanelProps) {
+    const { toast } = useToast()
 
     const handleQuickRun = (query: SavedQuery) => {
-        console.log('Quick run:', query.name)
+        onExecute?.(query.query)
     }
 
     const handleEdit = (query: SavedQuery) => {
-        console.log('Edit:', query.name)
+        // Edit functionality could be implemented by setting the editor code and switching tabs
+        onExecute?.(query.query)
     }
 
     const handleCopy = (query: SavedQuery) => {
-        console.log('Copy:', query.name)
+        navigator.clipboard.writeText(query.query).then(() => {
+            toast({ title: 'Query copied', type: 'success' })
+        })
     }
 
     const handleDelete = (query: SavedQuery) => {
-        console.log('Delete:', query.name)
+        if (confirm(`Are you sure you want to delete "${query.name}"?`)) {
+            onDelete?.(query.id)
+        }
+    }
+
+    const handleToggleFavorite = (query: SavedQuery) => {
+        onToggleFavorite?.(query.id, !!query.isFavorite)
     }
 
     return (
@@ -76,12 +90,16 @@ export function SavedQueriesPanel({ queries }: SavedQueriesPanelProps) {
                             transition={{ delay: index * 0.05 }}
                             className="group relative p-5 rounded-xl bg-card/50 backdrop-blur-xl border border-foreground/10 hover:border-indigo-500/30 transition-all hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-1"
                         >
-                            {/* Favorite Badge */}
-                            {query.isFavorite && (
-                                <div className="absolute top-3 right-3">
-                                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                </div>
-                            )}
+                            {/* Favorite Button */}
+                            <button
+                                onClick={() => handleToggleFavorite(query)}
+                                className="absolute top-3 right-3 p-1 rounded-full hover:bg-foreground/5 transition-colors z-10"
+                            >
+                                <Star className={cn(
+                                    "w-4 h-4 transition-all",
+                                    query.isFavorite ? "text-yellow-500 fill-yellow-500 scale-110" : "text-muted-foreground/30 hover:text-muted-foreground"
+                                )} />
+                            </button>
 
                             {/* Query Info */}
                             <div className="space-y-3">
