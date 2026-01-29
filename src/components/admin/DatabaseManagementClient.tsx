@@ -682,6 +682,35 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
         type: database.type || 'PostgreSQL'
     })
     const [isLoading, setIsLoading] = useState(false)
+    const [isTesting, setIsTesting] = useState(false)
+
+    // Manual test connection
+    const handleTestConnection = async () => {
+        setIsTesting(true)
+        const result = await testConnection({
+            host: formData.host,
+            port: formData.port ? parseInt(formData.port) : undefined,
+            type: formData.type || 'PostgreSQL',
+            username: formData.username,
+            password: formData.password || undefined,
+            databaseName: formData.databaseName || undefined
+        })
+
+        if (result.success) {
+            toast({
+                title: 'Connection successful',
+                description: `Connected in ${result.latency}ms`,
+                type: 'success'
+            })
+        } else {
+            toast({
+                title: 'Connection failed',
+                description: result.error || 'Unable to connect',
+                type: 'error'
+            })
+        }
+        setIsTesting(false)
+    }
 
     useScrollLock(isOpen)
 
@@ -717,7 +746,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="relative w-full max-w-xl bg-background border border-foreground/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+                            className="relative w-full max-w-4xl bg-background border border-foreground/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
                             style={{ zoom: 0.9 }}
                         >
                             <div className="p-8 border-b border-foreground/5 flex items-center justify-between">
@@ -731,119 +760,137 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                             </div>
 
                             <form onSubmit={handleSubmit} className="flex flex-col">
-                                <div className="p-8 space-y-6">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2 col-span-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Display Name</label>
-                                            <input
-                                                required
-                                                type="text"
-                                                value={formData.name}
-                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                            />
+                                <div className="p-8 grid grid-cols-2 gap-8">
+                                    {/* Left Column: Basic Info */}
+                                    <div className="space-y-6">
+                                        <div className="space-y-4">
+                                            <h3 className="text-sm font-black uppercase tracking-widest text-foreground/50">Details</h3>
+                                            <div className="grid gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Display Name</label>
+                                                    <input
+                                                        required
+                                                        type="text"
+                                                        value={formData.name}
+                                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                        className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.databaseName}
+                                                        onChange={(e) => setFormData({ ...formData, databaseName: e.target.value })}
+                                                        placeholder="Defaults to postgres"
+                                                        className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Environment</label>
+                                                    <input
+                                                        required
+                                                        type="text"
+                                                        value={formData.environment}
+                                                        onChange={(e) => setFormData({ ...formData, environment: e.target.value })}
+                                                        className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Description</label>
+                                                    <textarea
+                                                        value={formData.description}
+                                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                                        className="w-full h-24 p-3 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 resize-none"
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="space-y-2 col-span-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
-                                            <input
-                                                type="text"
-                                                value={formData.databaseName}
-                                                onChange={(e) => setFormData({ ...formData, databaseName: e.target.value })}
-                                                placeholder="Defaults to postgres"
-                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                            />
-                                        </div>
-                                        <div className="space-y-2 col-span-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Environment</label>
-                                            <input
-                                                required
-                                                type="text"
-                                                value={formData.environment}
-                                                onChange={(e) => setFormData({ ...formData, environment: e.target.value })}
-                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                            />
-                                        </div>
-                                        <div className="space-y-2 col-span-2 md:col-span-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Hostname</label>
-                                            <input
-                                                required
-                                                type="text"
-                                                value={formData.host}
-                                                onChange={(e) => setFormData({ ...formData, host: e.target.value })}
-                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                            />
-                                        </div>
-                                        <div className="space-y-2 col-span-2 md:col-span-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Port</label>
-                                            <input
-                                                required
-                                                type="number"
-                                                value={formData.port}
-                                                onChange={(e) => setFormData({ ...formData, port: e.target.value })}
-                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                            />
-                                        </div>
-                                        <div className="space-y-2 col-span-2 md:col-span-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Username</label>
-                                            <input
-                                                required
-                                                type="text"
-                                                value={formData.username}
-                                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                            />
-                                        </div>
-                                        <div className="space-y-2 col-span-2 md:col-span-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Password</label>
-                                            <input
-                                                required
-                                                type="password"
-                                                value={formData.password}
-                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                            />
-                                        </div>
-                                        <div className="space-y-2 col-span-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
-                                            <input
-                                                type="text"
-                                                value={formData.databaseName}
-                                                onChange={(e) => setFormData({ ...formData, databaseName: e.target.value })}
-                                                placeholder="e.g. postgres"
-                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                            />
-                                        </div>
-                                        <div className="space-y-2 col-span-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Database Type</label>
-                                            <select
-                                                value={formData.type}
-                                                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 appearance-none"
-                                            >
-                                                <option value="PostgreSQL">PostgreSQL</option>
-                                                <option value="MySQL">MySQL</option>
-                                                <option value="MongoDB">MongoDB</option>
-                                                <option value="Redis">Redis</option>
-                                            </select>
-                                        </div>
-                                        <div className="space-y-2 col-span-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Description</label>
-                                            <textarea
-                                                value={formData.description}
-                                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                                className="w-full h-24 p-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 resize-none"
-                                            />
+                                    </div>
+
+                                    {/* Right Column: Connection Info */}
+                                    <div className="space-y-6">
+                                        <div className="space-y-4">
+                                            <h3 className="text-sm font-black uppercase tracking-widest text-foreground/50">Connection</h3>
+                                            <div className="grid gap-4">
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div className="space-y-2 col-span-2">
+                                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Hostname</label>
+                                                        <input
+                                                            required
+                                                            type="text"
+                                                            value={formData.host}
+                                                            onChange={(e) => setFormData({ ...formData, host: e.target.value })}
+                                                            className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Port</label>
+                                                        <input
+                                                            required
+                                                            type="number"
+                                                            value={formData.port}
+                                                            onChange={(e) => setFormData({ ...formData, port: e.target.value })}
+                                                            className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Username</label>
+                                                    <input
+                                                        required
+                                                        type="text"
+                                                        value={formData.username}
+                                                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                                        className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Password</label>
+                                                    <input
+                                                        type="password"
+                                                        value={formData.password}
+                                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                        placeholder="Leave empty to keep current"
+                                                        className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="p-8 border-t border-foreground/5">
+                                <div className="p-8 border-t border-foreground/5 bg-foreground/[0.02] flex items-center justify-between">
                                     <button
-                                        disabled={isLoading}
-                                        className="w-full h-14 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-[10px] hover:opacity-90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
+                                        type="button"
+                                        onClick={handleTestConnection}
+                                        disabled={isTesting || isLoading}
+                                        className="px-6 py-2.5 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-xl font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2"
                                     >
-                                        {isLoading ? 'Saving Changes...' : 'Apply Modifications'}
+                                        <RefreshCw className={`w-3.5 h-3.5 ${isTesting ? 'animate-spin' : ''}`} />
+                                        {isTesting ? 'Testing...' : 'Test Connection'}
                                     </button>
+
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={onClose}
+                                            className="px-6 py-2.5 rounded-xl font-bold text-sm text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={isLoading}
+                                            className="px-8 py-2.5 bg-primary text-primary-foreground rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isLoading ? (
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            ) : (
+                                                'Save Changes'
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
                         </motion.div>
