@@ -8,17 +8,18 @@ export interface AuthUser {
   email: string
   name?: string | null
   role: Role
+  isActive: boolean
 }
 
 export async function requireAuth(): Promise<AuthUser> {
   const session = await getServerSession(authOptions)
-  
+
   if (!session?.user) {
     throw new Error('Unauthorized')
   }
 
   const user = session.user as AuthUser
-  
+
   if (!user.id || !user.role) {
     throw new Error('Invalid session')
   }
@@ -28,11 +29,11 @@ export async function requireAuth(): Promise<AuthUser> {
 
 export async function requireRole(role: Role): Promise<AuthUser> {
   const user = await requireAuth()
-  
+
   if (user.role !== role) {
     throw new Error(`Requires ${role} role`)
   }
-  
+
   return user
 }
 

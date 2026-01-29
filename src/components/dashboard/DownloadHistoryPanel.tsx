@@ -46,10 +46,10 @@ export function DownloadHistoryPanel({
 
     const getFileColor = (type: string) => {
         switch (type) {
-            case 'csv': return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
-            case 'json': return 'text-blue-400 bg-blue-500/10 border-blue-500/20'
-            case 'excel': return 'text-green-400 bg-green-500/10 border-green-500/20'
-            default: return 'text-muted-foreground bg-foreground/5 border-foreground/10'
+            case 'csv': return 'text-emerald-500 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+            case 'json': return 'text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20'
+            case 'excel': return 'text-green-600 dark:text-green-400 bg-green-500/10 border-green-500/20'
+            default: return 'text-muted-foreground bg-foreground/[0.03] dark:bg-white/5 border-foreground/10 dark:border-white/10'
         }
     }
 
@@ -86,7 +86,7 @@ export function DownloadHistoryPanel({
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.05 }}
-                                className="group relative p-4 rounded-xl bg-card/50 backdrop-blur-xl border border-foreground/10 hover:border-foreground/20 transition-all hover:shadow-lg"
+                                className="group relative p-3 rounded-xl bg-background dark:bg-card/50 backdrop-blur-xl border border-foreground/10 dark:border-white/10 hover:border-primary/30 transition-all hover:shadow-lg shadow-sm"
                             >
                                 <div className="flex items-start gap-4">
                                     {/* File Icon */}
@@ -111,10 +111,10 @@ export function DownloadHistoryPanel({
                                                 )}
                                             </div>
                                             <span className={cn(
-                                                "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide whitespace-nowrap",
-                                                item.fileType === 'csv' && "bg-emerald-500/10 text-emerald-400",
-                                                item.fileType === 'json' && "bg-blue-500/10 text-blue-400",
-                                                item.fileType === 'excel' && "bg-green-500/10 text-green-400"
+                                                "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wide whitespace-nowrap",
+                                                item.fileType === 'csv' && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+                                                item.fileType === 'json' && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+                                                item.fileType === 'excel' && "bg-green-500/10 text-green-600 dark:text-green-400"
                                             )}>
                                                 {item.fileType}
                                             </span>

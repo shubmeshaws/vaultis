@@ -2,7 +2,13 @@
 
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User } from './UserTable'
+interface User {
+    id: string
+    name: string | null
+    email: string
+    role: any
+    access: string[]
+}
 
 interface PermissionEditorProps {
     user: User | null
@@ -101,8 +107,8 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
                                                 key={db}
                                                 onClick={() => toggleAccess(db)}
                                                 className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${selectedAccess.includes(db)
-                                                        ? 'bg-primary/10 border-primary/30 text-foreground'
-                                                        : 'bg-white/[0.03] border-white/5 text-muted-foreground hover:border-white/20'
+                                                    ? 'bg-primary/10 border-primary/30 text-foreground'
+                                                    : 'bg-white/[0.03] border-white/5 text-muted-foreground hover:border-white/20'
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-3">
@@ -110,8 +116,8 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
                                                     <span className="text-sm font-bold">{db}</span>
                                                 </div>
                                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${selectedAccess.includes(db)
-                                                        ? 'bg-primary border-primary'
-                                                        : 'border-white/10'
+                                                    ? 'bg-primary border-primary'
+                                                    : 'border-white/10'
                                                     }`}>
                                                     {selectedAccess.includes(db) && <Icons.Save className="w-3 h-3 text-primary-foreground" />}
                                                 </div>

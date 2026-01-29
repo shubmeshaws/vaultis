@@ -117,19 +117,19 @@ export function SqlEditor({ initialValue = '', onRun }: SqlEditorProps) {
     return (
         <div className="relative group">
             {/* Editor Container */}
-            <div className="bg-card/95 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 group-hover:border-white/20">
+            <div className="bg-background dark:bg-card/95 backdrop-blur-xl border border-foreground/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 group-hover:border-foreground/20 dark:group-hover:border-white/20">
 
                 {/* Toolbar */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/5">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-foreground/5 dark:border-white/5 bg-foreground/[0.02] dark:bg-white/5">
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
-                            <div className="w-2.5 h-2.5 rounded-full bg-amber-500/50" />
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
+                        <div className="flex items-center gap-1.5 opacity-60">
+                            <div className="w-2 h-2 rounded-full bg-red-500/40" />
+                            <div className="w-2 h-2 rounded-full bg-amber-500/40" />
+                            <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
                         </div>
-                        <div className="h-4 w-[1px] bg-white/10" />
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                            <EditorIcons.Terminal className="w-3 h-3" />
+                        <div className="h-3 w-[1px] bg-foreground/20 dark:bg-white/10" />
+                        <div className="flex items-center gap-2 text-[10px] font-black text-foreground/60 dark:text-muted-foreground uppercase tracking-widest">
+                            <EditorIcons.Terminal className="w-2.5 h-2.5" />
                             SQL Editor
                         </div>
                     </div>
@@ -156,8 +156,8 @@ export function SqlEditor({ initialValue = '', onRun }: SqlEditorProps) {
 
                 <div className="flex relative min-h-[400px]">
                     {/* Line Numbers Gutter */}
-                    <div className="w-12 py-4 bg-black/20 text-right pr-3 select-none pointer-events-none border-r border-white/5">
-                        <pre className="text-xs font-mono leading-6 text-muted-foreground/40 text-right">
+                    <div className="w-10 py-4 bg-foreground/[0.03] dark:bg-black/20 text-right pr-3 select-none pointer-events-none border-r border-foreground/5 dark:border-white/5">
+                        <pre className="text-[10px] font-mono leading-6 text-foreground/20 dark:text-muted-foreground/40 text-right">
                             {lineNumbers}
                         </pre>
                     </div>
@@ -168,7 +168,7 @@ export function SqlEditor({ initialValue = '', onRun }: SqlEditorProps) {
                         <pre
                             ref={preRef}
                             aria-hidden="true"
-                            className="absolute inset-0 p-4 m-0 text-xs font-mono leading-6 whitespace-pre-wrap break-all pointer-events-none"
+                            className="absolute inset-0 p-4 m-0 text-[13px] font-mono leading-6 whitespace-pre-wrap break-all pointer-events-none text-foreground"
                             dangerouslySetInnerHTML={{ __html: handleHighlight(code) + '\n' }}
                         />
                         {/* Input Layer */}
@@ -179,14 +179,14 @@ export function SqlEditor({ initialValue = '', onRun }: SqlEditorProps) {
                             onScroll={syncScroll}
                             onKeyDown={handleKeyDown}
                             spellCheck={false}
-                            className="absolute inset-0 p-4 m-0 text-xs font-mono leading-6 bg-transparent text-transparent caret-primary outline-none resize-none whitespace-pre-wrap break-all w-full h-full"
+                            className="absolute inset-0 p-4 m-0 text-[13px] font-mono leading-6 bg-transparent text-transparent caret-primary outline-none resize-none whitespace-pre-wrap break-all w-full h-full"
                             placeholder="-- Execute your command here&#10;SELECT * FROM users LIMIT 10;"
                         />
                     </div>
                 </div>
 
                 {/* Status Bar */}
-                <div className="px-4 py-2 border-t border-white/5 bg-black/20 flex items-center justify-between text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                <div className="px-4 py-1.5 border-t border-foreground/10 dark:border-white/5 bg-foreground/[0.04] dark:bg-black/20 flex items-center justify-between text-[9px] font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-wider">
                     <div>{code.length} characters | {code.split('\n').length} lines</div>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1">

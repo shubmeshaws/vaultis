@@ -45,38 +45,38 @@ export function ExecutionStatus({ status, executionTime, affectedRows, error }: 
             case 'success':
                 return {
                     label: 'Success',
-                    color: 'text-emerald-400',
+                    color: 'text-emerald-600 dark:text-emerald-400',
                     bg: 'bg-emerald-500/10',
                     border: 'border-emerald-500/20',
-                    glow: 'shadow-[0_0_10px_rgba(16,185,129,0.3)]',
+                    glow: 'shadow-[0_0_10px_rgba(16,185,129,0.2)] dark:shadow-[0_0_10px_rgba(16,185,129,0.3)]',
                     icon: <Icons.Check className="w-3 h-3" />
                 }
             case 'warning':
                 return {
                     label: 'Slow Query',
-                    color: 'text-amber-400',
+                    color: 'text-amber-600 dark:text-amber-400',
                     bg: 'bg-amber-500/10',
                     border: 'border-amber-500/20',
-                    glow: 'shadow-[0_0_10px_rgba(245,158,11,0.3)]',
+                    glow: 'shadow-[0_0_10px_rgba(245,158,11,0.2)] dark:shadow-[0_0_10px_rgba(245,158,11,0.3)]',
                     icon: <Icons.Alert className="w-3 h-3" />
                 }
             case 'error':
                 return {
                     label: 'Error',
-                    color: 'text-red-400',
+                    color: 'text-red-600 dark:text-red-400',
                     bg: 'bg-red-500/10',
                     border: 'border-red-500/20',
-                    glow: 'shadow-[0_0_10px_rgba(239,68,68,0.3)]',
+                    glow: 'shadow-[0_0_10px_rgba(239,68,68,0.2)] dark:shadow-[0_0_10px_rgba(239,68,68,0.3)]',
                     icon: <Icons.Alert className="w-3 h-3" />
                 }
             default:
                 return {
                     label: 'Ready',
-                    color: 'text-muted-foreground',
-                    bg: 'bg-white/5',
-                    border: 'border-white/10',
+                    color: 'text-foreground/60 dark:text-muted-foreground',
+                    bg: 'bg-foreground/[0.03] dark:bg-white/5',
+                    border: 'border-foreground/10 dark:border-white/10',
                     glow: '',
-                    icon: <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
+                    icon: <div className="w-1.5 h-1.5 rounded-full bg-foreground/20 dark:bg-muted-foreground/30" />
                 }
         }
     }
@@ -111,14 +111,14 @@ export function ExecutionStatus({ status, executionTime, affectedRows, error }: 
                     className="flex items-center gap-1.5"
                 >
                     {executionTime !== undefined && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-                            <Icons.Clock className="w-3 h-3 text-muted-foreground" />
-                            <span className="text-[10px] font-mono text-muted-foreground">{executionTime}ms</span>
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-foreground/[0.03] dark:bg-white/5 border border-foreground/10 dark:border-white/10 backdrop-blur-md">
+                            <Icons.Clock className="w-3 h-3 text-foreground/40 dark:text-muted-foreground" />
+                            <span className="text-[10px] font-mono text-foreground/60 dark:text-muted-foreground">{executionTime}ms</span>
                         </div>
                     )}
                     {affectedRows !== undefined && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-foreground/[0.03] dark:bg-white/5 border border-foreground/10 dark:border-white/10 backdrop-blur-md">
+                            <span className="text-[10px] font-bold text-foreground/60 dark:text-muted-foreground uppercase tracking-wider">
                                 {affectedRows} {affectedRows === 1 ? 'Row' : 'Rows'}
                             </span>
                         </div>
@@ -130,7 +130,7 @@ export function ExecutionStatus({ status, executionTime, affectedRows, error }: 
                 <motion.div
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-[10px] font-medium text-red-400/80 italic max-w-xs truncate"
+                    className="text-[10px] font-medium text-red-600 dark:text-red-400/80 italic max-w-xs truncate"
                 >
                     {error}
                 </motion.div>

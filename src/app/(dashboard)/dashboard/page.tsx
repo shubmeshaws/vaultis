@@ -14,16 +14,16 @@ export default async function DashboardPage() {
   const isAdmin = user.role === Role.ADMIN
 
   return (
-    <div className="space-y-8 p-8 relative overflow-hidden min-h-full">
+    <div className="space-y-5 p-5 relative overflow-hidden min-h-full">
       {/* Background Ambience */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
 
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-black tracking-tight text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground text-sm font-medium">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5">
+        <div className="space-y-0.5">
+          <h1 className="text-xl font-black tracking-tight text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground text-[12px] font-medium">
             Welcome back, <span className="text-primary">{user.name || user.email}</span>
           </p>
         </div>
@@ -52,18 +52,18 @@ export default async function DashboardPage() {
           { label: 'Avg Latency', value: '45ms', change: '-10.5%', icon: Zap, color: 'text-yellow-500' },
           { label: 'Active Connections', value: '12', change: '+4', icon: Shield, color: 'text-purple-500' },
         ].map((stat, i) => (
-          <div key={i} className="group relative p-6 bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl hover:bg-card/80 dark:hover:bg-foreground/[0.04] border border-foreground/10 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
-            <div className="flex justify-between items-start mb-4">
-              <div className={`p-3 rounded-xl bg-background shadow-sm border border-foreground/5 ${stat.color} bg-opacity-10`}>
-                <stat.icon className={`w-5 h-5 ${stat.color}`} />
+          <div key={i} className="group relative p-4 bg-white dark:bg-foreground/[0.02] backdrop-blur-xl hover:bg-slate-50 dark:hover:bg-foreground/[0.04] border border-foreground/10 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 shadow-sm">
+            <div className="flex justify-between items-start mb-2.5">
+              <div className={`p-2 rounded-lg bg-background shadow-sm border border-foreground/5 ${stat.color} bg-opacity-10`}>
+                <stat.icon className={`w-3.5 h-3.5 ${stat.color}`} />
               </div>
               <span className={`text-[10px] font-bold px-2 py-1 rounded-full border border-transparent ${stat.change.startsWith('+') ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
                 {stat.change}
               </span>
             </div>
-            <div className="space-y-1">
-              <h3 className="text-2xl font-black text-foreground tracking-tight">{stat.value}</h3>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+            <div className="space-y-0">
+              <h3 className="text-lg font-black text-foreground tracking-tight">{stat.value}</h3>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{stat.label}</p>
             </div>
           </div>
         ))}
@@ -71,7 +71,7 @@ export default async function DashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
         {/* Recent Activity */}
-        <Card className="lg:col-span-2 border-foreground/10 bg-foreground/[0.02] backdrop-blur-sm shadow-none">
+        <Card className="lg:col-span-2 border-foreground/10 bg-white dark:bg-foreground/[0.02] backdrop-blur-sm shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-lg font-bold">Recent Queries</CardTitle>
@@ -104,39 +104,39 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Quick Actions / Role Card */}
-        <div className="space-y-6">
-          <Card className="border-foreground/10 bg-primary/5 shadow-none relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10" />
-            <CardHeader>
-              <CardTitle className="text-lg font-bold">Access Level</CardTitle>
-              <CardDescription>Your current permissions</CardDescription>
+        <div className="space-y-4">
+          <Card className="border-foreground/10 bg-primary/[0.03] dark:bg-primary/5 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-3xl -mr-6 -mt-6" />
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-sm font-bold">Access Level</CardTitle>
+              <CardDescription className="text-[11px] text-foreground/60 dark:text-muted-foreground">Your permissions</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
-                  <Shield className="w-5 h-5 text-primary-foreground" />
+            <CardContent className="pb-3 px-4">
+              <div className="flex items-center gap-2 mb-2.5">
+                <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
+                  <Shield className="w-3.5 h-3.5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-xl font-black text-foreground">{user.role}</p>
-                  <p className="text-xs text-muted-foreground font-medium">Account Status: Active</p>
+                  <p className="text-base font-black text-foreground">{user.role}</p>
+                  <p className="text-[10px] text-foreground/50 dark:text-muted-foreground font-medium uppercase tracking-tight">Active</p>
                 </div>
               </div>
               {isAdmin && (
                 <a
                   href="/admin"
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-background border border-foreground/10 hover:border-primary/50 text-foreground rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-sm hover:shadow-md group"
+                  className="w-full h-8 flex items-center justify-center gap-2 bg-white dark:bg-background border border-foreground/10 hover:border-primary/50 text-foreground rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all shadow-sm hover:shadow-md group"
                 >
-                  Admin Panel <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                  Admin <ChevronRight className="w-2.5 h-2.5 group-hover:translate-x-1 transition-transform" />
                 </a>
               )}
             </CardContent>
           </Card>
 
           <Card className="border-foreground/10 bg-foreground/[0.02] shadow-none">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold">Quick Actions</CardTitle>
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-sm font-bold">Quick Actions</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-3">
+            <CardContent className="grid grid-cols-2 gap-2 pb-3 px-4">
               {[
                 { label: 'History', href: '/queries/history', icon: Clock },
                 { label: 'Saved', href: '/queries/saved', icon: Database },
@@ -146,10 +146,10 @@ export default async function DashboardPage() {
                 <a
                   key={i}
                   href={action.href}
-                  className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-background border border-foreground/5 hover:border-primary/30 hover:bg-primary/5 transition-all group"
+                  className="flex flex-col items-center justify-center gap-1 p-2.5 rounded-lg bg-white dark:bg-background border border-foreground/5 hover:border-primary/30 hover:bg-primary/5 transition-all group shadow-sm text-center"
                 >
-                  <action.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">{action.label}</span>
+                  <action.icon className="w-3.5 h-3.5 text-foreground/40 dark:text-muted-foreground group-hover:text-primary transition-colors" />
+                  <span className="text-[8.5px] font-bold uppercase tracking-wider text-foreground/60 dark:text-muted-foreground group-hover:text-foreground transition-colors">{action.label}</span>
                 </a>
               ))}
             </CardContent>

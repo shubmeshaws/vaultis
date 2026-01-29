@@ -43,7 +43,7 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
         const highlighted = highlight(input, languages.sql, 'sql')
             .split('\n')
             .map((line: string, i: number) =>
-                `<span class="line-number text-white/20 select-none mr-4 text-xs font-mono w-6 inline-block text-right border-r border-white/10 pr-2">${i + 1}</span>${line}`
+                `<span class="line-number text-foreground/20 dark:text-white/20 select-none mr-4 text-[10px] font-mono w-5 inline-block text-right border-r border-foreground/5 dark:border-white/10 pr-2">${i + 1}</span>${line}`
             )
             .join('\n')
         return highlighted
@@ -56,18 +56,18 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
                 "relative rounded-2xl overflow-hidden backdrop-blur-xl border transition-all duration-500",
                 isDestructive
                     ? "bg-red-500/[0.02] border-red-500/30 shadow-[0_0_30px_-5px_rgba(239,68,68,0.1)]"
-                    : "bg-black/40 border-white/10 shadow-2xl"
+                    : "bg-background dark:bg-black/40 border-foreground/10 dark:border-white/10 shadow-2xl shadow-indigo-500/5 group-hover:border-foreground/20 dark:group-hover:border-white/20"
             )}>
 
                 {/* Visual Header / Toolbar */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/[0.02]">
+                <div className="flex items-center justify-between px-4 py-2.5 border-b border-foreground/5 dark:border-white/5 bg-foreground/[0.02] dark:bg-white/[0.02]">
                     <div className="flex items-center gap-2">
-                        <div className="flex gap-1.5">
-                            <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/30" />
-                            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/30" />
-                            <div className="w-2.5 h-2.5 rounded-full bg-green-500/20 border border-green-500/30" />
+                        <div className="flex gap-1.5 opacity-60">
+                            <div className="w-2 h-2 rounded-full bg-red-500/40 border border-red-500/60" />
+                            <div className="w-2 h-2 rounded-full bg-amber-500/40 border border-amber-500/60" />
+                            <div className="w-2 h-2 rounded-full bg-emerald-500/40 border border-emerald-500/60" />
                         </div>
-                        <span className="text-[10px] font-mono text-white/30 ml-2 uppercase tracking-widest">SQL Editor</span>
+                        <span className="text-[9px] font-mono text-foreground/40 dark:text-white/30 ml-2 uppercase tracking-widest font-black">SQL Editor</span>
                     </div>
 
                     {/* Quick Access Toolbar */}
@@ -76,18 +76,18 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
                             <motion.div
                                 initial={{ opacity: 0, x: 10 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="flex items-center gap-1.5 px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-red-400"
+                                className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 dark:text-red-400"
                             >
-                                <AlertTriangle className="w-3 h-3" />
-                                <span className="text-[9px] font-bold uppercase tracking-wide">Danger Zone</span>
+                                <AlertTriangle className="w-2.5 h-2.5" />
+                                <span className="text-[8px] font-black uppercase tracking-wide">Danger Zone</span>
                             </motion.div>
                         )}
-                        <div className="h-4 w-px bg-white/10 mx-1" />
-                        <button className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors">
-                            <Save className="w-3.5 h-3.5" />
+                        <div className="h-3 w-px bg-foreground/10 dark:bg-white/10 mx-1" />
+                        <button className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/10 text-foreground/30 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors">
+                            <Save className="w-3 h-3" />
                         </button>
-                        <button className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors">
-                            <Share2 className="w-3.5 h-3.5" />
+                        <button className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/10 text-foreground/30 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors">
+                            <Share2 className="w-3 h-3" />
                         </button>
                     </div>
                 </div>
@@ -101,15 +101,15 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
                         padding={20}
                         onKeyDown={handleKeyDown}
                         className={cn(
-                            "font-mono text-sm bg-transparent !outline-none min-h-[300px]",
+                            "font-mono text-[13px] bg-transparent !outline-none min-h-[300px]",
                             "search-editor-textarea", // Custom class for global styles if needed
                         )}
                         textareaClassName="focus:outline-none"
                         style={{
                             fontFamily: '"JetBrains Mono", "Fira Code", monospace',
-                            fontSize: 14,
+                            fontSize: 13,
                             backgroundColor: 'transparent',
-                            color: isDestructive ? '#fca5a5' : '#e2e8f0', // Slight red tint if destructive
+                            color: isDestructive ? '#ef4444' : 'hsl(var(--foreground))', // Slight red tint if destructive
                             textShadow: isDestructive ? '0 0 10px rgba(239,68,68,0.2)' : 'none'
                         }}
                     />
@@ -140,15 +140,15 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
                 </div>
 
                 {/* Status Bar */}
-                <div className="px-4 py-1.5 bg-black/40 border-t border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-[10px] text-white/30 font-mono">
+                <div className="px-4 py-1.5 bg-foreground/[0.04] dark:bg-black/40 border-t border-foreground/10 dark:border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-4 text-[9px] text-foreground/50 dark:text-white/30 font-mono font-bold">
                         <span>Line 1, Col 1</span>
                         <span>UTF-8</span>
                         <span>{code.length} chars</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 animate-pulse" />
-                        <span className="text-[10px] text-emerald-500/70 font-bold uppercase tracking-wider">Ready</span>
+                        <span className="text-[9px] text-emerald-500/70 font-bold uppercase tracking-wider">Ready</span>
                     </div>
                 </div>
             </div>
@@ -184,7 +184,7 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
                 .token.constant,
                 .token.symbol,
                 .token.deleted {
-                    color: #ec4899; /* Pink numbers */
+                    color: #d946ef; /* Magenta numbers */
                 }
 
                 .token.selector,
@@ -193,7 +193,11 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
                 .token.char,
                 .token.builtin,
                 .token.inserted {
-                    color: #a5b4fc; /* Indigo strings */
+                    color: #4f46e5; /* Indigo strings */
+                }
+                
+                .dark .token.string {
+                    color: #a5b4fc;
                 }
 
                 .token.operator,
@@ -201,25 +205,33 @@ export function QueryEditor({ initialValue = '', onRun }: QueryEditorProps) {
                 .token.url,
                 .language-css .token.string,
                 .style .token.string {
-                    color: #e2e8f0;
+                    color: inherit;
                 }
 
                 .token.atrule,
                 .token.attr-value,
                 .token.keyword {
-                    color: #818cf8; /* Indigo/Blue keywords */
-                    font-weight: bold;
+                    color: #6366f1; /* Indigo keywords */
+                    font-weight: 700;
+                }
+                
+                .dark .token.keyword {
+                    color: #818cf8;
                 }
                 
                 .token.function,
                 .token.class-name {
-                    color: #38bdf8; /* Cyan functions */
+                    color: #0891b2; /* Cyan functions */
+                }
+                
+                .dark .token.function {
+                    color: #38bdf8;
                 }
 
                 .token.regex,
                 .token.important,
                 .token.variable {
-                    color: #fbbf24;
+                    color: #d97706;
                 }
             `}</style>
         </div>

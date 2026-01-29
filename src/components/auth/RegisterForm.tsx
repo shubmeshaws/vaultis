@@ -38,7 +38,11 @@ const SECURITY_QUESTIONS = [
   "What was the name of your elementary school?"
 ]
 
-export function RegisterForm() {
+interface RegisterFormProps {
+  onSuccess?: (user: any) => void
+}
+
+export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -70,7 +74,11 @@ export function RegisterForm() {
         return
       }
 
-      router.push('/login?registered=true')
+      if (onSuccess) {
+        onSuccess(result.user)
+      } else {
+        router.push('/login?registered=true')
+      }
     } catch (err) {
       setError('An error occurred. Please try again.')
       setIsLoading(false)

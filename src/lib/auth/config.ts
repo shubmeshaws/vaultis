@@ -59,6 +59,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role as Role,
+          isActive: (user as any).isActive,
         }
       },
     }),
@@ -68,6 +69,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.role = (user as any).role
+        token.isActive = (user as any).isActive
       }
       return token
     },
@@ -75,6 +77,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string
         session.user.role = token.role as Role
+        session.user.isActive = token.isActive as any
       }
       return session
     },

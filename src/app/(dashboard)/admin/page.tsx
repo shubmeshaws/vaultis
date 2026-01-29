@@ -20,22 +20,22 @@ export default async function AdminPage() {
   const systemHealth = 98
 
   return (
-    <div className="space-y-8 p-8 relative min-h-full">
+    <div className="space-y-5 p-5 relative min-h-full">
       {/* Background Glows */}
       <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
 
       {/* Admin Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-foreground/5 pb-6">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-[10px] font-black uppercase tracking-widest text-red-500">
-              Protected Area
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b border-foreground/5 pb-4">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-1">
+            <div className="px-1 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-[8px] font-black uppercase tracking-widest text-red-500">
+              Protected
             </div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">System Administration</p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">System Administration</p>
           </div>
-          <h1 className="text-4xl font-black tracking-tighter text-foreground">Command Center</h1>
-          <p className="text-sm text-muted-foreground font-medium">Real-time operational oversight and control</p>
+          <h1 className="text-xl font-black tracking-tighter text-foreground">Command Center</h1>
+          <p className="text-[10px] text-muted-foreground font-medium">Real-time operational oversight</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -53,18 +53,18 @@ export default async function AdminPage() {
       {/* Core Vitals - Enhanced with Charts */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Total Users */}
-        <Card className="bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-cyan-500/30 transition-all overflow-hidden relative group shadow-sm">
-          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-cyan-500">
-            <Users className="w-24 h-24" />
+        <Card className="bg-white dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-cyan-500/30 transition-all overflow-hidden relative group shadow-sm">
+          <div className="absolute top-0 right-0 p-2.5 opacity-5 group-hover:opacity-10 transition-opacity text-cyan-500">
+            <Users className="w-16 h-16" />
           </div>
-          <CardHeader className="pb-2">
-            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Total Users</CardDescription>
-            <CardTitle className="text-4xl font-black text-foreground">{userCount}</CardTitle>
+          <CardHeader className="pb-1 px-4 pt-4">
+            <CardDescription className="uppercase tracking-widest text-[8px] font-bold text-muted-foreground">Total Users</CardDescription>
+            <CardTitle className="text-2xl font-black text-foreground">{userCount}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full bg-cyan-500" />
-              <p className="text-xs font-medium text-muted-foreground">Registered Accounts</p>
+          <CardContent className="px-4 pb-4">
+            <div className="flex items-center gap-1 mb-1.5">
+              <div className="w-1 h-1 rounded-full bg-cyan-500" />
+              <p className="text-[10px] font-medium text-muted-foreground">Registered Accounts</p>
             </div>
             {/* Mini Trend Chart */}
             <div className="flex items-end gap-1 h-8">
@@ -80,18 +80,18 @@ export default async function AdminPage() {
         </Card>
 
         {/* Active Queries */}
-        <Card className="bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-indigo-500/30 transition-all overflow-hidden relative group shadow-sm">
-          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-indigo-500">
-            <Database className="w-24 h-24" />
+        <Card className="bg-white dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-indigo-500/30 transition-all overflow-hidden relative group shadow-sm">
+          <div className="absolute top-0 right-0 p-2.5 opacity-5 group-hover:opacity-10 transition-opacity text-indigo-500">
+            <Database className="w-16 h-16" />
           </div>
-          <CardHeader className="pb-2">
-            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Active Queries</CardDescription>
-            <CardTitle className="text-4xl font-black text-foreground">{activeQueries}</CardTitle>
+          <CardHeader className="pb-1 px-4 pt-4">
+            <CardDescription className="uppercase tracking-widest text-[8px] font-bold text-muted-foreground">Active Queries</CardDescription>
+            <CardTitle className="text-2xl font-black text-foreground">{activeQueries}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-              <p className="text-xs font-medium text-muted-foreground">Running Operations</p>
+          <CardContent className="px-4 pb-4">
+            <div className="flex items-center gap-1 mb-1.5">
+              <div className="w-1 h-1 rounded-full bg-indigo-500 animate-pulse" />
+              <p className="text-[10px] font-medium text-muted-foreground">Running Ops</p>
             </div>
             {/* Mini Trend Chart */}
             <div className="flex items-end gap-1 h-8">
@@ -107,18 +107,18 @@ export default async function AdminPage() {
         </Card>
 
         {/* Risky Operations */}
-        <Card className="bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-amber-500/30 transition-all overflow-hidden relative group shadow-sm">
-          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-amber-500">
-            <AlertTriangle className="w-24 h-24" />
+        <Card className="bg-white dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-amber-500/30 transition-all overflow-hidden relative group shadow-sm">
+          <div className="absolute top-0 right-0 p-2.5 opacity-5 group-hover:opacity-10 transition-opacity text-amber-500">
+            <AlertTriangle className="w-16 h-16" />
           </div>
-          <CardHeader className="pb-2">
-            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">Risky Operations</CardDescription>
-            <CardTitle className="text-4xl font-black text-foreground">{riskyOperations}</CardTitle>
+          <CardHeader className="pb-1 px-4 pt-4">
+            <CardDescription className="uppercase tracking-widest text-[8px] font-bold text-muted-foreground">Risky Ops</CardDescription>
+            <CardTitle className="text-2xl font-black text-foreground">{riskyOperations}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full bg-amber-500" />
-              <p className="text-xs font-medium text-muted-foreground">Requires Attention</p>
+          <CardContent className="px-4 pb-4">
+            <div className="flex items-center gap-1 mb-1.5">
+              <div className="w-1 h-1 rounded-full bg-amber-500" />
+              <p className="text-[10px] font-medium text-muted-foreground">Attention Needed</p>
             </div>
             {/* Mini Trend Chart */}
             <div className="flex items-end gap-1 h-8">
@@ -134,21 +134,21 @@ export default async function AdminPage() {
         </Card>
 
         {/* System Health */}
-        <Card className="bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-emerald-500/30 transition-all overflow-hidden relative group shadow-sm">
-          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-emerald-500">
-            <Server className="w-24 h-24" />
+        <Card className="bg-white dark:bg-foreground/[0.02] backdrop-blur-xl border-foreground/10 hover:border-emerald-500/30 transition-all overflow-hidden relative group shadow-sm">
+          <div className="absolute top-0 right-0 p-2.5 opacity-5 group-hover:opacity-10 transition-opacity text-emerald-500">
+            <Server className="w-16 h-16" />
           </div>
-          <CardHeader className="pb-2">
-            <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-muted-foreground">System Health</CardDescription>
-            <CardTitle className="text-4xl font-black text-foreground">{systemHealth}%</CardTitle>
+          <CardHeader className="pb-1 px-4 pt-4">
+            <CardDescription className="uppercase tracking-widest text-[8px] font-bold text-foreground/40 dark:text-muted-foreground">Health</CardDescription>
+            <CardTitle className="text-2xl font-black text-foreground">{systemHealth}%</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" />
-              <p className="text-xs font-medium text-muted-foreground">Operational Status</p>
+          <CardContent className="px-4 pb-4">
+            <div className="flex items-center gap-1 mb-1.5">
+              <div className="w-1 h-1 rounded-full bg-emerald-500" />
+              <p className="text-[10px] font-medium text-foreground/60 dark:text-muted-foreground">Operational</p>
             </div>
             {/* Health Bar */}
-            <div className="h-8 w-full bg-foreground/5 rounded-lg overflow-hidden">
+            <div className="h-8 w-full bg-foreground/5 rounded-lg overflow-hidden border border-foreground/5">
               <div className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-lg" style={{ width: `${systemHealth}%` }} />
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs text-emerald-500 font-bold">
@@ -161,7 +161,7 @@ export default async function AdminPage() {
 
       <div className="grid gap-6 md:grid-cols-3">
         {/* User Management Panel */}
-        <Card className="md:col-span-2 border-foreground/10 bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl shadow-sm">
+        <Card className="md:col-span-2 border-foreground/10 bg-white dark:bg-foreground/[0.02] backdrop-blur-xl shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between border-b border-foreground/5 pb-4">
             <div className="space-y-1">
               <CardTitle className="text-lg font-bold">Recent Registrations</CardTitle>
@@ -218,15 +218,15 @@ export default async function AdminPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-foreground/10 bg-card/50 dark:bg-foreground/[0.02] backdrop-blur-xl shadow-sm">
+          <Card className="border-foreground/10 bg-white dark:bg-foreground/[0.02] backdrop-blur-xl shadow-sm">
             <CardHeader className="border-b border-foreground/5 pb-4">
               <CardTitle className="text-base font-bold">Quick Configurations</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-1">
               {['General Settings', 'API Keys', 'Audit Logs', 'Security Policies'].map((link, i) => (
                 <a key={i} href="#" className="flex items-center justify-between p-3 rounded-lg hover:bg-foreground/5 transition-colors group">
-                  <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">{link}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
+                  <span className="text-sm font-medium text-foreground/60 dark:text-muted-foreground group-hover:text-foreground transition-colors">{link}</span>
+                  <ChevronRight className="w-4 h-4 text-foreground/20 dark:text-muted-foreground/30 group-hover:text-primary transition-colors" />
                 </a>
               ))}
             </CardContent>
