@@ -142,6 +142,8 @@ export async function testConnection(data: {
 }) {
     if (!data.host) return { success: false, error: 'Hostname is required' }
 
+    const startTime = performance.now()
+
     try {
         switch (data.type) {
             case 'PostgreSQL': {
@@ -194,10 +196,38 @@ export async function testConnection(data: {
                 return { success: false, error: `Unsupported database type: ${data.type}` }
         }
 
-        return { success: true, message: 'Connection established successfully!' }
+        const endTime = performance.now()
+        const latency = Math.round(endTime - startTime)
+
+        return { success: true, message: 'Connection established successfully!', latency }
     } catch (error: any) {
         console.error(`Connection test failed for ${data.type}:`, error)
         return { success: false, error: error.message || 'Failed to connect to database' }
+    }
+}
+
+// Test connection by database ID
+export async function testConnectionById(databaseId: string) {
+    try {
+        const db = await prisma.database.findUnique({
+            where: { id: databaseId }
+        })
+
+        if (!db) {
+            return { success: false, error: 'Database not found' }
+        }
+
+        return await testConnection({
+            host: db.host || undefined,
+            port: db.port || undefined,
+            type: db.type || 'PostgreSQL',
+            username: db.username || undefined,
+            password: db.password || undefined,
+            password: db.password || undefined,
+            databaseName: (db as any).databaseName || undefined // Let testConnection handle the default ('postgres')
+        })
+    } catch (error: any) {
+        return { success: false, error: error.message || 'Failed to test connection' }
     }
 }
 

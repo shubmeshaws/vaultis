@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Plus,
@@ -20,13 +20,17 @@ import {
     Globe,
     Cpu,
     Lock,
-    Unlock
+    Unlock,
+    CheckCircle2,
+    XCircle,
+    RefreshCw
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Portal } from '@/components/ui/Portal'
-import { createDatabase, updateDatabase, deleteDatabase, testConnection, toggleDatabaseLock } from '@/lib/actions/databaseActions'
+import { createDatabase, updateDatabase, deleteDatabase, testConnection, testConnectionById, toggleDatabaseLock } from '@/lib/actions/databaseActions'
 import { useScrollLock } from '@/hooks/use-scroll-lock'
 import { useToast } from '@/contexts/ToastContext'
+import Image from 'next/image'
 
 interface Database {
     id: string
@@ -38,6 +42,7 @@ interface Database {
     environment: string | null
     username: string | null
     password: string | null
+    databaseName: string | null
     isLocked: boolean
     createdAt: Date
     updatedAt: Date
@@ -51,11 +56,19 @@ interface DatabaseManagementClientProps {
 }
 
 const DB_TYPES = [
-    { id: 'postgresql', name: 'PostgreSQL', logoPath: '/logos/postgresql.svg', color: 'bg-blue-500' },
-    { id: 'mongodb', name: 'MongoDB', logoPath: '/logos/mongodb.svg', color: 'bg-green-500' },
-    { id: 'mysql', name: 'MySQL', logoPath: '/logos/mysql.svg', color: 'bg-orange-500' },
-    { id: 'redis', name: 'Redis', logoPath: '/logos/redis.svg', color: 'bg-red-500' },
+    { id: 'postgresql', name: 'PostgreSQL', logoPath: '/database-logos/postgresql.svg', color: 'bg-blue-500' },
+    { id: 'mongodb', name: 'MongoDB', logoPath: '/database-logos/mongodb.svg', color: 'bg-green-500' },
+    { id: 'mysql', name: 'MySQL', logoPath: '/database-logos/mysql.svg', color: 'bg-orange-500' },
+    { id: 'redis', name: 'Redis', logoPath: '/database-logos/redis.svg', color: 'bg-red-500' },
 ]
+
+interface ConnectionStatus {
+    [key: string]: {
+        connected: boolean
+        latency: number | null
+        lastChecked: Date
+    }
+}
 
 export function DatabaseManagementClient({ initialDatabases }: DatabaseManagementClientProps) {
     const { toast } = useToast()
@@ -65,6 +78,8 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     const [selectedDatabase, setSelectedDatabase] = useState<Database | null>(null)
+    const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({})
+    const [testingConnection, setTestingConnection] = useState<{ [key: string]: boolean }>({})
     const [isLoading, setIsLoading] = useState(false)
 
     // Filter databases
@@ -72,6 +87,62 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
         db.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         db.type?.toLowerCase().includes(searchQuery.toLowerCase())
     )
+
+    // Connection monitoring - check all databases every 10 seconds
+    useEffect(() => {
+        const checkConnections = async () => {
+            for (const db of databases) {
+                const result = await testConnectionById(db.id)
+                setConnectionStatus(prev => ({
+                    ...prev,
+                    [db.id]: {
+                        connected: result.success || false,
+                        latency: result.latency || null,
+                        lastChecked: new Date()
+                    }
+                }))
+            }
+        }
+
+        // Initial check
+        checkConnections()
+
+        // Set up interval for periodic checks
+        const interval = setInterval(checkConnections, 10000) // 10 seconds
+
+        return () => clearInterval(interval)
+    }, [databases])
+
+    // Manual test connection
+    const handleTestConnection = async (db: Database) => {
+        setTestingConnection(prev => ({ ...prev, [db.id]: true }))
+        const result = await testConnectionById(db.id)
+
+        setConnectionStatus(prev => ({
+            ...prev,
+            [db.id]: {
+                connected: result.success || false,
+                latency: result.latency || null,
+                lastChecked: new Date()
+            }
+        }))
+
+        if (result.success) {
+            toast({
+                title: 'Connection successful',
+                description: `Connected to ${db.name} in ${result.latency}ms`,
+                type: 'success'
+            })
+        } else {
+            toast({
+                title: 'Connection failed',
+                description: result.error || 'Unable to connect to database',
+                type: 'error'
+            })
+        }
+
+        setTestingConnection(prev => ({ ...prev, [db.id]: false }))
+    }
 
     const handleAddSuccess = (newDb: Database) => {
         setDatabases([newDb, ...databases])
@@ -162,12 +233,18 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
 
                         <CardHeader className="pb-3">
                             <div className="flex items-start gap-4">
-                                <div className={`p-3 rounded-2xl ${db.type?.toLowerCase() === 'postgresql' ? 'bg-blue-500/10 text-blue-500' :
-                                    db.type?.toLowerCase() === 'mongodb' ? 'bg-green-500/10 text-green-500' :
-                                        db.type?.toLowerCase() === 'mysql' ? 'bg-orange-500/10 text-orange-500' :
-                                            'bg-red-500/10 text-red-500'
-                                    }`}>
-                                    <DatabaseIcon className="w-6 h-6" />
+                                <div className="p-3 rounded-2xl bg-white dark:bg-foreground/5 flex items-center justify-center">
+                                    {DB_TYPES.find(type => type.id === db.type?.toLowerCase())?.logoPath ? (
+                                        <Image
+                                            src={DB_TYPES.find(type => type.id === db.type?.toLowerCase())!.logoPath}
+                                            alt={db.type || 'Database'}
+                                            width={48}
+                                            height={48}
+                                            className="object-contain"
+                                        />
+                                    ) : (
+                                        <DatabaseIcon className="w-12 h-12 text-muted-foreground" />
+                                    )}
                                 </div>
                                 <div className="flex-1 min-w-0 pr-12">
                                     <CardTitle className="text-xl font-black truncate">{db.name}</CardTitle>
@@ -205,12 +282,42 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
 
                             <div className="pt-4 border-t border-foreground/5 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Operational</span>
+                                    {connectionStatus[db.id]?.connected ? (
+                                        <>
+                                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Connected</span>
+                                        </>
+                                    ) : connectionStatus[db.id]?.connected === false ? (
+                                        <>
+                                            <XCircle className="w-3.5 h-3.5 text-red-500" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-red-500">Disconnected</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-pulse" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Checking...</span>
+                                        </>
+                                    )}
                                 </div>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <Zap className="w-3.5 h-3.5" />
-                                    <span>45ms latency</span>
+                                <div className="flex items-center gap-3">
+                                    {connectionStatus[db.id]?.latency && (
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <Zap className="w-3.5 h-3.5" />
+                                            <span>{connectionStatus[db.id].latency}ms</span>
+                                        </div>
+                                    )}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleTestConnection(db)
+                                        }}
+                                        disabled={testingConnection[db.id]}
+                                        className="px-3 py-1 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-xs font-bold transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                                        title="Test Connection"
+                                    >
+                                        <RefreshCw className={`w-3 h-3 ${testingConnection[db.id] ? 'animate-spin' : ''}`} />
+                                        Test
+                                    </button>
                                 </div>
                             </div>
                         </CardContent>
@@ -337,7 +444,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
 
         if (result.success && result.database) {
             onSuccess(result.database as any)
-            setFormData({ name: '', description: '', environment: '', host: '', port: '', username: '', password: '' })
+            setFormData({ name: '', description: '', environment: '', host: '', port: '', username: '', password: '', databaseName: '' })
             setSelectedType(null)
             setStep(1)
         } else {
@@ -397,8 +504,14 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                                         : 'border-foreground/5 bg-foreground/[0.02] hover:border-foreground/20'
                                                         }`}
                                                 >
-                                                    <div className={`p-4 rounded-2xl ${type.color} bg-opacity-10 group-hover:scale-110 transition-transform`}>
-                                                        <DatabaseIcon className={`w-8 h-8 ${type.color.replace('bg-', 'text-')}`} />
+                                                    <div className="p-4 rounded-2xl bg-white dark:bg-foreground/5 group-hover:scale-110 transition-transform flex items-center justify-center">
+                                                        <Image
+                                                            src={type.logoPath}
+                                                            alt={type.name}
+                                                            width={40}
+                                                            height={40}
+                                                            className="object-contain"
+                                                        />
                                                     </div>
                                                     <div>
                                                         <h3 className="font-black text-sm">{type.name}</h3>
@@ -627,6 +740,16 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                                 type="text"
                                                 value={formData.name}
                                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                            />
+                                        </div>
+                                        <div className="space-y-2 col-span-2">
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
+                                            <input
+                                                type="text"
+                                                value={formData.databaseName}
+                                                onChange={(e) => setFormData({ ...formData, databaseName: e.target.value })}
+                                                placeholder="Defaults to postgres"
                                                 className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
                                             />
                                         </div>
