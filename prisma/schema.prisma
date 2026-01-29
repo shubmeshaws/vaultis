@@ -54,6 +54,7 @@ model User {
   accounts          Account[]
   sessions          Session[]
   groups            Group[]
+  directDatabases   Database[] @relation("DirectAccess")
   savedQueries      SavedQuery[]
   queryHistory      QueryHistory[]
 }
@@ -89,6 +90,7 @@ model Database {
   databaseName String?
   isLocked    Boolean  @default(false)
   groups      Group[]
+  directAccessUsers User[] @relation("DirectAccess")
   savedQueries SavedQuery[]
   queryHistory QueryHistory[]
   createdAt   DateTime @default(now())

@@ -80,11 +80,14 @@ export async function toggleUserStatus(userId: string, isVerified: boolean) {
 
 export async function getDatabases() {
     try {
+        console.log('Fetching all databases...')
         const databases = await (prisma as any).database.findMany({
             select: { id: true, name: true, type: true }
         })
+        console.log('Fetched databases count:', databases.length)
         return { success: true, databases }
     } catch (error) {
+        console.error('Failed to fetch databases:', error)
         return { success: false, error: 'Failed to fetch databases' }
     }
 }
@@ -151,8 +154,17 @@ export async function getGroups() {
 
 export async function updateUserPermissions(userId: string, access: string[]) {
     try {
-        // In a real app, we would update a join table or a JSON field
-        // For now, we simulate success as the schema doesn't have an 'access' field yet
+        // Update the directDatabases relation
+        // We assume 'access' contains database IDs
+        await (prisma as any).user.update({
+            where: { id: userId },
+            data: {
+                directDatabases: {
+                    set: access.map(id => ({ id }))
+                }
+            }
+        })
+        revalidatePath('/admin/users')
         return { success: true }
     } catch (error: any) {
         console.error('Error updating permissions:', error)

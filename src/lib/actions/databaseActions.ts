@@ -30,22 +30,38 @@ export async function getUserDatabases() {
 
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
-            include: { groups: { include: { databases: true } } }
+            include: {
+                groups: { include: { databases: true } },
+                directDatabases: true
+            }
         })
 
         if (!user) return { success: false, error: 'User not found' }
 
-        let databases
+        let databases: any[] = []
 
         if (user.role === 'ADMIN') {
             databases = await prisma.database.findMany({
                 orderBy: { name: 'asc' }
             })
         } else {
-            // Flatten databases from all groups
+            // Get databases from groups
             const groupDbs = user.groups.flatMap(g => g.databases)
-            // Remove duplicates
-            databases = Array.from(new Map(groupDbs.map(db => [db.id, db])).values())
+
+            // Get databases from direct access (assuming user.access contains DB names or IDs)
+            // We'll fetch DBs where name matches (if storing names) or ID matches
+            const directDbs = await prisma.database.findMany({
+                where: {
+                    OR: [
+                        { id: { in: user.access } }, // Support ID based access
+                        { name: { in: user.access } } // Backward compatibility for Name based access
+                    ]
+                }
+            })
+
+            // Merge and remove duplicates
+            const allDbs = [...groupDbs, ...directDbs]
+            databases = Array.from(new Map(allDbs.map(db => [db.id, db])).values())
         }
 
         return { success: true, databases }
@@ -222,7 +238,6 @@ export async function testConnectionById(databaseId: string) {
             port: db.port || undefined,
             type: db.type || 'PostgreSQL',
             username: db.username || undefined,
-            password: db.password || undefined,
             password: db.password || undefined,
             databaseName: (db as any).databaseName || undefined // Let testConnection handle the default ('postgres')
         })

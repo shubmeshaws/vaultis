@@ -16,12 +16,18 @@ interface PermissionEditorProps {
     isOpen: boolean
     onClose: () => void
     onSave?: (userId: string, access: string[]) => void
+    availableDatabases: any[]
 }
 
 const Icons = {
     Close: ({ className }: { className?: string }) => (
         <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    ),
+    Check: ({ className }: { className?: string }) => (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
     ),
     Shield: ({ className }: { className?: string }) => (
@@ -41,7 +47,7 @@ const Icons = {
     ),
 }
 
-export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEditorProps) {
+export function PermissionEditor({ user, isOpen, onClose, onSave, availableDatabases }: PermissionEditorProps) {
     const [selectedAccess, setSelectedAccess] = React.useState<string[]>([])
 
     React.useEffect(() => {
@@ -50,13 +56,18 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
         }
     }, [user])
 
-    const databases = ['Production DB', 'Inventory DB', 'Marketing DB', 'Billing DB', 'Analytics DB']
-
-    const toggleAccess = (db: string) => {
+    const toggleAccess = (dbId: string) => {
         setSelectedAccess(prev =>
-            prev.includes(db) ? prev.filter(a => a !== db) : [...prev, db]
+            prev.includes(dbId) ? prev.filter(a => a !== dbId) : [...prev, dbId]
         )
     }
+
+    // Filter out databases that are already in user's groups to avoid confusion? 
+    // Or just show all? Showing all with indication might be better, but for now simple list.
+    // The user might want to give direct access even if in group (redundant but harmless),
+    // or maybe the user IS NOT in the group yet. 
+
+    // We'll show all available databases.
 
     return (
         <Portal>
@@ -102,30 +113,31 @@ export function PermissionEditor({ user, isOpen, onClose, onSave }: PermissionEd
 
                                 {/* Body */}
                                 <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
-                                    <div>
-                                        <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4">Database Access Grants</h4>
-                                        <div className="space-y-2">
-                                            {databases.map((db) => (
-                                                <button
-                                                    key={db}
-                                                    onClick={() => toggleAccess(db)}
-                                                    className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${selectedAccess.includes(db)
-                                                        ? 'bg-primary/10 border-primary/30 text-foreground'
-                                                        : 'bg-foreground/[0.03] border-foreground/5 text-muted-foreground hover:border-foreground/20'
-                                                        }`}
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <Icons.Database className={`w-4 h-4 transition-colors ${selectedAccess.includes(db) ? 'text-primary' : 'opacity-50'}`} />
-                                                        <span className="text-sm font-bold">{db}</span>
-                                                    </div>
-                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${selectedAccess.includes(db)
-                                                        ? 'bg-primary border-primary'
-                                                        : 'border-foreground/10'
-                                                        }`}>
-                                                        {selectedAccess.includes(db) && <Icons.Save className="w-3 h-3 text-primary-foreground" />}
-                                                    </div>
-                                                </button>
-                                            ))}
+                                    {/* Database Selection - Mirroring CreateGroupModal structure */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Database Permissions</label>
+                                        <div className="max-h-[60vh] overflow-y-auto border border-foreground/10 rounded-xl p-2 bg-foreground/5 space-y-1">
+                                            {availableDatabases && availableDatabases.length > 0 ? (
+                                                availableDatabases.map(db => (
+                                                    <label key={db.id} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${selectedAccess.includes(db.id) ? 'bg-primary/10 border border-primary/20' : 'hover:bg-foreground/5 border border-transparent'}`}>
+                                                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${selectedAccess.includes(db.id) ? 'bg-primary border-primary' : 'border-foreground/30'}`}>
+                                                            {selectedAccess.includes(db.id) && <Icons.Check className="w-3 h-3 text-primary-foreground" />}
+                                                        </div>
+                                                        <input
+                                                            type="checkbox"
+                                                            className="hidden"
+                                                            checked={selectedAccess.includes(db.id)}
+                                                            onChange={() => toggleAccess(db.id)}
+                                                        />
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm font-bold text-left">{db.name}</span>
+                                                            <span className="text-[10px] text-muted-foreground">{db.type} • {db.host}</span>
+                                                        </div>
+                                                    </label>
+                                                ))
+                                            ) : (
+                                                <p className="text-sm text-muted-foreground italic p-4 text-center">No available databases found.</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

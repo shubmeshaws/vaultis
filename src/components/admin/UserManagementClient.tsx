@@ -82,9 +82,10 @@ interface UserManagementClientProps {
 }
 
 export function UserManagementClient({ initialUsers, initialGroups, initialDatabases }: UserManagementClientProps) {
+    console.log('UserManagementClient - initialDatabases:', initialDatabases)
     const { toast } = useToast()
     const [activeTab, setActiveTab] = useState<'users' | 'groups'>('users')
-    const [users, setUsers] = useState(initialUsers.map(u => ({ ...u, access: u.access || ['Production DB'] })))
+    const [users, setUsers] = useState(initialUsers)
     const [groups, setGroups] = useState(initialGroups)
     const [databases] = useState(initialDatabases)
     const [searchQuery, setSearchQuery] = useState('')
@@ -114,6 +115,10 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
         isOpen: false,
         group: null
     })
+    const [deleteGroupModal, setDeleteGroupModal] = useState<{ isOpen: boolean, groupId: string | null }>({
+        isOpen: false,
+        groupId: null
+    })
 
     const stats = useMemo(() => ({
         total: users.length,
@@ -141,6 +146,9 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
             return matchesSearch && matchesRole
         })
     }, [users, searchQuery, roleFilter])
+
+    // Debug DB count (Remove later)
+    console.log('Client Render - databases count:', databases?.length)
 
     // Pagination logic
     const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE)
@@ -240,6 +248,12 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
     return (
         <div className="space-y-7">
             {/* Stats Overview */}
+            {(!databases || databases.length === 0) && (
+                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold flex items-center justify-between">
+                    <span>⚠️ Debug: No databases received from server.</span>
+                    <span className="text-xs font-mono bg-red-500/10 px-2 py-1 rounded">Length: {databases?.length || 0}</span>
+                </div>
+            )}
             <div className="grid gap-3 md:grid-cols-3">
                 <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-xl overflow-hidden">
                     <CardHeader className="pb-1 pt-4 px-4">
@@ -420,15 +434,22 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <div className="flex flex-wrap gap-1 max-w-[150px]">
-                                                                {user.access.slice(0, 2).map((db, i) => (
-                                                                    <span key={i} className="px-2 py-0.5 rounded bg-foreground/5 border border-foreground/10 text-[9px] font-bold text-muted-foreground whitespace-nowrap">
-                                                                        {db}
-                                                                    </span>
-                                                                ))}
-                                                                {user.access.length > 2 && (
-                                                                    <span className="px-2 py-0.5 rounded bg-foreground/5 border border-foreground/10 text-[9px] font-bold text-muted-foreground whitespace-nowrap cursor-help" title={user.access.slice(2).join(', ')}>
-                                                                        +{user.access.length - 2} more
-                                                                    </span>
+                                                                {user.access && user.access.length > 0 ? (
+                                                                    <>
+                                                                        {user.access.slice(0, 2).map((db, i) => (
+                                                                            <span key={i} className="px-2 py-0.5 rounded bg-foreground/5 border border-foreground/10 text-[9px] font-bold text-muted-foreground whitespace-nowrap">
+                                                                                {/* Find database name if possible, or show ID/fallback */}
+                                                                                {databases?.find(d => d.id === db)?.name || db}
+                                                                            </span>
+                                                                        ))}
+                                                                        {user.access.length > 2 && (
+                                                                            <span className="px-2 py-0.5 rounded bg-foreground/5 border border-foreground/10 text-[9px] font-bold text-muted-foreground whitespace-nowrap cursor-help" title={user.access.map(a => databases?.find(d => d.id === a)?.name || a).join(', ')}>
+                                                                                +{user.access.length - 2} more
+                                                                            </span>
+                                                                        )}
+                                                                    </>
+                                                                ) : (
+                                                                    <span className="text-[9px] text-muted-foreground font-medium italic">No individual access</span>
                                                                 )}
                                                             </div>
                                                         </td>
@@ -594,16 +615,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                             <Edit className="w-4 h-4" />
                                                         </button>
                                                         <button
-                                                            onClick={() => {
-                                                                if (confirm('Are you sure you want to delete this group?')) {
-                                                                    deleteGroup(group.id).then(res => {
-                                                                        if (res.success) {
-                                                                            setGroups(prev => prev.filter(g => g.id !== group.id))
-                                                                            toast({ title: 'Group Deleted', description: 'User group has been removed.', type: 'success' })
-                                                                        }
-                                                                    })
-                                                                }
-                                                            }}
+                                                            onClick={() => setDeleteGroupModal({ isOpen: true, groupId: group.id })}
                                                             className="p-2 hover:bg-foreground/5 rounded-lg text-muted-foreground hover:text-red-500 transition-colors"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
@@ -707,6 +719,12 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                             </button>
                                         </div>
                                         <div className="p-6">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <div className="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-emerald-500">
+                                                    Admin Panel
+                                                </div>
+                                                <p className="text-xs text-muted-foreground uppercase tracking-wider">User Management (DBs: {databases?.length || 0})</p>
+                                            </div>
                                             <div className="text-center mb-4">
                                                 <h2 className="text-xl font-black tracking-tight">CREATE <span className="text-primary">ACCOUNT</span></h2>
                                                 <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-1">Join the QueryX Network</p>
@@ -879,6 +897,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                     <PermissionEditor
                         isOpen={permissionModal.isOpen}
                         user={permissionModal.user}
+                        availableDatabases={databases}
                         onClose={() => setPermissionModal({ isOpen: false, user: null })}
                         onSave={handleSavePermissions}
                     />

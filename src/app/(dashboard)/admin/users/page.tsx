@@ -12,11 +12,17 @@ export default async function UsersManagementPage() {
         redirect('/dashboard')
     }
 
-    // Fetch all users with their groups
+    // Fetch all users with their groups and direct databases
     const users = await (prisma.user as any).findMany({
         orderBy: { createdAt: 'desc' },
         include: {
             groups: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            },
+            directDatabases: {
                 select: {
                     id: true,
                     name: true
@@ -26,12 +32,17 @@ export default async function UsersManagementPage() {
     })
 
     const { groups: initialGroups } = await getGroups()
-    const { databases } = await getDatabases()
 
-    // Map the users to include a default 'access' field for the client component
-    const mappedUsers = users.map(user => ({
+    // Fetch databases directly to ensure fresh data
+    const databases = await prisma.database.findMany({
+        select: { id: true, name: true, type: true }
+    })
+    console.log('Page Direct Fetch - Databases:', databases.length)
+
+    // Map the users to include 'access' field (IDs of direct databases) for the client component
+    const mappedUsers = users.map((user: any) => ({
         ...user,
-        access: ['Production DB'], // Default mock access
+        access: user.directDatabases?.map((db: any) => db.id) || [],
     }))
 
     return (
