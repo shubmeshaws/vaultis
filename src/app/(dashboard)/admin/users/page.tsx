@@ -8,7 +8,7 @@ import {
     CheckCircle,
 } from 'lucide-react'
 import { UserManagementClient } from '@/components/admin/UserManagementClient'
-import { getGroups } from '@/lib/actions/userActions'
+import { getGroups, getDatabases } from '@/lib/actions/userActions'
 
 export default async function UsersManagementPage() {
     const currentUser = await getCurrentUser()
@@ -31,6 +31,7 @@ export default async function UsersManagementPage() {
     })
 
     const { groups: initialGroups } = await getGroups()
+    const { databases } = await getDatabases()
 
     // Map the users to include a default 'access' field for the client component
     const mappedUsers = users.map(user => ({
@@ -102,6 +103,7 @@ export default async function UsersManagementPage() {
                 <UserManagementClient
                     initialUsers={mappedUsers as any}
                     initialGroups={initialGroups || []}
+                    initialDatabases={databases || []}
                 />
             </div>
         </div>
