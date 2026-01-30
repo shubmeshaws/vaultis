@@ -12,9 +12,9 @@ export function GlobalRefreshButton() {
 
     const handleRefresh = async () => {
         setIsRefreshing(true)
-        router.refresh()
-        // Artificial delay to make it feel responsive and show animation
-        setTimeout(() => setIsRefreshing(false), 800)
+        // Use window.location.reload() to ensure all data is refreshed
+        // This works for both server and client components
+        window.location.reload()
     }
 
     return (

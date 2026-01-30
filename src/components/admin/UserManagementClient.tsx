@@ -119,6 +119,10 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
         isOpen: false,
         groupId: null
     })
+    const [editGroupModal, setEditGroupModal] = useState<{ isOpen: boolean, group: any | null }>({
+        isOpen: false,
+        group: null
+    })
 
     const stats = useMemo(() => ({
         total: users.length,
@@ -135,6 +139,8 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
     useScrollLock(deleteModal.isOpen)
     useScrollLock(permissionModal.isOpen)
     useScrollLock(manageGroupModal.isOpen)
+    useScrollLock(editGroupModal.isOpen)
+    useScrollLock(deleteGroupModal.isOpen)
 
     // Filtered users
     const filteredUsers = useMemo(() => {
@@ -240,6 +246,48 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
             toast({
                 title: 'Update Failed',
                 description: res.error || 'Failed to update permissions.',
+                type: 'error'
+            })
+        }
+    }
+
+    const handleRenameGroup = async (newName: string) => {
+        if (!editGroupModal.group) return
+
+        const res = await renameGroup(editGroupModal.group.id, newName)
+        if (res.success) {
+            setGroups(prev => prev.map(g => g.id === editGroupModal.group.id ? { ...g, name: newName } : g))
+            toast({
+                title: 'Group Renamed',
+                description: 'Group name has been updated successfully.',
+                type: 'success'
+            })
+            setEditGroupModal({ isOpen: false, group: null })
+        } else {
+            toast({
+                title: 'Rename Failed',
+                description: res.error || 'Failed to rename group.',
+                type: 'error'
+            })
+        }
+    }
+
+    const handleDeleteGroup = async () => {
+        if (!deleteGroupModal.groupId) return
+
+        const res = await deleteGroup(deleteGroupModal.groupId)
+        if (res.success) {
+            setGroups(prev => prev.filter(g => g.id !== deleteGroupModal.groupId))
+            toast({
+                title: 'Group Deleted',
+                description: 'The group has been permanently removed.',
+                type: 'success'
+            })
+            setDeleteGroupModal({ isOpen: false, groupId: null })
+        } else {
+            toast({
+                title: 'Deletion Failed',
+                description: res.error || 'Failed to delete group.',
                 type: 'error'
             })
         }
@@ -599,18 +647,9 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                     </div>
                                                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <button
-                                                            onClick={() => {
-                                                                const newName = prompt('Enter new group name:', group.name)
-                                                                if (newName) {
-                                                                    renameGroup(group.id, newName).then(res => {
-                                                                        if (res.success) {
-                                                                            setGroups(prev => prev.map(g => g.id === group.id ? { ...g, name: newName } : g))
-                                                                            toast({ title: 'Group Renamed', description: 'Group name has been updated successfully.', type: 'success' })
-                                                                        }
-                                                                    })
-                                                                }
-                                                            }}
+                                                            onClick={() => setEditGroupModal({ isOpen: true, group })}
                                                             className="p-2 hover:bg-foreground/5 rounded-lg text-muted-foreground hover:text-primary transition-colors"
+                                                            title="Rename Group"
                                                         >
                                                             <Edit className="w-4 h-4" />
                                                         </button>
@@ -694,6 +733,71 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                         confirmText="Yes, Terminate"
                         type="danger"
                     />
+
+                    <SimpleConfirmationModal
+                        isOpen={deleteGroupModal.isOpen}
+                        onClose={() => setDeleteGroupModal({ isOpen: false, groupId: null })}
+                        onConfirm={handleDeleteGroup}
+                        title="Delete Group?"
+                        description="This will permanently remove this group. All users will lose group-based database access."
+                        confirmText="Yes, Delete Group"
+                        type="danger"
+                    />
+
+                    <Portal>
+                        <AnimatePresence>
+                            {editGroupModal.isOpen && (
+                                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                                        onClick={() => setEditGroupModal({ isOpen: false, group: null })}
+                                    />
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95, y: 30 }}
+                                        className="relative z-10 w-full max-w-md bg-background rounded-3xl shadow-2xl border border-foreground/10 p-6"
+                                        style={{ zoom: 0.9 }}
+                                    >
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-lg font-black tracking-tight">Rename Group</h3>
+                                            <button onClick={() => setEditGroupModal({ isOpen: false, group: null })} className="p-2 hover:bg-foreground/5 rounded-full transition-colors">
+                                                <X className="w-5 h-5 text-muted-foreground" />
+                                            </button>
+                                        </div>
+                                        <form onSubmit={(e) => {
+                                            e.preventDefault()
+                                            const formData = new FormData(e.currentTarget)
+                                            const newName = formData.get('groupName') as string
+                                            if (newName) handleRenameGroup(newName)
+                                        }}>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Group Name</label>
+                                                    <input
+                                                        name="groupName"
+                                                        type="text"
+                                                        required
+                                                        defaultValue={editGroupModal.group?.name}
+                                                        className="w-full h-10 px-3 mt-2 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 transition-all"
+                                                    />
+                                                </div>
+                                                <button
+                                                    type="submit"
+                                                    className="w-full h-10 bg-primary text-primary-foreground rounded-xl text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-primary/20"
+                                                >
+                                                    Save Changes
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </motion.div>
+                                </div>
+                            )}
+                        </AnimatePresence>
+                    </Portal>
 
                     <Portal>
                         <AnimatePresence>

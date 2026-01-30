@@ -71,8 +71,11 @@ export function Sidebar() {
 
     links.push(
         { href: '/queries', label: 'Query Explorer', icon: Database },
-        { href: '/settings', label: 'Settings', icon: Settings },
     )
+
+    if (isAdmin) {
+        links.push({ href: '/settings', label: 'Settings', icon: Settings })
+    }
 
     // Mock databases removed
 
