@@ -90,16 +90,13 @@ export function Sidebar() {
         <aside className="fixed left-0 top-0 z-40 h-screen w-56 hidden lg:flex flex-col bg-background dark:bg-[#05050A] border-r border-foreground/5 dark:border-white/5 shadow-2xl z-[100] text-foreground dark:text-accent-foreground">
             {/* 1. Logo Area */}
             <div className="h-14 flex items-center px-4 border-b border-foreground/5 dark:border-white/5">
-                <Link href="/" className="flex items-center gap-2 group">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/20 transition-all">
-                        <Command className="w-3.5 h-3.5 text-indigo-400" />
-                    </div>
-                    <div className="flex flex-col justify-center">
-                        <span className="text-base font-black tracking-tight text-foreground dark:text-white leading-none font-[family-name:var(--font-flexing)]">
+                <Link href="/" className="flex items-center group relative">
+                    <div className="flex flex-col justify-center ml-8">
+                        <span className="text-4xl font-black tracking-[0.05em] text-foreground dark:text-white leading-none transition-all group-hover:text-indigo-500 font-[family-name:var(--font-flexing)]">
                             VAULTIS
                         </span>
-                        <span className="text-[7.5px] font-bold text-foreground/30 dark:text-white/30 uppercase tracking-[0.2em] mt-0.5">
-                            Query Platform
+                        <span className="text-[7px] font-bold tracking-[0.5px] text-muted-foreground/60 uppercase mt-[-6px] ml-[2px] group-hover:text-indigo-500 transition-colors">
+                            BY SHUBHAM MESHRAM
                         </span>
                     </div>
                 </Link>
