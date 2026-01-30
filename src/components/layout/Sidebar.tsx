@@ -69,7 +69,6 @@ export function Sidebar() {
 
     links.push(
         { href: '/queries', label: 'Query Explorer', icon: Database },
-        { href: '/queries/history', label: 'History', icon: Activity },
         { href: '/settings', label: 'Settings', icon: Settings },
     )
 

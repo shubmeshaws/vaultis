@@ -18,9 +18,9 @@ A futuristic SaaS web application for database query execution & monitoring with
    ```
 
 2. **Choose your database:**
-   - **Option A: Supabase (Recommended)** - See `SETUP_COMPLETE.md`
-   - **Option B: Docker** - See `SETUP_COMPLETE.md`
-   - **Option C: Local PostgreSQL** - See `SETUP_COMPLETE.md`
+   - **Option A: Supabase (Recommended)** - See [Deployment Guide](./deployment/README.md)
+   - **Option B: Docker** - See [Deployment Guide](./deployment/README.md)
+   - **Option C: Local PostgreSQL** - See [Deployment Guide](./deployment/README.md)
 
 3. **Set up database:**
    ```bash
@@ -41,9 +41,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📚 Documentation
 
-- **`SETUP_COMPLETE.md`** - Complete setup guide with all database options
-- **`QUICK_START.md`** - Quick reference guide
-- **`DATABASE_SETUP.md`** - Detailed database setup instructions
+- **[Installation & Deployment](./deployment/README.md)** - Complete guide for Docker, EC2, and Kubernetes
 - **`docs/AUTH_IMPLEMENTATION.md`** - Authentication system documentation
 - **`docs/AUTH_QUICK_REFERENCE.md`** - Auth quick reference
 - **`docs/TECH_STACK.md`** - Technology choices
