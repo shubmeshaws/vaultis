@@ -18,7 +18,8 @@ import {
     ChevronDown,
     Server,
     FileText,
-    BarChart3
+    BarChart3,
+    Bot
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
@@ -71,6 +72,7 @@ export function Sidebar() {
 
     links.push(
         { href: '/queries', label: 'Query Explorer', icon: Database },
+        { href: '/meshy', label: 'Meshy AI', icon: Bot },
     )
 
     if (isAdmin) {

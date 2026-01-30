@@ -141,6 +141,17 @@ model SystemConfig {
   updatedAt DateTime @updatedAt
 }
 
+model AIConfig {
+  id        String   @id @default(cuid())
+  provider  String   @unique // 'openai', 'anthropic', 'google', 'azure'
+  apiKey    String
+  model     String?  // Optional: specific model to use
+  endpoint  String?  // For Azure OpenAI custom endpoints
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum Role {
   USER
   ADMIN
