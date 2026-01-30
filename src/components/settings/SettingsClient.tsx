@@ -4,62 +4,38 @@ import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { RefreshCw, CheckCircle, XCircle, Server, Activity, ArrowUpCircle, Database, ShieldCheck, Wifi } from 'lucide-react'
-import { checkDatabaseHealth, getSystemInfo, getManagedDatabases } from '@/lib/actions/systemActions'
-import { testConnectionById } from '@/lib/actions/databaseActions'
+import { RefreshCw, CheckCircle, Server, Activity, ArrowUpCircle, ShieldCheck, Wifi } from 'lucide-react'
+import { checkDatabaseHealth, getSystemInfo } from '@/lib/actions/systemActions'
 import { useToast } from '@/contexts/ToastContext'
-import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
 export default function SettingsClient() {
     const { toast } = useToast()
-    const { isAdmin } = useAuth()
     const [health, setHealth] = useState<{ status: string, latency: number, message: string } | null>(null)
     const [systemInfo, setSystemInfo] = useState<{ version: string, nodeVersion: string, environment: string, uptime: number } | null>(null)
-    const [managedDbs, setManagedDbs] = useState<any[]>([])
     const [isLoadingHealth, setIsLoadingHealth] = useState(false)
-    const [isTestingDb, setIsTestingDb] = useState<string | null>(null)
-    const [dbResults, setDbResults] = useState<Record<string, { success: boolean, latency?: number, error?: string }>>({})
 
-    const fetchHealth = async () => {
-        setIsLoadingHealth(true)
+    const fetchHealth = async (isManual = false) => {
+        if (isManual) setIsLoadingHealth(true)
         const res = await checkDatabaseHealth()
+
+        // Only toast if manual OR if status changed (e.g. went offline)
+        const statusChanged = health && health.status !== res.status
+        if (isManual || statusChanged) {
+            if (res.success) {
+                toast({ title: 'Application Health Check', description: 'Internal database connection is stable.', type: 'success' })
+            } else {
+                toast({ title: 'System Warning', description: 'Internal database connection failed.', type: 'error' })
+            }
+        }
+
         setHealth({
             status: res.status,
             latency: res.latency,
             message: res.message
         })
-        setIsLoadingHealth(false)
-        if (res.success) {
-            toast({ title: 'Application Health Check', description: 'Internal database connection is stable.', type: 'success' })
-        } else {
-            toast({ title: 'System Warning', description: 'Internal database connection failed.', type: 'error' })
-        }
-    }
 
-    const testExternalDb = async (dbId: string, dbName: string) => {
-        setIsTestingDb(dbId)
-        try {
-            const res = await testConnectionById(dbId)
-            setDbResults(prev => ({
-                ...prev,
-                [dbId]: {
-                    success: res.success,
-                    latency: res.latency,
-                    error: res.error
-                }
-            }))
-
-            if (res.success) {
-                toast({ title: `Connection to ${dbName} OK`, description: `Latency: ${res.latency}ms`, type: 'success' })
-            } else {
-                toast({ title: `Connection to ${dbName} Failed`, description: res.error, type: 'error' })
-            }
-        } catch (error) {
-            setDbResults(prev => ({ ...prev, [dbId]: { success: false, error: 'Request timeout' } }))
-        } finally {
-            setIsTestingDb(null)
-        }
+        if (isManual) setIsLoadingHealth(false)
     }
 
     const fetchData = async () => {
@@ -68,19 +44,30 @@ export default function SettingsClient() {
 
         // Auto-check health on load
         fetchHealth()
-
-        if (isAdmin) {
-            const dbs = await getManagedDatabases()
-            if (dbs.success) setManagedDbs(dbs.databases || [])
-        }
     }
 
     useEffect(() => {
         fetchData()
-    }, [isAdmin])
+
+        // Real-time metadata health check every 10 seconds
+        const healthInterval = setInterval(fetchHealth, 10000)
+
+        // Local uptime increment every second for real-time feel
+        const uptimeInterval = setInterval(() => {
+            setSystemInfo(prev => {
+                if (!prev) return null;
+                return { ...prev, uptime: prev.uptime + 1 }
+            })
+        }, 1000)
+
+        return () => {
+            clearInterval(healthInterval)
+            clearInterval(uptimeInterval)
+        }
+    }, [])
 
     return (
-        <div className="space-y-6">
+        <div className="max-w-5xl space-y-6">
             {/* System Health Section */}
             <Card className="bg-card/50 backdrop-blur-sm border-foreground/10 overflow-hidden">
                 <CardHeader className="bg-foreground/[0.02]">
@@ -95,7 +82,7 @@ export default function SettingsClient() {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={fetchHealth}
+                            onClick={() => fetchHealth(true)}
                             disabled={isLoadingHealth}
                             className="gap-2 border-indigo-500/20 hover:bg-indigo-500/10"
                         >
@@ -116,7 +103,7 @@ export default function SettingsClient() {
                                     <Server className={cn("w-5 h-5", health?.status === 'online' ? "text-emerald-500" : "text-red-500")} />
                                 </div>
                                 <div>
-                                    <p className="text-[13px] font-bold">Metadata Database</p>
+                                    <p className="text-[13px] font-bold">Metadata Database <span className="text-[10px] text-indigo-500 font-medium ml-1 opacity-70">(Real-time)</span></p>
                                     <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Prisma Client</p>
                                 </div>
                             </div>
@@ -162,69 +149,6 @@ export default function SettingsClient() {
                 </CardContent>
             </Card>
 
-            {/* External Database Connectivity (Admin Only) */}
-            {isAdmin && managedDbs.length > 0 && (
-                <Card className="bg-card/50 backdrop-blur-sm border-foreground/10 overflow-hidden">
-                    <CardHeader className="bg-foreground/[0.02]">
-                        <CardTitle className="flex items-center gap-2">
-                            <Database className="w-5 h-5 text-indigo-500" />
-                            Managed Connectivity
-                        </CardTitle>
-                        <CardDescription>Test connections to registered external databases</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                        <div className="grid gap-3">
-                            {managedDbs.map((db) => (
-                                <div key={db.id} className="p-3 rounded-xl border border-foreground/5 hover:border-indigo-500/20 transition-all bg-foreground/[0.01] flex items-center justify-between group">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-foreground/5 border border-foreground/10 flex items-center justify-center font-black text-[10px] text-muted-foreground uppercase group-hover:border-indigo-500/30 transition-all">
-                                            {db.type?.substring(0, 2) || 'DB'}
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-bold flex items-center gap-2">
-                                                {db.name}
-                                                {db.isLocked && <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />}
-                                            </p>
-                                            <p className="text-[10px] text-muted-foreground font-medium">{db.host || 'Direct Connection'}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-4">
-                                        {dbResults[db.id] && (
-                                            <div className="text-right">
-                                                <Badge variant={dbResults[db.id].success ? 'default' : 'destructive'} className={cn(
-                                                    "text-[9px] font-black uppercase px-2 h-4",
-                                                    dbResults[db.id].success ? "bg-emerald-500 text-white" : ""
-                                                )}>
-                                                    {dbResults[db.id].success ? 'Working' : 'Failed'}
-                                                </Badge>
-                                                {dbResults[db.id].success && (
-                                                    <p className="text-[9px] font-mono font-bold opacity-40 mt-0.5">{dbResults[db.id].latency}ms</p>
-                                                )}
-                                            </div>
-                                        )}
-                                        <Button
-                                            variant="secondary"
-                                            size="sm"
-                                            onClick={() => testExternalDb(db.id, db.name)}
-                                            disabled={isTestingDb === db.id}
-                                            className="h-8 text-[10px] font-bold px-4 gap-2 hover:bg-indigo-500 hover:text-white transition-all shadow-sm"
-                                        >
-                                            {isTestingDb === db.id ? (
-                                                <RefreshCw className="w-3 h-3 animate-spin" />
-                                            ) : (
-                                                <RefreshCw className="w-3 h-3" />
-                                            )}
-                                            {dbResults[db.id] ? 'Re-test' : 'Test Connection'}
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
             {/* Application Information */}
             <Card className="bg-card/50 backdrop-blur-sm border-foreground/10">
                 <CardHeader>
@@ -253,6 +177,22 @@ export default function SettingsClient() {
                                 <CheckCircle className="w-3 h-3 text-emerald-500" />
                                 <span className="text-xs font-bold">Stable Build</span>
                             </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t border-foreground/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                                <ShieldCheck className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-black">Created by</p>
+                                <p className="text-xs font-bold">Shubham Meshram <span className="text-primary/60 font-medium">(DevOps)</span></p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Wifi className="w-3.5 h-3.5" />
+                            <a href="mailto:shubmeshaws@gmail.com" className="text-xs font-mono font-medium">shubmeshaws@gmail.com</a>
                         </div>
                     </div>
                 </CardContent>

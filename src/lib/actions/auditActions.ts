@@ -11,6 +11,7 @@ interface AuditLogFilters {
     timeRange?: string
     startDate?: string
     endDate?: string
+    status?: string
 }
 
 export async function getAuditLogs(filters: AuditLogFilters = {}) {
@@ -21,10 +22,15 @@ export async function getAuditLogs(filters: AuditLogFilters = {}) {
             return { success: false, error: 'Unauthorized access', logs: [] }
         }
 
-        const { searchQuery, userId, databaseId, queryType, startDate, endDate } = filters
+        const { searchQuery, userId, databaseId, queryType, startDate, endDate, status } = filters
 
         // Build where clause
         const where: any = {}
+
+        // Status filter
+        if (status && status !== 'all') {
+            where.status = status
+        }
 
         // Custom date range filter
         if (startDate && endDate) {

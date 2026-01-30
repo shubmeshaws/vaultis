@@ -13,6 +13,7 @@ import {
     X
 } from 'lucide-react'
 import { getAuditLogs } from '@/lib/actions/auditActions'
+import { DateRangePicker } from '@/components/ui/DateRangePicker'
 
 interface AuditLog {
     id: string
@@ -53,6 +54,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
     const [userFilter, setUserFilter] = useState('all')
     const [databaseFilter, setDatabaseFilter] = useState('all')
     const [queryTypeFilter, setQueryTypeFilter] = useState('all')
+    const [statusFilter, setStatusFilter] = useState('all')
     const [startDate, setStartDate] = useState('')
     const [endDate, setEndDate] = useState('')
     const [logs, setLogs] = useState<AuditLog[]>(initialLogs)
@@ -69,7 +71,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
     // Reset to page 1 when filters change
     useEffect(() => {
         setCurrentPage(1)
-    }, [searchQuery, userFilter, databaseFilter, queryTypeFilter, startDate, endDate])
+    }, [searchQuery, userFilter, databaseFilter, queryTypeFilter, statusFilter, startDate, endDate])
 
     // Fetch logs when filters change
     useEffect(() => {
@@ -80,6 +82,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                 userId: userFilter,
                 databaseId: databaseFilter,
                 queryType: queryTypeFilter,
+                status: statusFilter,
                 startDate,
                 endDate
             })
@@ -94,7 +97,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
         }, 800) // Increased from 300ms to reduce server load
 
         return () => clearTimeout(debounce)
-    }, [searchQuery, userFilter, databaseFilter, queryTypeFilter, startDate, endDate])
+    }, [searchQuery, userFilter, databaseFilter, queryTypeFilter, statusFilter, startDate, endDate])
 
     const getRiskColor = (level: string) => {
         switch (level) {
@@ -120,7 +123,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
     return (
         <>
             {/* Filters Bar */}
-            <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 shadow-sm">
+            <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 shadow-sm relative z-20">
                 <CardContent className="p-4">
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="relative flex-1 min-w-[200px]">
@@ -136,7 +139,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                         <select
                             value={userFilter}
                             onChange={(e) => setUserFilter(e.target.value)}
-                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer"
+                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
                         >
                             <option value="all">All Users</option>
                             {users.map(user => (
@@ -148,7 +151,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                         <select
                             value={databaseFilter}
                             onChange={(e) => setDatabaseFilter(e.target.value)}
-                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer"
+                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
                         >
                             <option value="all">All Databases</option>
                             {databases.map(db => (
@@ -160,7 +163,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                         <select
                             value={queryTypeFilter}
                             onChange={(e) => setQueryTypeFilter(e.target.value)}
-                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer"
+                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
                         >
                             <option value="all">All Query Types</option>
                             <option value="SELECT">SELECT</option>
@@ -171,24 +174,27 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                             <option value="TRUNCATE">TRUNCATE</option>
                             <option value="ALTER">ALTER</option>
                         </select>
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">From:</label>
-                            <input
-                                type="datetime-local"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                className="h-10 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">To:</label>
-                            <input
-                                type="datetime-local"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                className="h-10 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium"
-                            />
-                        </div>
+
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="success">Success</option>
+                            <option value="error">Failed</option>
+                        </select>
+
+                        <div className="h-10 w-[1px] bg-foreground/10 hidden md:block mx-1" />
+
+                        <DateRangePicker
+                            initialStart={startDate}
+                            initialEnd={endDate}
+                            onRangeChange={(range) => {
+                                setStartDate(range.start)
+                                setEndDate(range.end)
+                            }}
+                        />
                     </div>
                 </CardContent>
             </Card>
