@@ -120,6 +120,7 @@ model QueryHistory {
   databaseId    String
   database      Database @relation(fields: [databaseId], references: [id], onDelete: Cascade)
   executionTime String?
+  executionTimeMs Int?    // Optimized for sorting
   status        String   @default("success") // success, error
   rowsAffected  Int?
   errorMessage  String?
@@ -129,6 +130,8 @@ model QueryHistory {
 
   @@index([userId])
   @@index([databaseId])
+  @@index([createdAt])
+  @@index([executionTimeMs])
 }
 
 model SystemConfig {

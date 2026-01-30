@@ -49,8 +49,8 @@ export async function getAnalyzerData(filters: AnalyzerFilters = {}) {
                 WHERE 
                     (qh."createdAt" >= ${start}::timestamp OR ${start}::timestamp IS NULL) AND
                     (qh."createdAt" <= ${end}::timestamp OR ${end}::timestamp IS NULL) AND
-                    (CAST(REPLACE(qh."executionTime", 'ms', '') AS INTEGER) >= ${minTime})
-                ORDER BY CAST(REPLACE(qh."executionTime", 'ms', '') AS INTEGER) DESC
+                    (qh."executionTimeMs" >= ${minTime})
+                ORDER BY qh."executionTimeMs" DESC
                 LIMIT 10
             `
         }

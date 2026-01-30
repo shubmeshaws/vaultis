@@ -72,7 +72,6 @@ export default async function DashboardLayout({
     <ToastProvider>
       <DatabaseProvider>
         <div className="min-h-screen bg-background dark:bg-[#05050A] text-foreground relative overflow-hidden font-sans selection:bg-primary/30 transition-colors duration-500">
-          <GlobalRefreshButton />
           {/* Global Ambient Background - Dark Mode Only */}
           <div className="fixed inset-0 z-0 pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-500">
             <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-indigo-900/20 rounded-full blur-[180px] opacity-40 animate-pulse" />
@@ -96,14 +95,13 @@ export default async function DashboardLayout({
             {/* Main Floating Content Area */}
             <main className="flex-1 lg:ml-56 p-4 lg:p-8 transition-all duration-300">
               <div className="h-full rounded-[2.5rem] bg-foreground/[0.02] dark:bg-black/40 border border-foreground/5 dark:border-white/5 backdrop-blur-2xl shadow-sm dark:shadow-2xl overflow-hidden relative">
+                <GlobalRefreshButton />
+                {children}
+
                 {/* Inner Glass Highlights - Dark Mode */}
                 <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 dark:opacity-100" />
                 <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 dark:opacity-100" />
 
-                {/* Content Scroll Area */}
-                <div className="h-full overflow-y-auto custom-scrollbar">
-                  {children}
-                </div>
               </div>
             </main>
           </div>
