@@ -48,16 +48,8 @@ export async function getUserDatabases() {
             // Get databases from groups
             const groupDbs = user.groups.flatMap(g => g.databases)
 
-            // Get databases from direct access (assuming user.access contains DB names or IDs)
-            // We'll fetch DBs where name matches (if storing names) or ID matches
-            const directDbs = await prisma.database.findMany({
-                where: {
-                    OR: [
-                        { id: { in: user.access } }, // Support ID based access
-                        { name: { in: user.access } } // Backward compatibility for Name based access
-                    ]
-                }
-            })
+            // Get databases from direct access (using the directDatabases relation)
+            const directDbs = user.directDatabases || []
 
             // Merge and remove duplicates
             const allDbs = [...groupDbs, ...directDbs]
