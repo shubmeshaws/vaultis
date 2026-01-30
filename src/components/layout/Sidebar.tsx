@@ -138,16 +138,33 @@ export function Sidebar() {
 
             {/* 4. Footer & Profile */}
             <div className="p-2.5 mx-2.5 mb-2.5 border-t border-foreground/5 dark:border-white/5 space-y-1.5">
-                <button
-                    onClick={toggleTheme}
-                    className="w-full h-7.5 flex items-center justify-between px-2 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/5 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-all"
-                >
-                    <span className="text-[10px] font-medium flex items-center gap-1.5">
-                        {theme === 'dark' ? <Moon className="w-2 h-2" /> : <Sun className="w-2 h-2" />}
-                        Mode
-                    </span>
-                    <span className="text-[8px] font-mono opacity-50 uppercase">{theme === 'dark' ? 'DARK' : 'LIGHT'}</span>
-                </button>
+                <div className="flex items-center p-1 bg-foreground/5 dark:bg-white/5 rounded-xl border border-foreground/5">
+                    {['light', 'dark'].map((t) => {
+                        const isActive = theme === t
+                        return (
+                            <button
+                                key={t}
+                                onClick={() => setTheme(t)}
+                                className={cn(
+                                    "flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider relative transition-colors",
+                                    isActive ? "text-foreground dark:text-white" : "text-muted-foreground hover:text-foreground/70"
+                                )}
+                            >
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="theme-pill"
+                                        className="absolute inset-0 bg-background dark:bg-white/10 shadow-sm rounded-lg border border-foreground/5"
+                                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                    />
+                                )}
+                                <span className="relative z-10 flex items-center gap-1.5">
+                                    {t === 'light' ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
+                                    {t}
+                                </span>
+                            </button>
+                        )
+                    })}
+                </div>
 
                 <div className="bg-background dark:bg-[#05050A] rounded-lg p-2 border border-indigo-500/20 backdrop-blur-md flex items-center gap-2 shadow-lg relative group overflow-hidden">
                     <div className="absolute inset-0 bg-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
