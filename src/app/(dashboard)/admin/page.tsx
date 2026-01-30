@@ -21,7 +21,7 @@ export default async function AdminPage() {
   const systemHealth = 98
 
   return (
-    <div className="space-y-5 p-5 relative min-h-full">
+    <div className="space-y-8 p-8 relative min-h-full">
       {/* Background Glows */}
       <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
