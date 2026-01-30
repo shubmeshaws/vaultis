@@ -24,15 +24,18 @@ export function GlobalRefreshButton() {
                 size="sm"
                 onClick={handleRefresh}
                 className={cn(
-                    "bg-background/80 backdrop-blur-xl border-foreground/10 hover:border-primary/50 shadow-lg transition-all duration-300 gap-2 h-9 px-4 rounded-full",
-                    isRefreshing && "bg-primary/10 border-primary/30"
+                    "bg-amber-500/10 backdrop-blur-xl border-amber-500/20 hover:bg-amber-500 hover:text-white shadow-lg shadow-amber-500/10 hover:shadow-amber-500/30 transition-all duration-300 gap-2 h-9 px-4 rounded-full group",
+                    isRefreshing && "bg-amber-500 text-white shadow-amber-500/40"
                 )}
             >
                 <RefreshCw className={cn(
-                    "w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-all duration-700",
-                    isRefreshing && "rotate-180 text-primary"
+                    "w-3.5 h-3.5 text-amber-600 dark:text-amber-500 group-hover:text-white transition-all duration-700",
+                    isRefreshing && "rotate-180 text-white"
                 )} />
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-primary transition-colors">
+                <span className={cn(
+                    "text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-500 group-hover:text-white transition-colors",
+                    isRefreshing && "text-white"
+                )}>
                     Refresh
                 </span>
             </Button>
