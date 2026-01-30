@@ -17,6 +17,16 @@ Use this option if you want to run both the application and the database in Dock
     DATABASE_URL="postgresql://queryflow:queryflow123@postgres:5432/queryflow?schema=public"
     NEXTAUTH_SECRET="your-secret-here"
     NEXTAUTH_URL="http://localhost:3000"
+    
+    # OAuth Providers
+    GITHUB_ID="your_github_id"
+    GITHUB_SECRET="your_github_secret"
+    GOOGLE_ID="your_google_id"
+    GOOGLE_SECRET="your_google_secret"
+    
+    # Domain Restrictions (Optional)
+    ALLOWED_DOMAINS="gmail.com,prismforce.ai"
+    NEXT_PUBLIC_ALLOWED_DOMAINS_MSG="Access denied. Only @gmail.com or @prismforce.ai domains are allowed."
     ```
 
 2.  **Start Services:**

@@ -36,3 +36,21 @@ export async function getSystemInfo() {
         uptime: process.uptime()
     }
 }
+
+export async function getManagedDatabases() {
+    try {
+        const databases = await prisma.database.findMany({
+            select: {
+                id: true,
+                name: true,
+                type: true,
+                host: true,
+                isLocked: true
+            },
+            orderBy: { name: 'asc' }
+        })
+        return { success: true, databases }
+    } catch (error: any) {
+        return { success: false, error: 'Failed to fetch databases' }
+    }
+}

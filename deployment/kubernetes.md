@@ -7,7 +7,13 @@ Store your sensitive database strings:
 ```bash
 kubectl create secret generic queryx-secrets \
   --from-literal=DATABASE_URL="postgresql://user:pass@host:5432/db" \
-  --from-literal=NEXTAUTH_SECRET="your-secret"
+  --from-literal=NEXTAUTH_SECRET="your-secret" \
+  --from-literal=GITHUB_ID="your-id" \
+  --from-literal=GITHUB_SECRET="your-secret" \
+  --from-literal=GOOGLE_ID="your-id" \
+  --from-literal=GOOGLE_SECRET="your-secret" \
+  --from-literal=ALLOWED_DOMAINS="gmail.com,prismforce.ai" \
+  --from-literal=NEXT_PUBLIC_ALLOWED_DOMAINS_MSG="Access denied."
 ```
 
 ## 2. Deployment Manifest (`deployment.yaml`)

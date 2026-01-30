@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db/prisma'
 import { Role } from './permissions'
 import bcrypt from 'bcryptjs'
 import GitHubProvider from 'next-auth/providers/github'
+import GoogleProvider from 'next-auth/providers/google'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -19,6 +20,10 @@ export const authOptions: NextAuthOptions = {
     GitHubProvider({
       clientId: process.env.GITHUB_ID ?? '',
       clientSecret: process.env.GITHUB_SECRET ?? '',
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID ?? '',
+      clientSecret: process.env.GOOGLE_SECRET ?? '',
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -65,6 +70,24 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === 'google' || account?.provider === 'github') {
+        const email = user.email || profile?.email;
+        if (!email) return false;
+
+        const allowedDomains = (process.env.ALLOWED_DOMAINS || '').split(',').map(d => d.trim()).filter(Boolean);
+
+        // If no domains are restricted, allow all
+        if (allowedDomains.length === 0) return true;
+
+        const domain = email.split('@')[1];
+
+        if (!allowedDomains.includes(domain)) {
+          return false;
+        }
+      }
+      return true;
+    },
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id
