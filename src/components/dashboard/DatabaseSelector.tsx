@@ -70,22 +70,22 @@ export function DatabaseSelector({ databases, selectedId, onSelect }: DatabaseSe
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className={cn(
-                    "w-full flex items-center justify-between p-1 pl-3 pr-3 py-2.5 rounded-xl border transition-all duration-300 group",
+                    "w-full flex items-center justify-between px-3 py-1.5 rounded-xl border transition-all duration-300 group",
                     isOpen
                         ? "bg-foreground/[0.08] dark:bg-white/10 border-indigo-500/50 shadow-lg shadow-indigo-500/10"
                         : "bg-foreground/[0.04] dark:bg-white/5 border-foreground/10 dark:border-white/5 hover:bg-foreground/[0.08] dark:hover:bg-white/[0.08] hover:border-foreground/20 dark:hover:border-white/10"
                 )}
             >
-                <div className="flex items-center gap-3 overflow-hidden">
+                <div className="flex items-center gap-2.5 overflow-hidden">
                     {/* Status Dot */}
                     <div className={cn("w-2 h-2 rounded-full shrink-0 transition-all duration-500", getStatusColor(selectedDb.status))} />
 
                     <div className="flex flex-col items-start min-w-0">
-                        <span className="text-xs font-bold text-foreground dark:text-white/90 truncate">{selectedDb.name}</span>
-                        <div className="flex items-center gap-1.5 opacity-50 text-foreground dark:text-white">
-                            <span className="text-[10px] font-mono uppercase tracking-wider">{selectedDb.type}</span>
+                        <span className="text-[10px] font-bold text-foreground dark:text-white/90 truncate leading-tight">{selectedDb.name}</span>
+                        <div className="flex items-center gap-1 opacity-50 text-foreground dark:text-white">
+                            <span className="text-[8px] font-mono uppercase tracking-wider">{selectedDb.type}</span>
                             <span className="w-0.5 h-0.5 rounded-full bg-foreground dark:bg-white/50" />
-                            <span className="text-[10px] uppercase font-bold">{selectedDb.region}</span>
+                            <span className="text-[8px] uppercase font-bold whitespace-nowrap">{selectedDb.region}</span>
                         </div>
                     </div>
                 </div>
@@ -103,9 +103,9 @@ export function DatabaseSelector({ databases, selectedId, onSelect }: DatabaseSe
                         className="absolute top-[calc(100%+8px)] left-0 w-[calc(100%+20px)] -ml-[10px] bg-popover/95 dark:bg-[#0A0A0E]/90 backdrop-blur-2xl border border-foreground/10 dark:border-white/10 rounded-2xl shadow-2xl p-2 z-50 overflow-hidden ring-1 ring-black/5 dark:ring-black/50"
                     >
                         {/* Header */}
-                        <div className="px-2 py-1.5 mb-1 flex items-center justify-between text-[10px] font-bold text-foreground/30 dark:text-white/20 uppercase tracking-widest border-b border-foreground/5 dark:border-white/5">
-                            <span>Select Database</span>
-                            {databases.length} Available
+                        <div className="px-2 py-1 mb-0.5 flex items-center justify-between text-[7.5px] font-black text-foreground/40 dark:text-white/40 uppercase tracking-[0.15em] border-b border-foreground/5 dark:border-white/5">
+                            <span className="whitespace-nowrap">Select Database</span>
+                            <span className="opacity-60 whitespace-nowrap">{databases.length} Available</span>
                         </div>
 
                         <div className="space-y-1 max-h-[300px] overflow-y-auto custom-scrollbar">
@@ -127,7 +127,7 @@ export function DatabaseSelector({ databases, selectedId, onSelect }: DatabaseSe
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: i * 0.03 }}
                                         className={cn(
-                                            "w-full flex items-center gap-3 p-2.5 rounded-xl border transition-all duration-200 group relative overflow-hidden text-left",
+                                            "w-full flex items-center gap-2 p-1.5 rounded-xl border transition-all duration-200 group relative overflow-hidden text-left",
                                             isSelected
                                                 ? "bg-indigo-600/20 border-indigo-500/30"
                                                 : "bg-transparent border-transparent hover:bg-white/5",
@@ -139,29 +139,26 @@ export function DatabaseSelector({ databases, selectedId, onSelect }: DatabaseSe
                                             <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                         )}
 
-                                        {/* Icon Box */}
-                                        <div className={cn(
-                                            "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border transition-colors",
-                                            isSelected ? "bg-indigo-500 text-white border-indigo-400" : "bg-foreground/[0.05] dark:bg-white/5 text-foreground/40 dark:text-white/40 border-foreground/5 dark:border-white/5 group-hover:border-foreground/20 dark:group-hover:border-white/10",
-                                            isLocked && "bg-foreground/[0.1] dark:bg-black/40 border-foreground/5 dark:border-white/5"
-                                        )}>
-                                            {isLocked ? <Lock className="w-3.5 h-3.5" /> : <HardDrive className="w-4 h-4" />}
-                                        </div>
+                                        {/* Layout aligned with trigger button */}
+                                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                            {/* Status Dot */}
+                                            <div className={cn("w-2 h-2 rounded-full shrink-0 transition-all duration-500", getStatusColor(db.status))} />
 
-                                        {/* Content */}
-                                        <div className="flex-1 min-w-0 z-10">
-                                            <div className="flex items-center justify-between mb-0.5">
-                                                <span className={cn(
-                                                    "text-xs font-bold truncate",
-                                                    isSelected ? "text-foreground dark:text-white" : "text-foreground/70 dark:text-white/70 group-hover:text-foreground dark:group-hover:text-white"
-                                                )}>
-                                                    {db.name}
-                                                </span>
-                                                {isLocked && <span className="text-[9px] font-black uppercase text-red-600 dark:text-red-500/70 border border-red-500/20 px-1 py-0.5 rounded">Locked</span>}
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", getStatusColor(db.status))} />
-                                                <span className="text-[10px] text-foreground/40 dark:text-white/30 font-medium uppercase truncate">{db.permission.replace('_', ' ')}</span>
+                                            <div className="flex flex-col items-start min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                    <span className={cn(
+                                                        "text-[10px] font-bold truncate leading-tight",
+                                                        isSelected ? "text-foreground dark:text-white" : "text-foreground/70 dark:text-white/70 group-hover:text-foreground dark:group-hover:text-white"
+                                                    )}>
+                                                        {db.name}
+                                                    </span>
+                                                    {isLocked && <Lock className="w-2.5 h-2.5 text-red-500/50" />}
+                                                </div>
+                                                <div className="flex items-center gap-1 opacity-50 text-foreground dark:text-white">
+                                                    <span className="text-[8px] font-mono uppercase tracking-wider">{db.type}</span>
+                                                    <span className="w-0.5 h-0.5 rounded-full bg-foreground dark:bg-white/50" />
+                                                    <span className="text-[8px] uppercase font-bold whitespace-nowrap">{db.permission.replace('_', ' ')}</span>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -179,12 +176,6 @@ export function DatabaseSelector({ databases, selectedId, onSelect }: DatabaseSe
                             })}
                         </div>
 
-                        {/* Footer */}
-                        <div className="mt-2 pt-2 border-t border-foreground/5 dark:border-white/5 px-1">
-                            <button className="w-full py-2 flex items-center justify-center gap-2 rounded-lg border border-dashed border-foreground/10 dark:border-white/10 text-[10px] font-bold text-foreground/40 dark:text-white/30 hover:text-foreground dark:hover:text-white hover:border-foreground/30 dark:hover:border-white/30 hover:bg-foreground/[0.05] dark:hover:bg-white/5 transition-all uppercase tracking-wide">
-                                + Add Connection
-                            </button>
-                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

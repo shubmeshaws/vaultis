@@ -4,16 +4,26 @@ import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { RefreshCw, CheckCircle, Server, Activity, ArrowUpCircle, ShieldCheck, Wifi } from 'lucide-react'
-import { checkDatabaseHealth, getSystemInfo } from '@/lib/actions/systemActions'
+import { checkDatabaseHealth, getSystemInfo, getSystemConfig, updateSystemConfig, performAuditLogCleanup } from '@/lib/actions/systemActions'
 import { useToast } from '@/contexts/ToastContext'
 import { cn } from '@/lib/utils'
+import { RefreshCw, CheckCircle, Server, Activity, ArrowUpCircle, ShieldCheck, Wifi, Database, Trash2, Save, Calendar } from 'lucide-react'
+import { SimpleConfirmationModal } from '@/components/ui/SimpleConfirmationModal'
 
 export default function SettingsClient() {
     const { toast } = useToast()
     const [health, setHealth] = useState<{ status: string, latency: number, message: string } | null>(null)
     const [systemInfo, setSystemInfo] = useState<{ version: string, nodeVersion: string, environment: string, uptime: number } | null>(null)
     const [isLoadingHealth, setIsLoadingHealth] = useState(false)
+    const [retentionDays, setRetentionDays] = useState('30')
+    const [isSavingRetention, setIsSavingRetention] = useState(false)
+    const [isCleaningLogs, setIsCleaningLogs] = useState(false)
+    const [isCleanupModalOpen, setIsCleanupModalOpen] = useState(false)
+    const [isMounted, setIsMounted] = useState(false)
+
+    useEffect(() => {
+        setIsMounted(true)
+    }, [])
 
     const fetchHealth = async (isManual = false) => {
         if (isManual) setIsLoadingHealth(true)
@@ -42,8 +52,45 @@ export default function SettingsClient() {
         const info = await getSystemInfo()
         setSystemInfo(info)
 
+        // Fetch retention config
+        const config = await getSystemConfig('AUDIT_LOG_RETENTION_DAYS')
+        if (config.success && config.value) {
+            setRetentionDays(config.value)
+        }
+
         // Auto-check health on load
         fetchHealth()
+    }
+
+    const handleSaveRetention = async () => {
+        setIsSavingRetention(true)
+        const res = await updateSystemConfig('AUDIT_LOG_RETENTION_DAYS', retentionDays)
+        if (res.success) {
+            toast({ title: 'Settings Saved', description: 'Audit log retention policy updated.', type: 'success' })
+        } else {
+            toast({ title: 'Error', description: res.error || 'Failed to save settings.', type: 'error' })
+        }
+        setIsSavingRetention(false)
+    }
+
+    const handleManualCleanup = async () => {
+        setIsCleanupModalOpen(false)
+        setIsCleaningLogs(true)
+        const res = await performAuditLogCleanup()
+        if (res.success) {
+            toast({ title: 'Cleanup Successful', description: res.message, type: 'success' })
+        } else {
+            toast({ title: 'Cleanup Failed', description: res.error || 'Failed to clean logs.', type: 'error' })
+        }
+        setIsCleaningLogs(false)
+    }
+
+    const getCutoffDateStr = () => {
+        const days = parseInt(retentionDays)
+        if (isNaN(days)) return 'Invalid'
+        const date = new Date()
+        date.setDate(date.getDate() - days)
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
 
     useEffect(() => {
@@ -149,6 +196,72 @@ export default function SettingsClient() {
                 </CardContent>
             </Card>
 
+            {/* Audit Log Governance Section */}
+            <Card className="bg-card/50 backdrop-blur-sm border-foreground/10 overflow-hidden">
+                <CardHeader className="bg-foreground/[0.02]">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle className="flex items-center gap-2">
+                                <ShieldCheck className="w-5 h-5 text-indigo-500" />
+                                Governance & Retention
+                            </CardTitle>
+                            <CardDescription>Configure data lifecycle and compliance policies</CardDescription>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <div className="space-y-4">
+                            <div className="p-4 rounded-xl border border-foreground/5 bg-foreground/[0.01]">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-2">Audit Log Retention (Days)</label>
+                                <div className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <input
+                                            type="number"
+                                            value={retentionDays}
+                                            onChange={(e) => setRetentionDays(e.target.value)}
+                                            className="w-full h-10 pl-10 pr-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500/50 transition-colors"
+                                            placeholder="30"
+                                        />
+                                    </div>
+                                    <Button
+                                        onClick={handleSaveRetention}
+                                        disabled={isSavingRetention}
+                                        className="bg-indigo-500 hover:bg-indigo-600 text-white gap-2 font-bold px-4"
+                                    >
+                                        <Save className="w-4 h-4" />
+                                        {isSavingRetention ? 'Saving...' : 'Save Policy'}
+                                    </Button>
+                                </div>
+                                <p className="text-[10px] text-muted-foreground mt-3 italic">
+                                    Keeping records from **{isMounted ? getCutoffDateStr() : '...'}** onwards. Policy is enforced during manual cleanup and nightly at 00:00 UTC.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="p-4 rounded-xl border border-red-500/10 bg-red-500/[0.02]">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-red-500/60 block mb-2">Manual Data Purge</label>
+                                <Button
+                                    onClick={() => setIsCleanupModalOpen(true)}
+                                    disabled={isCleaningLogs}
+                                    variant="outline"
+                                    className="w-full h-10 border-red-500/20 hover:bg-red-500/10 text-red-500 gap-2 font-bold"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                    {isCleaningLogs ? 'Cleaning...' : 'Run Retention Cleanup Now'}
+                                </Button>
+                                <p className="text-[10px] text-red-500/60 mt-3 font-medium flex flex-col">
+                                    <span>Immediately remove all logs older than **{isMounted ? getCutoffDateStr() : '...'}**.</span>
+                                    <span className="opacity-70 mt-0.5">Note: If you just created logs today, they won't be deleted unless you set Days to 0.</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
             {/* Application Information */}
             <Card className="bg-card/50 backdrop-blur-sm border-foreground/10">
                 <CardHeader>
@@ -197,6 +310,16 @@ export default function SettingsClient() {
                     </div>
                 </CardContent>
             </Card>
+
+            <SimpleConfirmationModal
+                isOpen={isCleanupModalOpen}
+                onClose={() => setIsCleanupModalOpen(false)}
+                onConfirm={handleManualCleanup}
+                title="Confirm Data Purge"
+                description={`Are you sure you want to permanently remove all audit logs older than ${retentionDays} days? This operation cannot be reversed.`}
+                confirmText="Yes, Purge Logs"
+                type="danger"
+            />
         </div>
     )
 }
