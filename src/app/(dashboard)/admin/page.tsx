@@ -1,7 +1,8 @@
 import { getCurrentUser } from '@/lib/auth/middleware'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { prisma } from '@/lib/db/prisma'
-import { Users, Shield, Server, Activity, ArrowUpRight, Search, Settings, AlertTriangle, ChevronRight, Database, Zap, TrendingUp, TrendingDown } from 'lucide-react'
+import { Users, Shield, Server, Activity, ArrowUpRight, Search, Settings, AlertTriangle, ChevronRight, Database, Zap, TrendingUp, TrendingDown, ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function AdminPage() {
   const user = await getCurrentUser()
@@ -26,19 +27,28 @@ export default async function AdminPage() {
       <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
 
       {/* Admin Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b border-foreground/5 pb-4">
-        <div className="space-y-0.5">
-          <div className="flex items-center gap-1">
-            <div className="px-1 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-[8px] font-black uppercase tracking-widest text-red-500">
-              Protected
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4 border-b border-foreground/5 pb-6">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="p-2 rounded-lg hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-[10px] font-black uppercase tracking-widest text-red-500 flex items-center gap-1">
+                <Shield className="w-3 h-3" />
+                Protected
+              </div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">System Administration</p>
             </div>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">System Administration</p>
+            <h1 className="text-4xl font-black tracking-tighter text-foreground">Command Center</h1>
+            <p className="text-sm text-muted-foreground font-medium mt-1">Real-time operational oversight</p>
           </div>
-          <h1 className="text-xl font-black tracking-tighter text-foreground">Command Center</h1>
-          <p className="text-[10px] text-muted-foreground font-medium">Real-time operational oversight</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 md:mt-16">
           <button className="h-10 px-4 bg-foreground/[0.05] hover:bg-foreground/[0.08] text-foreground rounded-xl text-sm font-bold flex items-center gap-2 transition-all">
             <Settings className="w-4 h-4" />
             System Config

@@ -2,7 +2,7 @@ import { getCurrentUser } from '@/lib/auth/middleware'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Role } from '@/lib/auth/permissions'
 import { redirect } from 'next/navigation'
-import { Activity, Database, Shield, Zap, Clock, ChevronRight, Search, Plus } from 'lucide-react'
+import { Activity, Database, Shield, Zap, Clock, ChevronRight, Search, Plus, LayoutDashboard } from 'lucide-react'
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
@@ -20,15 +20,22 @@ export default async function DashboardPage() {
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
 
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5">
-        <div className="space-y-0.5">
-          <h1 className="text-xl font-black tracking-tight text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground text-[12px] font-medium">
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4 border-b border-foreground/5 pb-6">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="px-2 py-1 rounded bg-blue-500/10 border border-blue-500/20 text-[10px] font-black uppercase tracking-widest text-blue-500 flex items-center gap-1">
+              <LayoutDashboard className="w-3 h-3" />
+              Overview
+            </div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Platform Home</p>
+          </div>
+          <h1 className="text-4xl font-black tracking-tighter text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground font-medium mt-1">
             Welcome back, <span className="text-primary">{user.name || user.email}</span>
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 md:mt-16">
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input

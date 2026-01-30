@@ -14,8 +14,10 @@ import {
     ArrowUpRight,
     Timer,
     ChevronDown,
-    Filter
+    Filter,
+    ChevronLeft
 } from 'lucide-react'
+import Link from 'next/link'
 import { getAnalyzerData } from '@/lib/actions/analyzerActions'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import { cn } from '@/lib/utils'
@@ -139,18 +141,33 @@ export function AnalyzerClient({ initialData }: AnalyzerClientProps) {
     return (
         <div className="space-y-6">
             {/* Header & Filters */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-black tracking-tight text-foreground dark:text-white flex items-center gap-3">
-                        <BarChart3 className="w-7 h-7 text-indigo-500" />
-                        Analyzer
-                    </h1>
-                    <p className="text-sm text-muted-foreground mt-1 italic">
-                        Real-time performance metrics and query activity insights.
-                    </p>
+            {/* Header & Filters */}
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <Link
+                        href="/dashboard"
+                        className="p-2 rounded-lg hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </Link>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="px-2 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-500 flex items-center gap-1">
+                                <BarChart3 className="w-3 h-3" />
+                                System Telemetry
+                            </div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Performance Monitor</p>
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground">
+                            Query Analyzer
+                        </h1>
+                        <p className="text-sm text-muted-foreground font-medium mt-1">
+                            Real-time performance metrics and query activity insights
+                        </p>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mr-8 md:mt-16">
                     <DateRangePicker
                         initialStart={startDate}
                         initialEnd={endDate}

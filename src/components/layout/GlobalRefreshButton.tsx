@@ -18,7 +18,7 @@ export function GlobalRefreshButton() {
     }
 
     return (
-        <div className="absolute top-6 right-[110px] z-[100] group">
+        <div className="absolute top-6 right-[35px] z-[100] group">
             <Button
                 variant="outline"
                 size="sm"

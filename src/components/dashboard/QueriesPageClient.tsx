@@ -5,8 +5,9 @@ import { QueryEditor } from '@/components/editor/QueryEditor'
 import { QueryStatusPanel } from '@/components/dashboard/QueryStatusPanel'
 import { QueryResultsTable } from '@/components/dashboard/QueryResultsTable'
 import { SavedQueriesPanel } from '@/components/dashboard/SavedQueriesPanel'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useDatabase } from '@/contexts/DatabaseContext'
 import { executeQuery, saveQuery, getSavedQueries, deleteSavedQuery, toggleFavoriteQuery, getQueryHistory } from '@/lib/actions/queryActions'
@@ -52,12 +53,12 @@ export function QueriesPageClient() {
 
     const fetchSavedQueries = useCallback(async () => {
         const result = await getSavedQueries()
-        if (result.success) setSavedQueries(result.queries)
+        if (result.success) setSavedQueries(result.queries || [])
     }, [])
 
     const fetchHistory = useCallback(async () => {
         const result = await getQueryHistory()
-        if (result.success) setHistory(result.history)
+        if (result.success) setHistory(result.history || [])
     }, [])
 
     useEffect(() => {
@@ -191,17 +192,31 @@ export function QueriesPageClient() {
         <div className="space-y-6 p-2 lg:p-4 min-h-full">
             {/* Header Area */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-xl font-black tracking-tight text-foreground flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-indigo-500" />
-                        Query Explorer
-                    </h1>
-                    <p className="text-muted-foreground text-[10px] font-medium mt-0.5">
-                        Write, execute, and analyze database operations
-                    </p>
+                <div className="flex items-center gap-3">
+                    <Link
+                        href="/dashboard"
+                        className="p-2 rounded-lg hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </Link>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="px-2 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-500 flex items-center gap-1">
+                                <Sparkles className="w-3 h-3" />
+                                SQL Runner
+                            </div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Database Tool</p>
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground">
+                            Query Explorer
+                        </h1>
+                        <p className="text-sm text-muted-foreground font-medium mt-1">
+                            Write, execute, and analyze database operations
+                        </p>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-foreground/5 p-1 rounded-xl">
+                <div className="flex items-center gap-2 bg-foreground/5 p-1 rounded-xl md:mt-16">
                     <button
                         onClick={() => setActiveTab('editor')}
                         className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'editor'
