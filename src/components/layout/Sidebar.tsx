@@ -17,7 +17,8 @@ import {
     Moon,
     ChevronDown,
     Server,
-    FileText
+    FileText,
+    BarChart3
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
@@ -61,6 +62,7 @@ export function Sidebar() {
     if (isAdmin) {
         links.push(
             { href: '/admin', label: 'Command Center', icon: Shield },
+            { href: '/admin/analyzer', label: 'Analyzer', icon: BarChart3 },
             { href: '/admin/users', label: 'User Management', icon: Users },
             { href: '/admin/databases', label: 'Database Management', icon: Server },
             { href: '/admin/audit-logs', label: 'Audit Logs', icon: FileText }

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth/middleware'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { CommandPaletteRegistry } from '@/components/layout/CommandPaletteRegistry'
+import { GlobalRefreshButton } from '@/components/layout/GlobalRefreshButton'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { CheckCircle } from 'lucide-react'
 import { AccessPollingHandler } from '@/components/auth/AccessPollingHandler'
@@ -71,6 +72,7 @@ export default async function DashboardLayout({
     <ToastProvider>
       <DatabaseProvider>
         <div className="min-h-screen bg-background dark:bg-[#05050A] text-foreground relative overflow-hidden font-sans selection:bg-primary/30 transition-colors duration-500">
+          <GlobalRefreshButton />
           {/* Global Ambient Background - Dark Mode Only */}
           <div className="fixed inset-0 z-0 pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-500">
             <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-indigo-900/20 rounded-full blur-[180px] opacity-40 animate-pulse" />
