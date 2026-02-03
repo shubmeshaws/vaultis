@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { message, databases } = await req.json()
+        const { message, databases, schemaContext, selectedDatabase } = await req.json()
 
         if (!message) {
             return NextResponse.json({ success: false, error: 'Message is required' }, { status: 400 })
@@ -91,14 +91,22 @@ export async function POST(req: NextRequest) {
 
         const { provider, apiKey, model, endpoint } = configResult.config
 
-        // Add database context to system instructions
-        const databaseContext = databases && databases.length > 0
-            ? `\n\nAvailable databases: ${databases.map((db: any) => db.name).join(', ')}`
+        // Add database/schema context to system instructions
+        const databaseInfo = schemaContext || (databases && databases.length > 0
+            ? `Available databases: ${databases.map((db: any) => db.name).join(', ')}`
+            : '')
+
+        const selectionInfo = selectedDatabase
+            ? `\n\nUSER HAS SELECTED DATABASE: "${selectedDatabase.name}" (${selectedDatabase.type})\nPrioritize this database for generating queries.`
             : ''
+
+        const schemaSection = schemaContext
+            ? `\n\n====================\nAVAILABLE SCHEMA\n====================\n${schemaContext}\n\nUse ONLY the tables and columns listed above.\nDO NOT assume or invent tables/columns that aren't shown.${selectionInfo}`
+            : databaseInfo ? `\n\n${databaseInfo}${selectionInfo}` : ''
 
         const userContext = `\n\nYou are chatting with a user named "${user.name}". When appropriate, address them by name.`
 
-        const fullSystemInstructions = MESHY_SYSTEM_INSTRUCTIONS + databaseContext + userContext
+        const fullSystemInstructions = MESHY_SYSTEM_INSTRUCTIONS + schemaSection + userContext
 
         let response
         switch (provider) {
@@ -109,7 +117,7 @@ export async function POST(req: NextRequest) {
                 response = await callAnthropic(apiKey, model || 'claude-3-5-sonnet-20241022', fullSystemInstructions, message)
                 break
             case 'google':
-                response = await callGoogle(apiKey, model || 'gemini-1.5-pro', fullSystemInstructions, message)
+                response = await callGoogle(apiKey, model || 'gemini-1.5-flash-001', fullSystemInstructions, message)
                 break
             case 'groq':
                 response = await callGroq(apiKey, model || 'llama-3.1-70b-versatile', fullSystemInstructions, message)

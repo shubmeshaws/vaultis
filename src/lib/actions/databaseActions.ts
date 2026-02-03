@@ -267,3 +267,224 @@ export async function toggleDatabaseLock(id: string, isLocked: boolean) {
         return { success: false, error: 'Failed to update lock status' }
     }
 }
+
+export async function getDatabaseSchema(databaseId: string) {
+    try {
+        const db = await prisma.database.findUnique({
+            where: { id: databaseId }
+        })
+
+        if (!db) {
+            return { success: false, error: 'Database not found' }
+        }
+
+        if (db.isLocked) {
+            return { success: false, error: 'Database is locked' }
+        }
+
+        let schema: any = { tables: [] }
+
+        switch (db.type) {
+            case 'PostgreSQL': {
+                const client = new PGClient({
+                    host: db.host || 'localhost',
+                    port: db.port || 5432,
+                    user: db.username || undefined,
+                    password: db.password || undefined,
+                    database: db.databaseName || 'postgres',
+                    connectionTimeoutMillis: 10000,
+                })
+
+                await client.connect()
+
+                // Get all tables with their columns
+                const tablesQuery = `
+                    SELECT 
+                        t.table_name,
+                        c.column_name,
+                        c.data_type,
+                        c.is_nullable,
+                        c.column_default,
+                        tc.constraint_type
+                    FROM information_schema.tables t
+                    LEFT JOIN information_schema.columns c 
+                        ON t.table_name = c.table_name 
+                        AND t.table_schema = c.table_schema
+                    LEFT JOIN information_schema.key_column_usage kcu
+                        ON c.table_name = kcu.table_name
+                        AND c.column_name = kcu.column_name
+                        AND c.table_schema = kcu.table_schema
+                    LEFT JOIN information_schema.table_constraints tc
+                        ON kcu.constraint_name = tc.constraint_name
+                        AND kcu.table_schema = tc.table_schema
+                    WHERE t.table_schema = 'public'
+                        AND t.table_type = 'BASE TABLE'
+                    ORDER BY t.table_name, c.ordinal_position
+                `
+
+                const result = await client.query(tablesQuery)
+                await client.end()
+
+                // Group columns by table
+                const tablesMap = new Map()
+                result.rows.forEach((row: any) => {
+                    if (!tablesMap.has(row.table_name)) {
+                        tablesMap.set(row.table_name, {
+                            name: row.table_name,
+                            columns: []
+                        })
+                    }
+
+                    const table = tablesMap.get(row.table_name)
+                    if (row.column_name && !table.columns.find((c: any) => c.name === row.column_name)) {
+                        table.columns.push({
+                            name: row.column_name,
+                            type: row.data_type,
+                            nullable: row.is_nullable === 'YES',
+                            defaultValue: row.column_default,
+                            isPrimaryKey: row.constraint_type === 'PRIMARY KEY',
+                            isForeignKey: row.constraint_type === 'FOREIGN KEY',
+                            isUnique: row.constraint_type === 'UNIQUE'
+                        })
+                    }
+                })
+
+                schema.tables = Array.from(tablesMap.values())
+                break
+            }
+
+            case 'MySQL': {
+                const connection = await mysql.createConnection({
+                    host: db.host || 'localhost',
+                    port: db.port || 3306,
+                    user: db.username || undefined,
+                    password: db.password || undefined,
+                    database: db.databaseName || undefined,
+                })
+
+                const dbName = db.databaseName || 'mysql'
+
+                // Get all tables with their columns
+                const [rows] = await connection.execute(`
+                    SELECT 
+                        t.TABLE_NAME as table_name,
+                        c.COLUMN_NAME as column_name,
+                        c.DATA_TYPE as data_type,
+                        c.IS_NULLABLE as is_nullable,
+                        c.COLUMN_DEFAULT as column_default,
+                        c.COLUMN_KEY as column_key
+                    FROM information_schema.TABLES t
+                    LEFT JOIN information_schema.COLUMNS c 
+                        ON t.TABLE_NAME = c.TABLE_NAME 
+                        AND t.TABLE_SCHEMA = c.TABLE_SCHEMA
+                    WHERE t.TABLE_SCHEMA = ?
+                        AND t.TABLE_TYPE = 'BASE TABLE'
+                    ORDER BY t.TABLE_NAME, c.ORDINAL_POSITION
+                `, [dbName])
+
+                await connection.end()
+
+                // Group columns by table
+                const tablesMap = new Map()
+                    ; (rows as any[]).forEach((row: any) => {
+                        if (!tablesMap.has(row.table_name)) {
+                            tablesMap.set(row.table_name, {
+                                name: row.table_name,
+                                columns: []
+                            })
+                        }
+
+                        const table = tablesMap.get(row.table_name)
+                        if (row.column_name) {
+                            table.columns.push({
+                                name: row.column_name,
+                                type: row.data_type,
+                                nullable: row.is_nullable === 'YES',
+                                defaultValue: row.column_default,
+                                isPrimaryKey: row.column_key === 'PRI',
+                                isForeignKey: row.column_key === 'MUL',
+                                isUnique: row.column_key === 'UNI'
+                            })
+                        }
+                    })
+
+                schema.tables = Array.from(tablesMap.values())
+                break
+            }
+
+            case 'MongoDB': {
+                const credentials = db.username && db.password ? `${encodeURIComponent(db.username)}:${encodeURIComponent(db.password)}@` : ''
+                const url = `mongodb://${credentials}${db.host}:${db.port || 27017}`
+                const client = new MongoClient(url, { serverSelectionTimeoutMS: 10000 })
+
+                await client.connect()
+                const database = client.db(db.databaseName || 'test')
+
+                // Get all collections
+                const collections = await database.listCollections().toArray()
+
+                // For each collection, sample a document to infer schema
+                const tables = await Promise.all(collections.map(async (col) => {
+                    const sampleDoc = await database.collection(col.name).findOne()
+                    const columns = sampleDoc
+                        ? Object.keys(sampleDoc).map(key => ({
+                            name: key,
+                            type: typeof sampleDoc[key],
+                            nullable: true,
+                            isPrimaryKey: key === '_id'
+                        }))
+                        : []
+
+                    return {
+                        name: col.name,
+                        columns
+                    }
+                }))
+
+                await client.close()
+                schema.tables = tables
+                break
+            }
+
+            case 'Redis': {
+                // Redis doesn't have a traditional schema, but we can get key patterns
+                const credentials = db.password ? `:${encodeURIComponent(db.password)}@` : ''
+                const url = `redis://${credentials}${db.host}:${db.port || 6379}`
+                const client = createRedisClient({
+                    url,
+                    socket: { connectTimeout: 10000 }
+                })
+
+                await client.connect()
+
+                // Get sample keys (limited to 100)
+                const keys = await client.keys('*')
+                const sampleKeys = keys.slice(0, 100)
+
+                await client.quit()
+
+                schema.tables = [{
+                    name: 'keys',
+                    columns: [
+                        { name: 'key', type: 'string', nullable: false },
+                        { name: 'value', type: 'string', nullable: true }
+                    ],
+                    meta: {
+                        totalKeys: keys.length,
+                        sampleKeys: sampleKeys
+                    }
+                }]
+                break
+            }
+
+            default:
+                return { success: false, error: `Schema introspection not supported for ${db.type}` }
+        }
+
+        return { success: true, schema, database: { name: db.name, type: db.type } }
+    } catch (error: any) {
+        console.error('Schema introspection failed:', error)
+        return { success: false, error: error.message || 'Failed to fetch database schema' }
+    }
+}
+

@@ -36,17 +36,13 @@ export async function saveAIConfig(provider: string, apiKey: string, model?: str
     }
 
     try {
-        // If a new provider is being saved as active, deactivate others
-        const existingConfig = await (prisma as any).aIConfig.findUnique({
-            where: { provider }
-        })
-
         const config = await (prisma as any).aIConfig.upsert({
             where: { provider },
             update: {
                 apiKey,
                 model,
                 endpoint,
+                isActive: true, // Auto-enable when saving/updating
                 updatedAt: new Date()
             },
             create: {
@@ -54,7 +50,7 @@ export async function saveAIConfig(provider: string, apiKey: string, model?: str
                 apiKey,
                 model,
                 endpoint,
-                isActive: false
+                isActive: true // Auto-enable on creation
             }
         })
 
@@ -65,7 +61,7 @@ export async function saveAIConfig(provider: string, apiKey: string, model?: str
     }
 }
 
-export async function setActiveProvider(provider: string) {
+export async function toggleProviderActive(provider: string, isActive: boolean) {
     const user = await getCurrentUser()
 
     if (!user || user.role !== 'ADMIN') {
@@ -73,23 +69,21 @@ export async function setActiveProvider(provider: string) {
     }
 
     try {
-        // Deactivate all providers
-        await (prisma as any).aIConfig.updateMany({
-            where: {},
-            data: { isActive: false }
-        })
-
-        // Activate the selected provider
         const config = await (prisma as any).aIConfig.update({
             where: { provider },
-            data: { isActive: true }
+            data: { isActive }
         })
 
         return { success: true, config }
     } catch (error) {
-        console.error('Set active provider error:', error)
-        return { success: false, error: 'Failed to set active provider' }
+        console.error('Toggle provider status error:', error)
+        return { success: false, error: 'Failed to update provider status' }
     }
+}
+
+// Deprecated: Use toggleProviderActive instead, but kept for backward compatibility if needed
+export async function setActiveProvider(provider: string) {
+    return toggleProviderActive(provider, true)
 }
 
 export async function deleteAIConfig(provider: string) {
@@ -113,15 +107,28 @@ export async function deleteAIConfig(provider: string) {
 
 export async function getActiveAIConfig() {
     try {
-        const config = await (prisma as any).aIConfig.findFirst({
+        // Fetch ALL active configurations
+        const configs = await (prisma as any).aIConfig.findMany({
             where: { isActive: true }
         })
 
-        if (!config) {
+        if (!configs || configs.length === 0) {
             return { success: false, error: 'No active AI provider configured' }
         }
 
-        return { success: true, config }
+        // Priority Order: Anthropic > OpenAI > Google > Groq
+        const priority = ['anthropic', 'openai', 'google', 'groq']
+
+        // Sort configs based on priority index
+        const sortedConfigs = configs.sort((a: any, b: any) => {
+            const indexA = priority.indexOf(a.provider)
+            const indexB = priority.indexOf(b.provider)
+            // If provider not in list (unexpected), push to end
+            return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB)
+        })
+
+        // Return the highest priority config
+        return { success: true, config: sortedConfigs[0] }
     } catch (error) {
         console.error('Get active AI config error:', error)
         return { success: false, error: 'Failed to fetch active AI configuration' }

@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, Copy, Check, Bot, User, Sparkles } from 'lucide-react'
+import { Send, Copy, Check, Bot, User, Sparkles, Table } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/contexts/ToastContext'
 import { getActiveAIConfig } from '@/lib/actions/aiConfigActions'
+import { getDatabaseSchema } from '@/lib/actions/databaseActions'
 
 interface Message {
     id: string
@@ -98,8 +99,14 @@ export function MeshyClient({ databases, userName }: MeshyClientProps) {
     const [isLoading, setIsLoading] = useState(false)
     const [copiedId, setCopiedId] = useState<string | null>(null)
     const [activeConfig, setActiveConfig] = useState<{ provider: string, model: string } | null>(null)
+    const [databaseSchemas, setDatabaseSchemas] = useState<any[]>([])
+    const [isLoadingSchemas, setIsLoadingSchemas] = useState(false)
+    const [schemaContext, setSchemaContext] = useState<string>('')
+    const [selectedDatabaseId, setSelectedDatabaseId] = useState<string | null>(null)
+    const [selectedTableName, setSelectedTableName] = useState<string | null>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
+    // Fetch active AI config on mount
     useEffect(() => {
         const fetchActiveConfig = async () => {
             const res = await getActiveAIConfig()
@@ -113,6 +120,57 @@ export function MeshyClient({ databases, userName }: MeshyClientProps) {
         fetchActiveConfig()
     }, [])
 
+    // Auto-fetch database schemas on mount
+    useEffect(() => {
+        const fetchSchemas = async () => {
+            if (databases.length === 0) return
+
+            setIsLoadingSchemas(true)
+            const schemas: any[] = []
+
+            for (const db of databases) {
+                try {
+                    const result = await getDatabaseSchema(db.id)
+                    if (result.success) {
+                        schemas.push({
+                            ...result,
+                            id: db.id,
+                            name: db.name
+                        })
+                    }
+                } catch (error) {
+                    console.error(`Failed to fetch schema for ${db.name}:`, error)
+                }
+            }
+
+            setDatabaseSchemas(schemas)
+            setIsLoadingSchemas(false)
+
+            // Build formatted schema context
+            const formatted = schemas.map(dbSchema => {
+                const dbInfo = `📦 ${dbSchema.database?.name || dbSchema.name} (${dbSchema.database?.type || 'Unknown'})`
+                const tables = dbSchema.schema?.tables?.map((table: any) => {
+                    const cols = table.columns?.map((col: any) => {
+                        const constraints = [
+                            col.isPrimaryKey && 'PK',
+                            col.isForeignKey && 'FK',
+                            col.isUnique && 'UNIQUE',
+                            !col.nullable && 'NOT NULL'
+                        ].filter(Boolean).join(', ')
+                        const constraintStr = constraints ? ` [${constraints}]` : ''
+                        return `    - ${col.name}: ${col.type}${constraintStr}`
+                    }).join('\n') || '    (no columns)'
+                    return `  └─ ${table.name}\n${cols}`
+                }).join('\n') || '  (no tables)'
+                return `${dbInfo}\n${tables}`
+            }).join('\n\n')
+
+            setSchemaContext(formatted)
+        }
+
+        fetchSchemas()
+    }, [databases])
+
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -122,28 +180,97 @@ export function MeshyClient({ databases, userName }: MeshyClientProps) {
         scrollToBottom()
     }, [messages])
 
-    const handleSend = async () => {
-        if (!input.trim() || isLoading) return
+    const handleSend = async (overrideMessage?: string) => {
+        const messageText = overrideMessage || input.trim()
+        if (!messageText || isLoading) return
 
         const userMessage: Message = {
             id: Date.now().toString(),
             role: 'user',
-            content: input.trim(),
+            content: messageText,
             timestamp: new Date()
         }
 
         setMessages(prev => [...prev, userMessage])
-        setInput('')
+        if (!overrideMessage) setInput('')
         setIsLoading(true)
 
         try {
+            // Check if Puter is active
+            if (activeConfig?.provider === 'puter') {
+                if (!(window as any).puter) {
+                    // Fallback if script not loaded
+                    throw new Error('Puter.js not loaded')
+                }
+
+                const selectedDb = databases.find(db => db.id === selectedDatabaseId)
+                const schemaInfo = schemaContext || `Available databases: ${databases.map((db: any) => db.name).join(', ')}`
+                const activeDbInfo = selectedDb ? `\n\nUSER HAS SELECTED DATABASE: "${selectedDb.name}" (${selectedDb.type})\nFocus on this database unless asked otherwise.` : ''
+
+                const systemWithContext = `${SYSTEM_INSTRUCTIONS}\n\n====================\nAVAILABLE SCHEMA\n====================\n${schemaInfo}${activeDbInfo}\n\nUse ONLY the tables and columns listed above.\nDO NOT assume or invent tables/columns that aren't shown.\n\nUser: ${userName}`
+
+                // Call Puter directly (Client Side)
+                const resp = await (window as any).puter.ai.chat(
+                    systemWithContext + '\n\n' + messageText,
+                    { model: activeConfig.model }
+                )
+
+                if (resp) {
+                    // Extract text content from Puter response
+                    let textContent = ''
+
+                    // Handle Anthropic content blocks format: [{"type":"text","text":"..."}]
+                    if (Array.isArray(resp) && resp.length > 0 && resp[0].type === 'text') {
+                        textContent = resp.map((block: any) => block.text || '').join('')
+                    } else if (typeof resp === 'string') {
+                        textContent = resp
+                    } else if (resp.message?.content) {
+                        // Handle nested content that might be an array of blocks
+                        if (Array.isArray(resp.message.content) && resp.message.content.length > 0 && resp.message.content[0]?.type === 'text') {
+                            textContent = resp.message.content.map((block: any) => block.text || '').join('')
+                        } else {
+                            textContent = typeof resp.message.content === 'string'
+                                ? resp.message.content
+                                : JSON.stringify(resp.message.content)
+                        }
+                    } else if (resp.content) {
+                        // Handle content that might be an array of blocks
+                        if (Array.isArray(resp.content) && resp.content.length > 0 && resp.content[0]?.type === 'text') {
+                            textContent = resp.content.map((block: any) => block.text || '').join('')
+                        } else {
+                            textContent = typeof resp.content === 'string'
+                                ? resp.content
+                                : JSON.stringify(resp.content)
+                        }
+                    } else if (resp.text) {
+                        textContent = resp.text
+                    } else {
+                        textContent = JSON.stringify(resp)
+                    }
+
+                    const aiMessage: Message = {
+                        id: (Date.now() + 1).toString(),
+                        role: 'assistant',
+                        content: textContent,
+                        timestamp: new Date()
+                    }
+                    setMessages(prev => [...prev, aiMessage])
+                    setIsLoading(false)
+                    return // EXIT EARLY, do not call server API
+                }
+            }
+
+            const selectedDb = databases.find(db => db.id === selectedDatabaseId)
+
             // Call real AI API
             const response = await fetch('/api/ai/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    message: input.trim(),
-                    databases: databases
+                    message: messageText,
+                    databases: databases,
+                    schemaContext: schemaContext,
+                    selectedDatabase: selectedDb ? { name: selectedDb.name, type: selectedDb.type } : null
                 })
             })
 
@@ -194,37 +321,136 @@ export function MeshyClient({ databases, userName }: MeshyClientProps) {
         setTimeout(() => setCopiedId(null), 2000)
     }
 
-    const handleExampleClick = (example: string) => {
-        setInput(example)
+    const handleDatabaseSelect = (db: any) => {
+        setSelectedDatabaseId(db.id)
+        setSelectedTableName(null)
+        handleSend(`I want to query the "${db.name}" (${db.type}) database.`)
     }
 
-    // Simple SQL syntax highlighter
-    const SyntaxHighlight = ({ code }: { code: string }) => {
-        const keywords = ['SELECT', 'FROM', 'WHERE', 'AND', 'OR', 'ORDER BY', 'GROUP BY', 'LIMIT', 'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'ON', 'AS', 'IN', 'BETWEEN', 'LIKE', 'IS', 'NULL', 'NOT', 'COUNT', 'SUM', 'AVG', 'MAX', 'MIN', 'HAVING', 'DISTINCT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER', 'TABLE', 'VALUES', 'SET', 'INTO']
+    const handleTableSelect = (tableName: string) => {
+        setSelectedTableName(tableName)
+        handleSend(`I want to query the "${tableName}" table.`)
+    }
 
-        const parts = code.split(new RegExp(`(${keywords.join('|')})`, 'g'))
+    const handleExampleClick = (example: string) => {
+        handleSend(example)
+    }
+
+    // Enhanced SQL syntax highlighter with vibrant colors
+    const SyntaxHighlight = ({ code }: { code: string }) => {
+        const lines = code.split('\n')
+
+        const highlightLine = (line: string) => {
+            // SQL Keywords (purple)
+            const keywords = ['SELECT', 'FROM', 'WHERE', 'AND', 'OR', 'ORDER BY', 'GROUP BY', 'LIMIT', 'OFFSET', 'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'OUTER JOIN', 'FULL JOIN', 'CROSS JOIN', 'ON', 'AS', 'IN', 'BETWEEN', 'LIKE', 'ILIKE', 'IS', 'NULL', 'NOT', 'EXISTS', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'DISTINCT', 'ALL', 'UNION', 'INTERSECT', 'EXCEPT', 'HAVING', 'WITH', 'RECURSIVE']
+
+            // Aggregate Functions (cyan)
+            const functions = ['COUNT', 'SUM', 'AVG', 'MAX', 'MIN', 'STDDEV', 'VARIANCE', 'COALESCE', 'NULLIF', 'CAST', 'CONVERT', 'SUBSTRING', 'CONCAT', 'UPPER', 'LOWER', 'TRIM', 'LENGTH', 'ROUND', 'FLOOR', 'CEIL', 'ABS', 'NOW', 'CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP', 'DATE', 'TIME', 'TIMESTAMP', 'INTERVAL', 'EXTRACT', 'DATE_TRUNC', 'TO_CHAR', 'TO_DATE', 'TO_TIMESTAMP']
+
+            // DML/DDL Keywords (red - for emphasis on modification)
+            const modificationKeywords = ['INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER', 'TRUNCATE', 'TABLE', 'INDEX', 'VIEW', 'DATABASE', 'SCHEMA', 'VALUES', 'SET', 'INTO']
+
+            // Table context keywords
+            const tableContextKeywords = ['FROM', 'JOIN']
+
+            // Check for comments first
+            if (line.trim().startsWith('--')) {
+                return <span className="text-gray-500 italic">{line}</span>
+            }
+
+            // Split by spaces and special characters while preserving them
+            const tokens = line.split(/(\s+|[(),;=<>!+\-*/%])/)
+
+            // Track if the next identifier should be highlighted as a table name
+            let nextIsTableName = false
+
+            return tokens.map((token, i) => {
+                const upperToken = token.toUpperCase()
+                const trimmedToken = token.trim()
+
+                // Skip empty tokens
+                if (!trimmedToken) {
+                    return <span key={i}>{token}</span>
+                }
+
+                // Check if this token is a table context keyword (FROM or JOIN)
+                if (tableContextKeywords.some(k => upperToken.includes(k))) {
+                    nextIsTableName = true
+                }
+
+                // If we just saw FROM/JOIN and this is an identifier, it's a table name!
+                if (nextIsTableName && trimmedToken.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/) && !keywords.includes(upperToken) && !functions.includes(upperToken) && !modificationKeywords.includes(upperToken)) {
+                    nextIsTableName = false
+                    return <span key={i} className="text-amber-400 font-bold">{token}</span>
+                }
+
+                // Reset if we hit something that's not whitespace or an identifier
+                if (trimmedToken && !trimmedToken.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) {
+                    nextIsTableName = false
+                }
+
+                // Keywords (purple/violet)
+                if (keywords.includes(upperToken)) {
+                    return <span key={i} className="text-violet-400 font-semibold">{token}</span>
+                }
+
+                // Functions (cyan)
+                if (functions.includes(upperToken)) {
+                    return <span key={i} className="text-cyan-400 font-semibold">{token}</span>
+                }
+
+                // Modification keywords (red/pink)
+                if (modificationKeywords.includes(upperToken)) {
+                    return <span key={i} className="text-rose-400 font-bold">{token}</span>
+                }
+
+                // Strings (green)
+                if (token.match(/^'[^']*'$/)) {
+                    return <span key={i} className="text-emerald-400">{token}</span>
+                }
+
+                // Numbers (orange)
+                if (token.match(/^\d+(\.\d+)?$/)) {
+                    return <span key={i} className="text-orange-400">{token}</span>
+                }
+
+                // Operators (yellow)
+                if (token.match(/^[=<>!+\-*\/%]+$/)) {
+                    return <span key={i} className="text-yellow-400">{token}</span>
+                }
+
+                // Special characters/punctuation (gray)
+                if (token.match(/^[(),;]$/)) {
+                    return <span key={i} className="text-gray-400">{token}</span>
+                }
+
+                // Table/column names and identifiers (blue/light)
+                if (token.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/) && !keywords.includes(upperToken) && !functions.includes(upperToken)) {
+                    return <span key={i} className="text-blue-300">{token}</span>
+                }
+
+                // Whitespace and everything else
+                return <span key={i} className="text-gray-300">{token}</span>
+            })
+        }
 
         return (
-            <code className="text-[10px] font-mono leading-relaxed">
-                {parts.map((part, i) => {
-                    if (keywords.includes(part.toUpperCase())) {
-                        return <span key={i} className="text-purple-400 font-bold">{part}</span>
-                    }
-                    // Simple string highlighting
-                    if (part.match(/'[^']*'/)) {
-                        return <span key={i} className="text-emerald-400">{part}</span>
-                    }
-                    // Simple number highlighting
-                    if (part.match(/\b\d+\b/)) {
-                        return <span key={i} className="text-orange-400">{part}</span>
-                    }
-                    return <span key={i} className="text-muted-foreground">{part}</span>
-                })}
+            <code className="text-[10px] font-mono leading-relaxed block">
+                {lines.map((line, idx) => (
+                    <div key={idx}>
+                        {highlightLine(line)}
+                    </div>
+                ))}
             </code>
         )
     }
 
     const renderMessageContent = (content: string) => {
+        // Ensure content is a string
+        if (typeof content !== 'string') {
+            content = String(content)
+        }
+
         // Simple markdown-like rendering
         const parts = content.split(/(```sql[\s\S]*?```)/g)
 
@@ -276,6 +502,18 @@ export function MeshyClient({ databases, userName }: MeshyClientProps) {
                             <Bot className="w-8 h-8 text-purple-500" />
                         </div>
                         <h3 className="text-lg font-black tracking-tight text-foreground mb-2">Hi {userName}, Ask Meshy Anything</h3>
+                        {isLoadingSchemas && (
+                            <p className="text-xs text-purple-500 mb-2 flex items-center gap-1.5 justify-center">
+                                <Sparkles className="w-3 h-3 animate-pulse" />
+                                Loading database schemas...
+                            </p>
+                        )}
+                        {!isLoadingSchemas && databaseSchemas.length > 0 && (
+                            <p className="text-xs text-emerald-500 mb-2">
+                                ✓ Loaded {databaseSchemas.length} database{databaseSchemas.length !== 1 ? 's' : ''} with full schema
+                            </p>
+                        )}
+
                         <p className="text-sm text-muted-foreground mb-6 max-w-md">
                             I'll help you build secure, read-only SQL queries. Try one of these examples:
                         </p>
@@ -367,6 +605,70 @@ export function MeshyClient({ databases, userName }: MeshyClientProps) {
 
             {/* Input Area */}
             <div className="p-4 border-t border-foreground/10 bg-card/50 backdrop-blur-xl">
+                {/* Contextual Suggestions */}
+                <div className="mb-4">
+                    {!selectedDatabaseId ? (
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <p className="text-xs text-muted-foreground mb-2 font-medium">Select database for which you want query :</p>
+                            <div className="flex flex-wrap gap-2">
+                                {databases.map((db: any) => (
+                                    <button
+                                        key={db.id}
+                                        onClick={() => handleDatabaseSelect(db)}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-muted-foreground hover:text-foreground transition-all"
+                                    >
+                                        {db.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    ) : !selectedTableName ? (
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs text-muted-foreground font-medium">Select table for which you want query :</p>
+                                <button
+                                    onClick={() => setSelectedDatabaseId(null)}
+                                    className="text-[10px] text-purple-500 hover:underline"
+                                >
+                                    Change Database
+                                </button>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {databaseSchemas.find(s => s.id === selectedDatabaseId)?.schema?.tables?.map((table: any) => (
+                                    <button
+                                        key={table.name}
+                                        onClick={() => handleTableSelect(table.name)}
+                                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/10 text-purple-400 hover:text-purple-300 transition-all"
+                                    >
+                                        {table.name}
+                                    </button>
+                                )) || (
+                                        <p className="text-[10px] text-muted-foreground italic">
+                                            {isLoadingSchemas ? "Loading tables..." : "No tables found"}
+                                        </p>
+                                    )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-500 font-medium">
+                                Database: {databases.find(db => db.id === selectedDatabaseId)?.name}
+                            </span>
+                            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 font-medium">
+                                Table: {selectedTableName}
+                            </span>
+                            <button
+                                onClick={() => {
+                                    setSelectedTableName(null)
+                                }}
+                                className="text-[10px] text-muted-foreground hover:text-foreground ml-auto"
+                            >
+                                Reset Selection
+                            </button>
+                        </div>
+                    )}
+                </div>
+
                 <div className="flex gap-2">
                     <input
                         type="text"
@@ -378,8 +680,8 @@ export function MeshyClient({ databases, userName }: MeshyClientProps) {
                         className="flex-1 h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 transition-all disabled:opacity-50"
                     />
                     <button
-                        onClick={handleSend}
-                        disabled={!input.trim() || isLoading}
+                        onClick={() => handleSend()}
+                        disabled={isLoading || !activeConfig}
                         className="h-12 px-6 bg-primary text-primary-foreground rounded-xl text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         <Send className="w-4 h-4" />
@@ -393,7 +695,9 @@ export function MeshyClient({ databases, userName }: MeshyClientProps) {
                             <span className="w-1 h-1 rounded-full bg-foreground/20" />
                             <span className="flex items-center gap-1.5 opacity-50">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                <span className="uppercase tracking-wider text-[9px]">{activeConfig.provider} • {activeConfig.model}</span>
+                                <span className="uppercase tracking-wider text-[9px]">
+                                    {activeConfig.provider === 'puter' ? 'PUTER.JS (CLIENT)' : activeConfig.provider} • {activeConfig.model}
+                                </span>
                             </span>
                         </>
                     )}

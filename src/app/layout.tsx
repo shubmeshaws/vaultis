@@ -24,6 +24,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} ${flexing.variable}`}>
         <Providers>{children}</Providers>
+        <script src="https://js.puter.com/v2/"></script>
       </body>
     </html>
   )

@@ -30,3 +30,11 @@ export const GroqLogo = ({ className = "w-5 h-5" }: LogoProps) => (
         <circle cx="12" cy="12" r="2" fill="currentColor" />
     </svg>
 )
+
+export const PuterLogo = ({ className = "w-6 h-6" }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="250" cy="250" r="250" fill="#3B82F6" fillOpacity="0.1" />
+        <path d="M142.857 321.429L142.857 285.714H178.571V250H214.286V214.286H250V178.571H285.714V142.857H321.429V107.143H357.143V321.429H142.857Z" fill="#3B82F6" />
+        <path d="M357.143 321.429V357.143H321.429V392.857H285.714V428.571H92.8571L92.8571 321.429H357.143Z" fill="#60A5FA" />
+    </svg>
+)
