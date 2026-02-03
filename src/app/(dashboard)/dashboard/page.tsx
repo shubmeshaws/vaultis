@@ -2,14 +2,29 @@ import { getCurrentUser } from '@/lib/auth/middleware'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Role } from '@/lib/auth/permissions'
 import { redirect } from 'next/navigation'
-import { Activity, Database, Shield, Zap, Clock, ChevronRight, Search, Plus, LayoutDashboard } from 'lucide-react'
+import { Activity, Database, Shield, Zap, Clock, ChevronRight, Plus, LayoutDashboard, Search } from 'lucide-react'
+import { getDashboardData } from '@/lib/actions/dashboardActions'
+import { formatDistanceToNow } from 'date-fns'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
 
+// Dashboard Overview Page - Live Data Integration
 export default async function DashboardPage() {
   const user = await getCurrentUser()
 
   if (!user) {
     redirect('/login')
   }
+
+  const dashRes = await getDashboardData()
+  const stats = (dashRes.success && dashRes.stats) ? dashRes.stats : {
+    totalQueries: '0',
+    queryChange: '0%',
+    successRate: '0%',
+    avgLatency: '0ms',
+    activeDatabases: 0
+  }
+  const recentQueries = (dashRes.success && dashRes.recentQueries) ? dashRes.recentQueries : []
 
   const isAdmin = user.role === Role.ADMIN
 
@@ -36,35 +51,29 @@ export default async function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-3 md:mt-16">
-          <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search queries..."
-              className="h-10 w-64 pl-9 pr-4 rounded-xl bg-background/50 border border-foreground/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            />
-          </div>
-          <button className="h-10 px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95">
-            <Plus className="w-4 h-4" />
-            New Query
-          </button>
+          <Link href="/meshy">
+            <button className="h-10 px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95">
+              <Plus className="w-4 h-4" />
+              New Query
+            </button>
+          </Link>
         </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Total Queries', value: '1,284', change: '+12.5%', icon: Database, color: 'text-blue-500' },
-          { label: 'Success Rate', value: '98.2%', change: '+2.1%', icon: Activity, color: 'text-green-500' },
-          { label: 'Avg Latency', value: '45ms', change: '-10.5%', icon: Zap, color: 'text-yellow-500' },
-          { label: 'Active Connections', value: '12', change: '+4', icon: Shield, color: 'text-purple-500' },
+          { label: 'Total Queries', value: stats.totalQueries, change: stats.queryChange, icon: Database, color: 'text-blue-500' },
+          { label: 'Success Rate', value: stats.successRate, change: 'Lifetime', icon: Activity, color: 'text-green-500' },
+          { label: 'Avg Latency', value: stats.avgLatency, change: 'Latest 100', icon: Zap, color: 'text-yellow-500' },
+          { label: 'Databases', value: stats.activeDatabases.toString(), change: 'Connected', icon: Shield, color: 'text-purple-500' },
         ].map((stat, i) => (
           <div key={i} className="group relative p-4 bg-white dark:bg-foreground/[0.02] backdrop-blur-xl hover:bg-slate-50 dark:hover:bg-foreground/[0.04] border border-foreground/10 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 shadow-sm">
             <div className="flex justify-between items-start mb-2.5">
               <div className={`p-2 rounded-lg bg-background shadow-sm border border-foreground/5 ${stat.color} bg-opacity-10`}>
                 <stat.icon className={`w-3.5 h-3.5 ${stat.color}`} />
               </div>
-              <span className={`text-[10px] font-bold px-2 py-1 rounded-full border border-transparent ${stat.change.startsWith('+') ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+              <span className={`text-[10px] font-bold px-2 py-1 rounded-full border border-transparent ${stat.change.startsWith('+') ? 'bg-green-500/10 text-green-500' : stat.change.startsWith('-') ? 'bg-red-500/10 text-red-500' : 'bg-muted/10 text-muted-foreground'}`}>
                 {stat.change}
               </span>
             </div>
@@ -84,28 +93,43 @@ export default async function DashboardPage() {
               <CardTitle className="text-lg font-bold">Recent Queries</CardTitle>
               <CardDescription>Your latest database interactions</CardDescription>
             </div>
-            <button className="text-xs font-bold text-primary hover:text-primary/80 transition-colors uppercase tracking-wider">View All</button>
+            <Link href="/queries?tab=history" className="text-xs font-bold text-primary hover:text-primary/80 transition-colors uppercase tracking-wider">View All</Link>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[1, 2, 3].map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 rounded-xl hover:bg-foreground/[0.03] transition-colors group cursor-pointer border border-transparent hover:border-foreground/5">
-                  <div className="p-2.5 rounded-lg bg-background border border-foreground/5 shadow-sm">
-                    <Database className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-foreground truncate">SELECT * FROM users_production LIMIT 100</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> 2 mins ago
-                      </span>
-                      <span className="w-1 h-1 rounded-full bg-foreground/20" />
-                      <span className="text-[10px] font-bold text-green-500">SUCCESS</span>
+              {recentQueries.length > 0 ? (
+                recentQueries.map((q: any) => (
+                  <div key={q.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-foreground/[0.03] transition-colors group cursor-pointer border border-transparent hover:border-foreground/5">
+                    <div className="p-2.5 rounded-lg bg-background border border-foreground/5 shadow-sm">
+                      <Database className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-foreground truncate font-mono bg-foreground/5 px-2 py-0.5 rounded inline-block max-w-full">
+                        {q.sql.length > 60 ? q.sql.substring(0, 60) + '...' : q.sql}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> {formatDistanceToNow(new Date(q.timestamp), { addSuffix: true })}
+                        </span>
+                        <span className="w-1 h-1 rounded-full bg-foreground/20" />
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">{q.databaseName}</span>
+                        <span className="w-1 h-1 rounded-full bg-foreground/20" />
+                        <span className={cn(
+                          "text-[10px] font-bold",
+                          q.status === 'SUCCESS' ? 'text-green-500' : 'text-red-500'
+                        )}>{q.status}</span>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:translate-x-1 transition-transform" />
+                ))
+              ) : (
+                <div className="py-12 text-center">
+                  <Database className="w-8 h-8 text-muted-foreground/20 mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">No queries recorded yet.</p>
+                  <Link href="/meshy" className="text-xs text-primary font-bold mt-2 inline-block hover:underline">Start querying with Meshy</Link>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
@@ -129,12 +153,12 @@ export default async function DashboardPage() {
                 </div>
               </div>
               {isAdmin && (
-                <a
+                <Link
                   href="/admin"
                   className="w-full h-8 flex items-center justify-center gap-2 bg-white dark:bg-background border border-foreground/10 hover:border-primary/50 text-foreground rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all shadow-sm hover:shadow-md group"
                 >
                   Admin <ChevronRight className="w-2.5 h-2.5 group-hover:translate-x-1 transition-transform" />
-                </a>
+                </Link>
               )}
             </CardContent>
           </Card>
@@ -145,19 +169,19 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-2 pb-3 px-4">
               {[
-                { label: 'History', href: '/queries/history', icon: Clock },
-                { label: 'Saved', href: '/queries/saved', icon: Database },
-                { label: 'Documentation', href: '/docs', icon: Search },
+                { label: 'History', href: '/queries?tab=history', icon: Clock },
+                { label: 'Saved', href: '/queries?tab=saved', icon: Database },
+                { label: 'Databases', href: '/settings', icon: Search },
                 { label: 'Settings', href: '/settings', icon: Zap },
               ].map((action, i) => (
-                <a
+                <Link
                   key={i}
                   href={action.href}
                   className="flex flex-col items-center justify-center gap-1 p-2.5 rounded-lg bg-white dark:bg-background border border-foreground/5 hover:border-primary/30 hover:bg-primary/5 transition-all group shadow-sm text-center"
                 >
                   <action.icon className="w-3.5 h-3.5 text-foreground/40 dark:text-muted-foreground group-hover:text-primary transition-colors" />
                   <span className="text-[8.5px] font-bold uppercase tracking-wider text-foreground/60 dark:text-muted-foreground group-hover:text-foreground transition-colors">{action.label}</span>
-                </a>
+                </Link>
               ))}
             </CardContent>
           </Card>

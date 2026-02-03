@@ -4,10 +4,16 @@ import { prisma } from '@/lib/db/prisma'
 import { Users, Shield, Server, Activity, ArrowUpRight, Search, Settings, AlertTriangle, ChevronRight, Database, Zap, TrendingUp, TrendingDown, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 
+import { getAdminOperationalStats } from '@/lib/actions/adminActions'
+
 export default async function AdminPage() {
   const user = await getCurrentUser()
+  if (!user || user.role !== 'ADMIN') {
+    // Basic safety fallback, though middleware should handle this
+    return <div>Unauthorized</div>
+  }
 
-  // Get some real stats
+  // Get real user stats
   const userCount = await prisma.user.count()
   const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } })
   const recentUsers = await prisma.user.findMany({
@@ -15,10 +21,11 @@ export default async function AdminPage() {
     orderBy: { createdAt: 'desc' }
   })
 
-  // Mock operational data
-  const activeQueries = 24
-  const riskyOperations = 3
-  const systemHealth = 98
+  // Get real operational stats from our new action
+  const opStatsRes = await getAdminOperationalStats()
+  const activeQueries = opStatsRes.success ? opStatsRes.activeQueries : 0
+  const riskyOperations = opStatsRes.success ? opStatsRes.riskyOperations : 0
+  const systemHealth = opStatsRes.success ? opStatsRes.systemHealth : 100
 
   return (
     <div className="space-y-8 p-8 relative min-h-full">
@@ -49,14 +56,18 @@ export default async function AdminPage() {
         </div>
 
         <div className="flex items-center gap-3 md:mt-16">
-          <button className="h-10 px-4 bg-foreground/[0.05] hover:bg-foreground/[0.08] text-foreground rounded-xl text-sm font-bold flex items-center gap-2 transition-all">
-            <Settings className="w-4 h-4" />
-            System Config
-          </button>
-          <button className="h-10 px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95">
-            <Activity className="w-4 h-4" />
-            Live Monitor
-          </button>
+          <Link href="/settings">
+            <button className="h-10 px-4 bg-foreground/[0.05] hover:bg-foreground/[0.08] text-foreground rounded-xl text-sm font-bold flex items-center gap-2 transition-all">
+              <Settings className="w-4 h-4" />
+              System Config
+            </button>
+          </Link>
+          <Link href="/admin/analyzer">
+            <button className="h-10 px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95">
+              <Activity className="w-4 h-4" />
+              Live Monitor
+            </button>
+          </Link>
         </div>
       </div>
 
@@ -198,9 +209,11 @@ export default async function AdminPage() {
                     <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider ${u.role === 'ADMIN' ? 'bg-purple-500/10 text-purple-500 border border-purple-500/20' : 'bg-cyan-500/10 text-cyan-500 border border-cyan-500/20'}`}>
                       {u.role}
                     </span>
-                    <button className="opacity-0 group-hover:opacity-100 p-2 hover:bg-foreground/5 rounded-lg transition-all">
-                      <Settings className="w-4 h-4 text-muted-foreground" />
-                    </button>
+                    <Link href="/admin/users">
+                      <button className="opacity-0 group-hover:opacity-100 p-2 hover:bg-foreground/5 rounded-lg transition-all">
+                        <Settings className="w-4 h-4 text-muted-foreground" />
+                      </button>
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -233,11 +246,16 @@ export default async function AdminPage() {
               <CardTitle className="text-base font-bold">Quick Configurations</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-1">
-              {['General Settings', 'API Keys', 'Audit Logs', 'Security Policies'].map((link, i) => (
-                <a key={i} href="#" className="flex items-center justify-between p-3 rounded-lg hover:bg-foreground/5 transition-colors group">
-                  <span className="text-sm font-medium text-foreground/60 dark:text-muted-foreground group-hover:text-foreground transition-colors">{link}</span>
+              {[
+                { label: 'General Settings', href: '/settings' },
+                { label: 'API Keys', href: '/settings' },
+                { label: 'Audit Logs', href: '/admin/audit-logs' },
+                { label: 'Security Policies', href: '/admin/users' }
+              ].map((link, i) => (
+                <Link key={i} href={link.href} className="flex items-center justify-between p-3 rounded-lg hover:bg-foreground/5 transition-colors group">
+                  <span className="text-sm font-medium text-foreground/60 dark:text-muted-foreground group-hover:text-foreground transition-colors">{link.label}</span>
                   <ChevronRight className="w-4 h-4 text-foreground/20 dark:text-muted-foreground/30 group-hover:text-primary transition-colors" />
-                </a>
+                </Link>
               ))}
             </CardContent>
           </Card>

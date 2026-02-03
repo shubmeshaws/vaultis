@@ -56,35 +56,58 @@ export default function SettingsClient() {
 
     const fetchHealth = async (isManual = false) => {
         if (isManual) setIsLoadingHealth(true)
-        const res = await checkDatabaseHealth()
+        try {
+            const res = await checkDatabaseHealth()
 
-        // Only toast if manual OR if status changed (e.g. went offline)
-        const statusChanged = health && health.status !== res.status
-        if (isManual || statusChanged) {
-            if (res.success) {
-                toast({ title: 'Application Health Check', description: 'Internal database connection is stable.', type: 'success' })
-            } else {
-                toast({ title: 'System Warning', description: 'Internal database connection failed.', type: 'error' })
+            if (!res) {
+                console.error('Database health check returned undefined')
+                setHealth({
+                    status: 'error',
+                    latency: 0,
+                    message: 'Failed to communicate with server'
+                })
+                return
             }
+
+            // Only toast if manual OR if status changed (e.g. went offline)
+            const statusChanged = health && health.status !== res.status
+            if (isManual || statusChanged) {
+                if (res.success) {
+                    toast({ title: 'Application Health Check', description: 'Internal database connection is stable.', type: 'success' })
+                } else {
+                    toast({ title: 'System Warning', description: 'Internal database connection failed.', type: 'error' })
+                }
+            }
+
+            setHealth({
+                status: res.status,
+                latency: res.latency,
+                message: res.message
+            })
+        } catch (err: any) {
+            console.error('Health check failed:', err)
+            setHealth({
+                status: 'error',
+                latency: 0,
+                message: err.message || 'Health check encountered an error'
+            })
+        } finally {
+            if (isManual) setIsLoadingHealth(false)
         }
-
-        setHealth({
-            status: res.status,
-            latency: res.latency,
-            message: res.message
-        })
-
-        if (isManual) setIsLoadingHealth(false)
     }
 
     const fetchData = async () => {
-        const info = await getSystemInfo()
-        setSystemInfo(info)
+        try {
+            const info = await getSystemInfo()
+            if (info) setSystemInfo(info)
 
-        // Fetch retention config
-        const config = await getSystemConfig('AUDIT_LOG_RETENTION_DAYS')
-        if (config.success && config.value) {
-            setRetentionDays(config.value)
+            // Fetch retention config
+            const config = await getSystemConfig('AUDIT_LOG_RETENTION_DAYS')
+            if (config && config.success && config.value) {
+                setRetentionDays(config.value)
+            }
+        } catch (err) {
+            console.error('Failed to fetch initial settings data:', err)
         }
 
         // Auto-check health on load
@@ -93,11 +116,15 @@ export default function SettingsClient() {
 
     const handleSaveRetention = async () => {
         setIsSavingRetention(true)
-        const res = await updateSystemConfig('AUDIT_LOG_RETENTION_DAYS', retentionDays)
-        if (res.success) {
-            toast({ title: 'Settings Saved', description: 'Audit log retention policy updated.', type: 'success' })
-        } else {
-            toast({ title: 'Error', description: res.error || 'Failed to save settings.', type: 'error' })
+        try {
+            const res = await updateSystemConfig('AUDIT_LOG_RETENTION_DAYS', retentionDays)
+            if (res && res.success) {
+                toast({ title: 'Settings Saved', description: 'Audit log retention policy updated.', type: 'success' })
+            } else {
+                toast({ title: 'Error', description: res?.error || 'Failed to save settings.', type: 'error' })
+            }
+        } catch (err: any) {
+            toast({ title: 'System Error', description: err.message || 'Failed to communicate with server', type: 'error' })
         }
         setIsSavingRetention(false)
     }
@@ -105,11 +132,15 @@ export default function SettingsClient() {
     const handleManualCleanup = async () => {
         setIsCleanupModalOpen(false)
         setIsCleaningLogs(true)
-        const res = await performAuditLogCleanup()
-        if (res.success) {
-            toast({ title: 'Cleanup Successful', description: res.message, type: 'success' })
-        } else {
-            toast({ title: 'Cleanup Failed', description: res.error || 'Failed to clean logs.', type: 'error' })
+        try {
+            const res = await performAuditLogCleanup()
+            if (res && res.success) {
+                toast({ title: 'Cleanup Successful', description: res.message, type: 'success' })
+            } else {
+                toast({ title: 'Cleanup Failed', description: res?.error || 'Failed to clean logs.', type: 'error' })
+            }
+        } catch (err: any) {
+            toast({ title: 'System Error', description: err.message || 'Failed to communicate with server', type: 'error' })
         }
         setIsCleaningLogs(false)
     }
@@ -152,41 +183,49 @@ export default function SettingsClient() {
 
     const handleSaveAIConfig = async (provider: string) => {
         setSavingProvider(provider)
-        let formData = aiFormData[provider]
+        try {
+            let formData = aiFormData[provider]
 
-        // Special handling for Puter: inject dummy key if missing
-        if (provider === 'puter' && !formData?.apiKey) {
-            formData = {
-                ...formData,
-                apiKey: 'puter-client-v2',
-                model: formData?.model || 'gpt-4o',
-                endpoint: formData?.endpoint || ''
+            // Special handling for Puter: inject dummy key if missing
+            if (provider === 'puter' && !formData?.apiKey) {
+                formData = {
+                    ...formData,
+                    apiKey: 'puter-client-v2',
+                    model: formData?.model || 'gpt-4o',
+                    endpoint: formData?.endpoint || ''
+                }
             }
-        }
 
-        if (!formData?.apiKey) {
-            toast({ title: 'Error', description: 'Please enter an API key', type: 'error' })
-            setSavingProvider(null)
-            return
-        }
+            if (!formData?.apiKey) {
+                toast({ title: 'Error', description: 'Please enter an API key', type: 'error' })
+                setSavingProvider(null)
+                return
+            }
 
-        const res = await saveAIConfig(provider, formData.apiKey, formData.model, formData.endpoint)
-        if (res.success) {
-            toast({ title: 'Saved', description: 'AI configuration saved successfully', type: 'success' })
-            fetchAIConfigs()
-        } else {
-            toast({ title: 'Error', description: res.error || 'Failed to save', type: 'error' })
+            const res = await saveAIConfig(provider, formData.apiKey, formData.model, formData.endpoint)
+            if (res && res.success) {
+                toast({ title: 'Saved', description: 'AI configuration saved successfully', type: 'success' })
+                fetchAIConfigs()
+            } else {
+                toast({ title: 'Error', description: res?.error || 'Failed to save', type: 'error' })
+            }
+        } catch (err: any) {
+            toast({ title: 'System Error', description: err.message || 'Failed to communicate with server', type: 'error' })
         }
         setSavingProvider(null)
     }
 
 
     const handleToggleActive = async (provider: string, checked: boolean) => {
-        const res = await toggleProviderActive(provider, checked)
-        if (res.success) {
-            fetchAIConfigs()
-        } else {
-            toast({ title: 'Error', description: res.error || 'Failed to update provider status', type: 'error' })
+        try {
+            const res = await toggleProviderActive(provider, checked)
+            if (res && res.success) {
+                fetchAIConfigs()
+            } else {
+                toast({ title: 'Error', description: res?.error || 'Failed to update provider status', type: 'error' })
+            }
+        } catch (err: any) {
+            toast({ title: 'System Error', description: err.message || 'Failed to communicate with server', type: 'error' })
         }
     }
 
@@ -201,26 +240,34 @@ export default function SettingsClient() {
     const confirmDisconnect = async () => {
         if (!providerToDisconnect) return
 
-        const res = await deleteAIConfig(providerToDisconnect)
-        if (res.success) {
-            toast({ title: 'Disconnected', description: `${providerToDisconnect} configuration removed`, type: 'success' })
-            fetchAIConfigs()
-            // Reset form data for this provider
-            setAiFormData(prev => ({
-                ...prev,
-                [providerToDisconnect]: { apiKey: '', model: prev[providerToDisconnect]?.model || '', endpoint: '' }
-            }))
-        } else {
-            toast({ title: 'Error', description: res.error || 'Failed to disconnect', type: 'error' })
+        try {
+            const res = await deleteAIConfig(providerToDisconnect)
+            if (res && res.success) {
+                toast({ title: 'Disconnected', description: `${providerToDisconnect} configuration removed`, type: 'success' })
+                fetchAIConfigs()
+                // Reset form data for this provider
+                setAiFormData(prev => ({
+                    ...prev,
+                    [providerToDisconnect]: { apiKey: '', model: prev[providerToDisconnect]?.model || '', endpoint: '' }
+                }))
+            } else {
+                toast({ title: 'Error', description: res?.error || 'Failed to disconnect', type: 'error' })
+            }
+        } catch (err: any) {
+            toast({ title: 'System Error', description: err.message || 'Failed to communicate with server', type: 'error' })
         }
         setDisconnectModalOpen(false)
         setProviderToDisconnect(null)
     }
 
     const fetchAIConfigs = async () => {
-        const res = await getAIConfigs()
-        if (res.success && res.configs) {
-            setAiConfigs(res.configs)
+        try {
+            const res = await getAIConfigs()
+            if (res && res.success && res.configs) {
+                setAiConfigs(res.configs)
+            }
+        } catch (err) {
+            console.error('Failed to fetch AI configurations:', err)
         }
     }
 
@@ -415,8 +462,94 @@ export default function SettingsClient() {
 
     return (
         <div className="max-w-5xl space-y-6">
-            {/* System Health Section (Collapsed for brevity if no changes, reusing structure) */}
-            {/* ... keeping existing health section ... */}
+            {/* System Health Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="md:col-span-2 bg-card/50 backdrop-blur-sm border-foreground/10 overflow-hidden">
+                    <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Activity className="w-5 h-5 text-indigo-500" />
+                                <CardTitle className="text-lg">Internal Database Health</CardTitle>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => fetchHealth(true)}
+                                disabled={isLoadingHealth}
+                                className="h-8 w-8 p-0 rounded-full hover:bg-foreground/5"
+                            >
+                                <RefreshCw className={cn("w-4 h-4", isLoadingHealth && "animate-spin text-indigo-500")} />
+                            </Button>
+                        </div>
+                        <CardDescription>Primary storage and query engine connectivity</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
+                            <div className="flex items-center gap-4">
+                                <div className={cn(
+                                    "w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all duration-500",
+                                    health?.status === 'online' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" :
+                                        health?.status === 'offline' ? "bg-red-500/10 border-red-500/20 text-red-500" :
+                                            "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                                )}>
+                                    <Server className="w-8 h-8" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-2xl font-black tracking-tight uppercase">
+                                            {health?.status || 'UNKNOWN'}
+                                        </p>
+                                        {health?.status === 'online' && (
+                                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Operational</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground font-medium">{health?.message || 'Connecting to database...'}</p>
+                                </div>
+                            </div>
+
+                            <div className="h-12 w-px bg-foreground/5 hidden sm:block" />
+
+                            <div className="space-y-1">
+                                <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black">Response Latency</p>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-2xl font-black tabular-nums tracking-tight">{health?.latency || 0}</span>
+                                    <span className="text-xs font-bold text-muted-foreground">ms</span>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-indigo-500/5 to-purple-500/5 backdrop-blur-sm border-foreground/10 overflow-hidden">
+                    <CardHeader className="pb-2">
+                        <div className="flex items-center gap-2">
+                            <ArrowUpCircle className="w-5 h-5 text-indigo-500" />
+                            <CardTitle className="text-lg">System Uptime</CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                        <div className="space-y-4">
+                            <div>
+                                <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black mb-1">Active Duration</p>
+                                <p className="text-3xl font-black tabular-nums tracking-tighter text-indigo-500">
+                                    {Math.floor((systemInfo?.uptime || 0) / 3600)}h {Math.floor(((systemInfo?.uptime || 0) % 3600) / 60)}m
+                                </p>
+                            </div>
+                            <div className="pt-4 border-t border-indigo-500/10">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-muted-foreground">Process State</span>
+                                    <Badge variant="outline" className="text-[10px] font-black border-indigo-500/20 text-indigo-500 bg-indigo-500/10">
+                                        RUNNING
+                                    </Badge>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
 
             {/* AI Configuration Section */}
             <Card className="bg-card/50 backdrop-blur-sm border-foreground/10 overflow-hidden">

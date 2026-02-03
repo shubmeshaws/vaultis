@@ -76,12 +76,14 @@ export async function executeQuery(databaseId: string, sql: string) {
 
     // Record History
     try {
+        const executionTimeMsNum = Math.round(endTime - startTime)
         await (prisma.queryHistory as any).create({
             data: {
                 sql,
                 userId: user.id,
                 databaseId,
                 executionTime,
+                executionTimeMs: executionTimeMsNum,
                 status: result.success ? 'success' : 'error',
                 rowsAffected: result.totalRows || 0,
                 errorMessage: result.error,
