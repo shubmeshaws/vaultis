@@ -69,8 +69,8 @@ export function AdminOverviewClient({ stats, recentUsers }: AdminOverviewClientP
                             </div>
                             <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">/ Administration</span>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-none italic flex flex-wrap items-center gap-x-4">
-                            Command <span className="text-primary not-italic">Center</span>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">
+                            Command <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Center</span>
                         </h1>
                         <p className="text-sm text-muted-foreground font-medium mt-2 max-w-xl">Real-time operational oversight & forensic intelligence</p>
                     </div>
@@ -84,7 +84,7 @@ export function AdminOverviewClient({ stats, recentUsers }: AdminOverviewClientP
                         </button>
                     </Link>
                     <Link href="/admin/analyzer">
-                        <button className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95">>
+                        <button className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95">
                             <Activity className="w-4 h-4" />
                             Live Monitor
                         </button>

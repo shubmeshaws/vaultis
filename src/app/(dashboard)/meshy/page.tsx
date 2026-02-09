@@ -61,7 +61,9 @@ export default async function MeshyPage() {
                             </div>
                         )}
                     </div>
-                    <h1 className="text-4xl font-black tracking-tighter text-foreground">Meshy AI</h1>
+                    <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">
+                        Meshy <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">AI</span>
+                    </h1>
                     <p className="text-sm text-muted-foreground font-medium mt-1">
                         Your intelligent SQL query builder assistant
                     </p>

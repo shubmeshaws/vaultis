@@ -319,8 +319,8 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                             </div>
                             <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">/ Administration</span>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-none italic flex flex-wrap items-center gap-x-4">
-                            IAM <span className="text-primary not-italic">Manager</span>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">
+                            IAM <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Manager</span>
                         </h1>
                         <p className="text-sm text-muted-foreground font-medium mt-2 max-w-xl">Identity, Access & Permission orchestration platform for QueryX nodes</p>
                     </div>
