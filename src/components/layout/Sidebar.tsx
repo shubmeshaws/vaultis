@@ -86,13 +86,13 @@ export function Sidebar() {
     }
 
     if (!mounted) return (
-        <aside className="fixed left-0 top-0 z-40 h-screen w-56 hidden lg:flex flex-col bg-background/5 border-r border-foreground/10 backdrop-blur-xl">
+        <aside className="fixed left-0 top-0 z-40 h-screen w-64 hidden lg:flex flex-col bg-background/5 border-r border-foreground/10 backdrop-blur-xl">
             <div className="h-20 flex items-center px-8 border-b border-foreground/5" />
         </aside>
     )
 
     return (
-        <aside className="fixed left-0 top-0 z-40 h-screen w-56 hidden lg:flex flex-col bg-background dark:bg-[#05050A] border-r border-foreground/5 dark:border-white/5 shadow-2xl z-[100] text-foreground dark:text-accent-foreground">
+        <aside className="fixed left-0 top-0 z-40 h-screen w-64 hidden lg:flex flex-col bg-background dark:bg-[#05050A] border-r border-foreground/5 dark:border-white/5 shadow-2xl z-[100] text-foreground dark:text-accent-foreground">
             {/* 1. Logo Area */}
             <div className="h-14 flex items-center px-4 border-b border-foreground/5 dark:border-white/5">
                 <Link href="/" className="flex items-center group relative">

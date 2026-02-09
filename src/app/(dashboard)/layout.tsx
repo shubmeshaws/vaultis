@@ -93,7 +93,7 @@ export default async function DashboardLayout({
             <CommandPaletteRegistry />
 
             {/* Main Floating Content Area */}
-            <main className="flex-1 lg:ml-56 p-4 lg:p-8 transition-all duration-300">
+            <main className="flex-1 lg:ml-64 p-4 lg:p-8 transition-all duration-300">
               <div className="h-full rounded-[2.5rem] bg-foreground/[0.02] dark:bg-black/40 border border-foreground/5 dark:border-white/5 backdrop-blur-2xl shadow-sm dark:shadow-2xl overflow-hidden relative">
                 <GlobalRefreshButton />
                 {children}
