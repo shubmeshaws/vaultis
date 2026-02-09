@@ -215,7 +215,7 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 md:mt-2">
+                <div className="flex items-center gap-3 mt-14 md:self-end">
                     <button
                         onClick={() => setIsAddModalOpen(true)}
                         className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95"

@@ -164,7 +164,7 @@ export function AnalyzerClient({ initialData }: AnalyzerClientProps) {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 mr-8 md:mt-2">
+                <div className="flex items-center gap-3 mr-8 mt-14 md:self-end">
                     <DateRangePicker
                         initialStart={startDate}
                         initialEnd={endDate}

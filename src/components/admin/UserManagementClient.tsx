@@ -326,7 +326,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 md:mt-2">
+                <div className="flex items-center gap-3 mt-8 md:self-end">
                     <button
                         onClick={() => setIsCreateGroupOpen(true)}
                         className="h-10 px-6 bg-foreground/5 hover:bg-foreground/10 text-foreground border border-foreground/5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all"
