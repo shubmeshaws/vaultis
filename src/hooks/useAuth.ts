@@ -9,11 +9,12 @@ export function useAuth() {
 
   const user: AuthUser | null = session?.user
     ? {
-        id: session.user.id,
-        email: session.user.email,
-        name: session.user.name,
-        role: session.user.role,
-      }
+      id: session.user.id,
+      email: session.user.email,
+      name: session.user.name,
+      role: session.user.role,
+      isActive: true, // Defaulting to true as active session implies active user
+    }
     : null
 
   const isAuthenticated = status === 'authenticated'

@@ -18,11 +18,9 @@ export default async function AnalyzerPage() {
     }
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            <Suspense fallback={<AnalyzerLoading />}>
-                <AnalyzerClient initialData={initialData} />
-            </Suspense>
-        </div>
+        <Suspense fallback={<AnalyzerLoading />}>
+            <AnalyzerClient initialData={initialData} />
+        </Suspense>
     )
 }
 

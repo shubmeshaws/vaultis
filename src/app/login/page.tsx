@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { LoginForm } from '@/components/auth/LoginForm'
 import LandingHeader from '@/components/landing/LandingHeader'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 
 export default function LoginPage() {
   return (
@@ -53,7 +53,9 @@ export default function LoginPage() {
           className="relative z-10 w-full max-w-xl mt-0"
         >
           <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-[80px] -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-          <LoginForm />
+          <Suspense fallback={<div>Loading...</div>}>
+            <LoginForm />
+          </Suspense>
         </motion.div>
 
         {/* Bottom Attribution */}

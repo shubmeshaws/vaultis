@@ -5,7 +5,7 @@ import SettingsClient from '@/components/settings/SettingsClient'
 
 export default function SettingsPage() {
     return (
-        <div className="space-y-8 p-8 relative min-h-screen pb-24">
+        <div className="space-y-8 p-6 relative max-w-[1600px] mx-auto min-h-screen pb-24">
             {/* Header Section */}
             <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-foreground/5 text-muted-foreground">

@@ -1,6 +1,8 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import * as React from 'react'
+import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import {
     Search,
     Filter,
@@ -20,6 +22,7 @@ import {
     X,
     UserCircle,
     Check,
+    ChevronDown,
     ChevronRight,
     ChevronsLeft,
     ChevronsRight
@@ -45,6 +48,7 @@ import { Role } from '@prisma/client'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useToast } from '@/contexts/ToastContext'
 import { PermissionEditor } from './PermissionEditor'
+import { cn } from '@/lib/utils'
 
 
 interface User {
@@ -294,718 +298,697 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
     }
 
     return (
-        <div className="space-y-7">
-            {/* Stats Overview */}
-            {(!databases || databases.length === 0) && (
-                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold flex items-center justify-between">
-                    <span>⚠️ Debug: No databases received from server.</span>
-                    <span className="text-xs font-mono bg-red-500/10 px-2 py-1 rounded">Length: {databases?.length || 0}</span>
+        <div className="space-y-8 p-6 relative max-w-[1600px] mx-auto min-h-full">
+            {/* Premium Background Ambience */}
+            <div className="absolute top-[-5%] right-[-5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
+
+            {/* Page Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-foreground/5 pb-6">
+                <div className="flex items-center gap-4">
+                    <Link
+                        href="/admin"
+                        className="p-3 rounded-2xl bg-foreground/5 hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-all border border-foreground/5"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </Link>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1.5">
+                            <div className="px-2.5 py-1 rounded bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-1.5 shadow-sm">
+                                <Users className="w-3.5 h-3.5" />
+                                Personnel Registry
+                            </div>
+                            <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">/ Administration</span>
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-none italic flex flex-wrap items-center gap-x-4">
+                            IAM <span className="text-primary not-italic">Manager</span>
+                        </h1>
+                        <p className="text-sm text-muted-foreground font-medium mt-2 max-w-xl">Identity, Access & Permission orchestration platform for QueryX nodes</p>
+                    </div>
                 </div>
-            )}
-            <div className="grid gap-3 md:grid-cols-3">
-                <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-xl overflow-hidden">
-                    <CardHeader className="pb-1 pt-4 px-4">
-                        <CardDescription className="uppercase tracking-widest text-[9px] font-bold text-muted-foreground">Total Users</CardDescription>
-                        <CardTitle className="text-2xl font-black text-foreground">{stats.total}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-4 pt-1">
-                        <div className="flex items-center gap-2">
-                            <Users className="w-3.5 h-3.5 text-cyan-500" />
-                            <p className="text-[10px] font-medium text-muted-foreground">Registered accounts</p>
-                        </div>
-                    </CardContent>
-                </Card>
 
-                <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-xl overflow-hidden">
-                    <CardHeader className="pb-1 pt-4 px-4">
-                        <CardDescription className="uppercase tracking-widest text-[9px] font-bold text-muted-foreground">Access Enabled</CardDescription>
-                        <CardTitle className="text-2xl font-black text-foreground">{stats.active}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-4 pt-1">
-                        <div className="flex items-center gap-2">
-                            <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                            <p className="text-[10px] font-medium text-muted-foreground">Users with platform access</p>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="bg-card/30 backdrop-blur-xl border-foreground/10 shadow-sm rounded-xl overflow-hidden">
-                    <CardHeader className="pb-1 pt-4 px-4">
-                        <CardDescription className="uppercase tracking-widest text-[9px] font-bold text-muted-foreground">Administrators</CardDescription>
-                        <CardTitle className="text-2xl font-black text-foreground">{stats.admins}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-4 pt-1">
-                        <div className="flex items-center gap-2">
-                            <Shield className="w-3.5 h-3.5 text-purple-500" />
-                            <p className="text-[10px] font-medium text-muted-foreground">Privileged access</p>
-                        </div>
-                    </CardContent>
-                </Card>
+                <div className="flex items-center gap-3 md:mt-2">
+                    <button
+                        onClick={() => setIsCreateGroupOpen(true)}
+                        className="h-10 px-6 bg-foreground/5 hover:bg-foreground/10 text-foreground border border-foreground/5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all"
+                    >
+                        <Users className="w-4 h-4" />
+                        Create Group
+                    </button>
+                    <button
+                        onClick={() => setIsCreateUserOpen(true)}
+                        className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95"
+                    >
+                        <UserPlus className="w-4 h-4" />
+                        Provision User
+                    </button>
+                </div>
             </div>
 
-            <div className="h-[calc(100vh-8rem)] flex flex-col">
-                <div className="flex-1 flex flex-col overflow-hidden" style={{ zoom: 0.9 }}>
-                    {/* Tabs */}
-                    <div className="flex gap-4 border-b border-foreground/10 pb-px shrink-0">
+            {/* Stats Overview - Premium Glow Version */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {[
+                    { label: 'Total Node Population', value: stats.total, icon: Users, color: 'text-cyan-500', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' },
+                    { label: 'Active Sessions', value: stats.active, icon: CheckCircle, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+                    { label: 'Privileged Entities', value: stats.admins, icon: Shield, color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+                ].map((stat, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="group relative p-6 rounded-[2rem] border backdrop-blur-3xl transition-all duration-500 bg-card border-foreground/10 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 overflow-hidden flex flex-col justify-between"
+                    >
+                        <div className={cn("absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl", stat.bg)} />
+                        <div className="relative z-10 flex justify-between items-start">
+                            <div className={cn("p-4 rounded-2xl bg-background border transition-all duration-500 shadow-inner group-hover:scale-110", stat.border)}>
+                                <stat.icon className={cn("w-6 h-6", stat.color)} />
+                            </div>
+                            <div className="px-3 py-1 rounded-full border border-foreground/10 bg-background/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground shadow-sm">
+                                Vitals
+                            </div>
+                        </div>
+                        <div className="relative z-10 mt-6">
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em] mb-1 opacity-70">{stat.label}</p>
+                            <h3 className="text-3xl font-black text-foreground tracking-tighter tabular-nums leading-none">{stat.value}</h3>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+
+            <div className="flex-1 flex flex-col">
+                {/* Tabs & Search Unified Bar */}
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 border-b border-foreground/5 pb-6">
+                    <div className="flex gap-6">
                         <button
                             onClick={() => setActiveTab('users')}
-                            className={`pb-4 px-2 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === 'users' ? 'text-primary' : 'text-muted-foreground'}`}
+                            className={`pb-4 px-1 text-xs font-black uppercase tracking-[0.3em] transition-all relative ${activeTab === 'users' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            User Directory
-                            {activeTab === 'users' && <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+                            Node Directory
+                            {activeTab === 'users' && <motion.div layoutId="tab-underline" className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-primary shadow-[0_0_15px_rgba(var(--primary),0.6)]" />}
                         </button>
                         <button
                             onClick={() => setActiveTab('groups')}
-                            className={`pb-4 px-2 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === 'groups' ? 'text-primary' : 'text-muted-foreground'}`}
+                            className={`pb-4 px-1 text-xs font-black uppercase tracking-[0.3em] transition-all relative ${activeTab === 'groups' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            Groups & Access
-                            {activeTab === 'groups' && <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+                            Security Sectors
+                            {activeTab === 'groups' && <motion.div layoutId="tab-underline" className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-primary shadow-[0_0_15px_rgba(var(--primary),0.6)]" />}
                         </button>
                     </div>
 
-                    {/* Action Bar */}
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card/30 backdrop-blur-xl p-4 rounded-2xl border border-foreground/10 mt-6 shrink-0">
-                        <div className="flex items-center gap-2 flex-1 w-full md:w-auto">
-                            <div className="relative flex-1 md:max-w-md">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                <input
-                                    type="text"
-                                    placeholder={activeTab === 'users' ? "Search by name or email..." : "Search groups..."}
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full h-10 pl-10 pr-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 transition-all"
-                                />
-                            </div>
-                            {activeTab === 'users' && (
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full xl:w-auto">
+                        <div className="relative flex-1 xl:w-96 shadow-2xl shadow-primary/5">
+                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/30" />
+                            <input
+                                type="text"
+                                placeholder={activeTab === 'users' ? "Search entities..." : "Search sectors..."}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full h-10 pl-14 pr-6 bg-foreground/[0.03] border border-foreground/10 rounded-2xl text-xs font-bold uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all placeholder:text-muted-foreground/30 focus:bg-background"
+                            />
+                        </div>
+                        {activeTab === 'users' && (
+                            <div className="relative">
+                                <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/30 pointer-events-none" />
                                 <select
                                     value={roleFilter}
                                     onChange={(e) => setRoleFilter(e.target.value as Role | 'ALL')}
-                                    className="h-10 px-3 bg-foreground/5 border border-foreground/10 rounded-xl text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-primary/50"
+                                    className="h-10 pl-12 pr-10 bg-foreground/[0.03] border border-foreground/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 cursor-pointer hover:bg-foreground/[0.05] transition-all appearance-none shadow-sm"
                                 >
-                                    <option value="ALL">All Roles</option>
-                                    <option value="USER">Users</option>
-                                    <option value="ADMIN">Admins</option>
+                                    <option value="ALL">All Clearances</option>
+                                    <option value="USER">User Clearance</option>
+                                    <option value="ADMIN">Admin Overlord</option>
                                 </select>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-2 w-full md:w-auto">
-                            <button
-                                onClick={() => setIsCreateGroupOpen(true)}
-                                className="flex-1 md:flex-none h-10 px-4 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
-                            >
-                                <Users className="w-4 h-4" />
-                                New Group
-                            </button>
-                            <button
-                                onClick={() => setIsCreateUserOpen(true)}
-                                className="flex-1 md:flex-none h-10 px-4 bg-primary text-primary-foreground rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20"
-                            >
-                                <UserPlus className="w-4 h-4" />
-                                Add User
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Content Content */}
-                    <div className="flex-1 overflow-hidden mt-6 relative">
-                        {activeTab === 'users' ? (
-                            <div className="bg-card/50 backdrop-blur-xl border border-foreground/10 rounded-2xl shadow-sm h-full flex flex-col">
-                                <div className="flex-1 overflow-y-auto custom-scrollbar">
-                                    <table className="w-full text-left relative">
-                                        <thead className="bg-card/90 backdrop-blur-md border-b border-foreground/5 sticky top-0 z-10">
-                                            <tr>
-                                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-card/90">User Information</th>
-                                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-card/90">System Role</th>
-                                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-card/90">Groups</th>
-                                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-card/90">DB Access</th>
-                                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-card/90">System Access</th>
-                                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right bg-card/90">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-foreground/5">
-                                            <AnimatePresence mode="popLayout">
-                                                {displayUsers.map((user, idx) => (
-                                                    <motion.tr
-                                                        key={user.id}
-                                                        initial={{ opacity: 0, y: 10 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        transition={{ delay: idx * 0.03 }}
-                                                        className="group hover:bg-foreground/[0.02] transition-colors"
-                                                    >
-                                                        <td className="px-6 py-4">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xs font-black text-primary border border-primary/10">
-                                                                    {user.name?.substring(0, 2).toUpperCase() || <UserCircle className="w-5 h-5" />}
-                                                                </div>
-                                                                <div>
-                                                                    <p className="text-sm font-bold text-foreground">{user.name || 'Unnamed'}</p>
-                                                                    <p className="text-[10px] text-muted-foreground font-medium">{user.email}</p>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <select
-                                                                value={user.role}
-                                                                onChange={(e) => setRoleChangeModal({
-                                                                    isOpen: true,
-                                                                    user,
-                                                                    targetRole: e.target.value as Role
-                                                                })}
-                                                                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all cursor-pointer ${user.role === 'ADMIN'
-                                                                    ? 'bg-purple-500/10 text-purple-500 border-purple-500/20'
-                                                                    : 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20'
-                                                                    }`}
-                                                            >
-                                                                <option value="USER" className="text-foreground">User</option>
-                                                                <option value="ADMIN" className="text-foreground">Admin</option>
-                                                            </select>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <div className="flex flex-wrap gap-1 max-w-[150px]">
-                                                                {user.groups?.length > 0 ? (
-                                                                    <>
-                                                                        {user.groups.slice(0, 2).map((group, i) => (
-                                                                            <span key={i} className="px-2 py-0.5 rounded bg-primary/5 border border-primary/10 text-[9px] font-bold text-primary whitespace-nowrap">
-                                                                                {group.name}
-                                                                            </span>
-                                                                        ))}
-                                                                        {user.groups.length > 2 && (
-                                                                            <span className="px-2 py-0.5 rounded bg-primary/5 border border-primary/10 text-[9px] font-bold text-primary whitespace-nowrap cursor-help" title={user.groups.slice(2).map(g => g.name).join(', ')}>
-                                                                                +{user.groups.length - 2} more
-                                                                            </span>
-                                                                        )}
-                                                                    </>
-                                                                ) : (
-                                                                    <span className="text-[9px] text-muted-foreground font-medium italic">No groups</span>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <div className="flex flex-wrap gap-1 max-w-[150px]">
-                                                                {user.access && user.access.length > 0 ? (
-                                                                    <>
-                                                                        {user.access.slice(0, 2).map((db, i) => (
-                                                                            <span key={i} className="px-2 py-0.5 rounded bg-foreground/5 border border-foreground/10 text-[9px] font-bold text-muted-foreground whitespace-nowrap">
-                                                                                {/* Find database name if possible, or show ID/fallback */}
-                                                                                {databases?.find(d => d.id === db)?.name || db}
-                                                                            </span>
-                                                                        ))}
-                                                                        {user.access.length > 2 && (
-                                                                            <span className="px-2 py-0.5 rounded bg-foreground/5 border border-foreground/10 text-[9px] font-bold text-muted-foreground whitespace-nowrap cursor-help" title={user.access.map(a => databases?.find(d => d.id === a)?.name || a).join(', ')}>
-                                                                                +{user.access.length - 2} more
-                                                                            </span>
-                                                                        )}
-                                                                    </>
-                                                                ) : (
-                                                                    <span className="text-[9px] text-muted-foreground font-medium italic">No individual access</span>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <button
-                                                                    onClick={() => handleUpdateActive(user, !user.isActive)}
-                                                                    className={`flex items-center gap-2 transition-all group/btn`}
-                                                                >
-                                                                    <div className={`w-3 h-3 rounded-full ${user.isActive ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`} />
-                                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${user.isActive ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                                        {user.isActive ? 'Enabled' : 'Disabled'}
-                                                                    </span>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-right">
-                                                            <div className="flex items-center justify-end gap-1">
-                                                                <button
-                                                                    onClick={() => setPermissionModal({ isOpen: true, user })}
-                                                                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                                                                    title="Manage Database Permissions"
-                                                                >
-                                                                    <Shield className="w-4 h-4" />
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleUpdateActive(user, !user.isActive)}
-                                                                    className={`p-2 rounded-lg transition-colors ${user.isActive
-                                                                        ? 'hover:bg-red-500/10 text-muted-foreground hover:text-red-500'
-                                                                        : 'hover:bg-emerald-500/10 text-muted-foreground hover:text-emerald-500'
-                                                                        }`}
-                                                                    title={user.isActive ? "Disable Account Access" : "Enable Account Access"}
-                                                                >
-                                                                    {user.isActive ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setDeleteModal({ isOpen: true, user })}
-                                                                    className="p-2 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors"
-                                                                    title="Delete User"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </motion.tr>
-                                                ))}
-                                            </AnimatePresence>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                {filteredUsers.length === 0 && (
-                                    <div className="py-20 text-center flex flex-col items-center justify-center">
-                                        <div className="w-16 h-16 rounded-full bg-foreground/5 flex items-center justify-center mb-4 text-muted-foreground/20">
-                                            <Search className="w-8 h-8" />
-                                        </div>
-                                        <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">No matching users</h3>
-                                        <p className="text-xs text-muted-foreground mt-1">Try adjusting your search or filters</p>
-                                    </div>
-                                )}
-
-
-                                {/* Pagination Footer */}
-                                {filteredUsers.length > 0 && (
-                                    <div className="px-6 py-4 border-t border-foreground/5 flex items-center justify-between bg-card/90 backdrop-blur-md shrink-0">
-                                        <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                                            Showing <span className="text-foreground">{startRow}</span> to <span className="text-foreground">{endRow}</span> of <span className="text-foreground">{filteredUsers.length}</span>
-                                        </div>
-
-                                        <div className="flex items-center gap-1">
-                                            <button
-                                                onClick={() => setCurrentPage(1)}
-                                                disabled={currentPage === 1}
-                                                className="p-1.5 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                            >
-                                                <ChevronsLeft className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                                disabled={currentPage === 1}
-                                                className="p-1.5 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                            >
-                                                <ChevronLeft className="w-4 h-4" />
-                                            </button>
-
-                                            <div className="flex items-center gap-1 mx-2">
-                                                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                                                    let pageNum: number
-                                                    if (totalPages <= 5) {
-                                                        pageNum = i + 1
-                                                    } else if (currentPage <= 3) {
-                                                        pageNum = i + 1
-                                                    } else if (currentPage >= totalPages - 2) {
-                                                        pageNum = totalPages - 4 + i
-                                                    } else {
-                                                        pageNum = currentPage - 2 + i
-                                                    }
-
-                                                    return (
-                                                        <button
-                                                            key={pageNum}
-                                                            onClick={() => setCurrentPage(pageNum)}
-                                                            className={`min-w-[28px] h-7 px-2 rounded-lg text-[10px] font-bold transition-all ${currentPage === pageNum
-                                                                ? "bg-primary text-primary-foreground shadow-sm"
-                                                                : "hover:bg-foreground/10 text-muted-foreground hover:text-foreground"
-                                                                }`}
-                                                        >
-                                                            {pageNum}
-                                                        </button>
-                                                    )
-                                                })}
-                                            </div>
-
-                                            <button
-                                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                                disabled={currentPage === totalPages}
-                                                className="p-1.5 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                            >
-                                                <ChevronRight className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => setCurrentPage(totalPages)}
-                                                disabled={currentPage === totalPages}
-                                                className="p-1.5 rounded-lg hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                            >
-                                                <ChevronsRight className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="h-full overflow-y-auto custom-scrollbar">
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
-                                    <AnimatePresence mode="popLayout">
-                                        {groups.map((group, idx) => (
-                                            <motion.div
-                                                key={group.id}
-                                                initial={{ opacity: 0, scale: 0.9 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                transition={{ delay: idx * 0.05 }}
-                                                className="group relative bg-card/50 backdrop-blur-xl border border-foreground/10 rounded-2xl p-6 hover:border-primary/30 transition-all shadow-sm"
-                                            >
-                                                <div className="flex justify-between items-start mb-4">
-                                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                                                        <Users className="w-6 h-6" />
-                                                    </div>
-                                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <button
-                                                            onClick={() => setEditGroupModal({ isOpen: true, group })}
-                                                            className="p-2 hover:bg-foreground/5 rounded-lg text-muted-foreground hover:text-primary transition-colors"
-                                                            title="Rename Group"
-                                                        >
-                                                            <Edit className="w-4 h-4" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setDeleteGroupModal({ isOpen: true, groupId: group.id })}
-                                                            className="p-2 hover:bg-foreground/5 rounded-lg text-muted-foreground hover:text-red-500 transition-colors"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <h3 className="text-base font-black text-foreground uppercase tracking-tight">{group.name}</h3>
-                                                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{group.description || 'No description provided.'}</p>
-
-                                                <div className="mt-6 flex items-center justify-between pt-4 border-t border-foreground/5">
-                                                    <div className="flex -space-x-2 overflow-hidden">
-                                                        {[...Array(Math.min(3, group._count?.users || 0))].map((_, i) => (
-                                                            <div key={i} className="inline-block h-6 w-6 rounded-full ring-2 ring-background bg-foreground/10 flex items-center justify-center text-[8px] font-bold">
-                                                                U{i + 1}
-                                                            </div>
-                                                        ))}
-                                                        {(group._count?.users || 0) > 3 && (
-                                                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-foreground/5 text-[8px] font-bold ring-2 ring-background">
-                                                                +{(group._count?.users || 0) - 3}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                                                        {group._count?.users || 0} Members
-                                                    </div>
-                                                </div>
-
-                                                <button
-                                                    onClick={() => setManageGroupModal({ isOpen: true, group })}
-                                                    className="w-full mt-4 h-9 bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
-                                                >
-                                                    Manage Access
-                                                </button>
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
-
-                                    {groups.length === 0 && (
-                                        <div className="col-span-full py-20 text-center bg-card/30 rounded-2xl border border-dashed border-foreground/10">
-                                            <Users className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-                                            <h3 className="text-sm font-bold text-foreground">No groups established</h3>
-                                            <button
-                                                onClick={() => setIsCreateGroupOpen(true)}
-                                                className="mt-4 text-xs font-black text-primary uppercase tracking-widest hover:underline"
-                                            >
-                                                Establish Your First Group
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
                             </div>
                         )}
                     </div>
-
                 </div>
 
+                {/* Content Area */}
+                <div className="flex-1 mt-6 relative">
+                    <AnimatePresence mode="wait">
+                        {activeTab === 'users' ? (
+                            <motion.div
+                                key="users-tab"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 20 }}
+                                className="h-full flex flex-col"
+                            >
+                                <div className="bg-card/30 backdrop-blur-3xl border border-foreground/10 rounded-3xl shadow-2xl overflow-hidden h-full flex flex-col">
+                                    <div className="flex-1 overflow-x-auto custom-scrollbar">
+                                        <table className="w-full text-left relative border-collapse min-w-[1000px]">
+                                            <thead className="bg-background/80 backdrop-blur-3xl border-b border-foreground/10 sticky top-0 z-10">
+                                                <tr>
+                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Identity & Signature</th>
+                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Clearance Level</th>
+                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Assignments</th>
+                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Individual Access</th>
+                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">System Status</th>
+                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground text-right">Directives</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-foreground/5">
+                                                <AnimatePresence mode="popLayout">
+                                                    {displayUsers.map((user, idx) => (
+                                                        <motion.tr
+                                                            key={user.id}
+                                                            initial={{ opacity: 0, y: 15 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            transition={{ delay: idx * 0.05, type: 'spring', damping: 25 }}
+                                                            className="group hover:bg-primary/[0.02] transition-all duration-300"
+                                                        >
+                                                            <td className="px-6 py-2.5 border-transparent">
+                                                                <div className="flex items-center gap-4">
+                                                                    <div className="relative">
+                                                                        <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                                        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-sm font-black text-primary border border-primary/10 shadow-inner">
+                                                                            {user.name ? (
+                                                                                <span className="tracking-tighter">{user.name.substring(0, 2).toUpperCase()}</span>
+                                                                            ) : (
+                                                                                <UserCircle className="w-6 h-6" />
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-sm font-black text-foreground tracking-tight group-hover:text-primary transition-colors">{user.name || 'Anonymous Node'}</p>
+                                                                        <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase opacity-60 mt-0.5">{user.email}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-3.5 border-transparent">
+                                                                <select
+                                                                    value={user.role}
+                                                                    onChange={(e) => setRoleChangeModal({
+                                                                        isOpen: true,
+                                                                        user,
+                                                                        targetRole: e.target.value as Role
+                                                                    })}
+                                                                    className={cn(
+                                                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all cursor-pointer focus:ring-2 focus:ring-primary/20",
+                                                                        user.role === 'ADMIN'
+                                                                            ? 'bg-purple-500/10 text-purple-500 border-purple-500/20 hover:bg-purple-500/20 shadow-lg shadow-purple-500/5'
+                                                                            : 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20 hover:bg-cyan-500/20 shadow-lg shadow-cyan-500/5'
+                                                                    )}
+                                                                >
+                                                                    <option value="USER">User Clearance</option>
+                                                                    <option value="ADMIN">Admin Overlord</option>
+                                                                </select>
+                                                            </td>
+                                                            <td className="px-6 py-3.5 border-transparent">
+                                                                <div className="flex flex-wrap gap-1.5 max-w-[180px]">
+                                                                    {user.groups?.length > 0 ? (
+                                                                        <>
+                                                                            {user.groups.slice(0, 2).map((group, i) => (
+                                                                                <span key={i} className="px-2.5 py-1 rounded-lg bg-primary/5 border border-primary/10 text-[9px] font-black uppercase tracking-wider text-primary shadow-sm">
+                                                                                    {group.name}
+                                                                                </span>
+                                                                            ))}
+                                                                            {user.groups.length > 2 && (
+                                                                                <Tooltip content={user.groups.slice(2).map(g => g.name).join(', ')}>
+                                                                                    <span className="px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-black uppercase tracking-wider text-muted-foreground cursor-help hover:bg-foreground/10 transition-colors">
+                                                                                        +{user.groups.length - 2} More
+                                                                                    </span>
+                                                                                </Tooltip>
+                                                                            )}
+                                                                        </>
+                                                                    ) : (
+                                                                        <span className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-30">Unassigned</span>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-8 py-5 border-transparent">
+                                                                <div className="flex flex-wrap gap-1.5 max-w-[180px]">
+                                                                    {user.access && user.access.length > 0 ? (
+                                                                        <>
+                                                                            {user.access.slice(0, 2).map((db, i) => (
+                                                                                <span key={i} className="px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-black uppercase tracking-wider text-muted-foreground shadow-sm">
+                                                                                    {databases?.find(d => d.id === db)?.name || db}
+                                                                                </span>
+                                                                            ))}
+                                                                            {user.access.length > 2 && (
+                                                                                <Tooltip content={user.access.map(a => databases?.find(d => d.id === a)?.name || a).join(', ')}>
+                                                                                    <span className="px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-black uppercase tracking-wider text-muted-foreground cursor-help hover:bg-foreground/10 transition-colors">
+                                                                                        +{user.access.length - 2} More
+                                                                                    </span>
+                                                                                </Tooltip>
+                                                                            )}
+                                                                        </>
+                                                                    ) : (
+                                                                        <span className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-30">Universal Access</span>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-8 py-5 border-transparent">
+                                                                <button
+                                                                    onClick={() => handleUpdateActive(user, !user.isActive)}
+                                                                    className="flex items-center gap-3 transition-all group/status"
+                                                                >
+                                                                    <div className={cn(
+                                                                        "w-3.5 h-3.5 rounded-full border-2 transition-all duration-500",
+                                                                        user.isActive
+                                                                            ? "bg-emerald-500 border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.5)] animate-pulse"
+                                                                            : "bg-red-500 border-red-500/20 shadow-[0_0_12px_rgba(239,68,68,0.5)]"
+                                                                    )} />
+                                                                    <span className={cn(
+                                                                        "text-[10px] font-black uppercase tracking-[0.15em]",
+                                                                        user.isActive ? "text-emerald-500" : "text-red-500"
+                                                                    )}>
+                                                                        {user.isActive ? 'Active Node' : 'Deactivated'}
+                                                                    </span>
+                                                                </button>
+                                                            </td>
+                                                            <td className="px-8 py-5 border-transparent text-right">
+                                                                <div className="flex items-center justify-end gap-2">
+                                                                    <button
+                                                                        onClick={() => setPermissionModal({ isOpen: true, user })}
+                                                                        className="p-2.5 rounded-xl bg-foreground/5 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all border border-transparent hover:border-primary/20"
+                                                                        title="Database Grants"
+                                                                    >
+                                                                        <Shield className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleUpdateActive(user, !user.isActive)}
+                                                                        className={cn(
+                                                                            "p-2.5 rounded-xl bg-foreground/5 transition-all border border-transparent",
+                                                                            user.isActive
+                                                                                ? 'hover:bg-red-500/10 text-muted-foreground hover:text-red-500 hover:border-red-500/20'
+                                                                                : 'hover:bg-emerald-500/10 text-muted-foreground hover:text-emerald-500 hover:border-emerald-500/20'
+                                                                        )}
+                                                                    >
+                                                                        {user.isActive ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setDeleteModal({ isOpen: true, user })}
+                                                                        className="p-2.5 rounded-xl bg-foreground/5 hover:bg-red-500/20 text-muted-foreground hover:text-red-500 transition-all border border-transparent hover:border-red-500/20"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </motion.tr>
+                                                    ))}
+                                                </AnimatePresence>
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                {/* Modals - Outside zoomed container to prevent distortion, but scaled internally */}
-                <div className="z-[100]">
-                    <SimpleConfirmationModal
-                        isOpen={roleChangeModal.isOpen}
-                        onClose={() => setRoleChangeModal({ isOpen: false, user: null, targetRole: null })}
-                        onConfirm={handleRoleChange}
-                        title="Update Privileges?"
-                        description={`You are about to change the system permissions for ${roleChangeModal.user?.name || roleChangeModal.user?.email} to ${roleChangeModal.targetRole}. This change takes effect immediately.`}
-                        confirmText="Yes, Change Role"
-                        type="warning"
-                    />
-
-                    <SimpleConfirmationModal
-                        isOpen={deleteModal.isOpen}
-                        onClose={() => setDeleteModal({ isOpen: false, user: null })}
-                        onConfirm={handleDeleteUser}
-                        title="Terminate Account?"
-                        description={`This will permanently remove the account for ${deleteModal.user?.name || deleteModal.user?.email}. All associated settings and history will be lost.`}
-                        confirmText="Yes, Terminate"
-                        type="danger"
-                    />
-
-                    <SimpleConfirmationModal
-                        isOpen={deleteGroupModal.isOpen}
-                        onClose={() => setDeleteGroupModal({ isOpen: false, groupId: null })}
-                        onConfirm={handleDeleteGroup}
-                        title="Delete Group?"
-                        description="This will permanently remove this group. All users will lose group-based database access."
-                        confirmText="Yes, Delete Group"
-                        type="danger"
-                    />
-
-                    <Portal>
-                        <AnimatePresence>
-                            {editGroupModal.isOpen && (
-                                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                                    <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
-                                        onClick={() => setEditGroupModal({ isOpen: false, group: null })}
-                                    />
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                                        exit={{ opacity: 0, scale: 0.95, y: 30 }}
-                                        className="relative z-10 w-full max-w-md bg-background rounded-3xl shadow-2xl border border-foreground/10 p-6"
-                                        style={{ zoom: 0.9 }}
-                                    >
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h3 className="text-lg font-black tracking-tight">Rename Group</h3>
-                                            <button onClick={() => setEditGroupModal({ isOpen: false, group: null })} className="p-2 hover:bg-foreground/5 rounded-full transition-colors">
-                                                <X className="w-5 h-5 text-muted-foreground" />
+                                    {/* Table Footer / Pagination */}
+                                    <div className="px-8 py-6 bg-background/50 backdrop-blur-3xl border-t border-foreground/10 flex items-center justify-between">
+                                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                                            Displaying <span className="text-foreground">{startRow}-{endRow}</span> of <span className="text-primary">{filteredUsers.length}</span> Entities
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                                disabled={currentPage === 1}
+                                                className="p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-muted-foreground disabled:opacity-30 transition-all"
+                                            >
+                                                <ChevronLeft className="w-5 h-5" />
+                                            </button>
+                                            <div className="flex gap-1.5">
+                                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                                                    <button
+                                                        key={p}
+                                                        onClick={() => setCurrentPage(p)}
+                                                        className={cn(
+                                                            "w-9 h-9 rounded-xl text-[10px] font-black transition-all border",
+                                                            currentPage === p
+                                                                ? "bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20"
+                                                                : "bg-foreground/5 border-foreground/5 text-muted-foreground hover:bg-foreground/10 hover:text-foreground"
+                                                        )}
+                                                    >
+                                                        {p}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <button
+                                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                                disabled={currentPage === totalPages}
+                                                className="p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-muted-foreground disabled:opacity-30 transition-all"
+                                            >
+                                                <ChevronRight className="w-5 h-5" />
                                             </button>
                                         </div>
-                                        <form onSubmit={(e) => {
-                                            e.preventDefault()
-                                            const formData = new FormData(e.currentTarget)
-                                            const newName = formData.get('groupName') as string
-                                            if (newName) handleRenameGroup(newName)
-                                        }}>
-                                            <div className="space-y-4">
-                                                <div>
-                                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Group Name</label>
-                                                    <input
-                                                        name="groupName"
-                                                        type="text"
-                                                        required
-                                                        defaultValue={editGroupModal.group?.name}
-                                                        className="w-full h-10 px-3 mt-2 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 transition-all"
-                                                    />
-                                                </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="groups-tab"
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-10"
+                            >
+                                <AnimatePresence mode="popLayout">
+                                    {groups.map((group, idx) => (
+                                        <motion.div
+                                            key={group.id}
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            className="group relative p-8 rounded-[2.5rem] bg-card/20 backdrop-blur-3xl border border-foreground/10 hover:border-primary/30 transition-all duration-500 shadow-xl hover:shadow-primary/5"
+                                        >
+                                            <div className="absolute top-0 right-0 p-4 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
                                                 <button
-                                                    type="submit"
-                                                    className="w-full h-10 bg-primary text-primary-foreground rounded-xl text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-primary/20"
+                                                    onClick={() => setEditGroupModal({ isOpen: true, group })}
+                                                    className="p-2.5 rounded-xl bg-background border border-foreground/10 text-muted-foreground hover:text-primary transition-all hover:bg-primary/5 hover:border-primary/20"
                                                 >
-                                                    Save Changes
+                                                    <Edit className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setDeleteGroupModal({ isOpen: true, groupId: group.id })}
+                                                    className="p-2.5 rounded-xl bg-background border border-foreground/10 text-muted-foreground hover:text-red-500 transition-all hover:bg-red-500/5 hover:border-red-500/20"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>
-                                        </form>
-                                    </motion.div>
-                                </div>
-                            )}
-                        </AnimatePresence>
-                    </Portal>
 
-                    <Portal>
-                        <AnimatePresence>
-                            {isCreateUserOpen && (
-                                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-24">
-                                    <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
-                                        onClick={() => setIsCreateUserOpen(false)}
-                                    />
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                                        exit={{ opacity: 0, scale: 0.95, y: 30 }}
-                                        className="relative z-10 w-full max-w-3xl bg-background rounded-3xl shadow-2xl border border-foreground/10"
-                                        style={{ zoom: 0.9 }}
-                                    >
-                                        <div className="absolute top-4 right-4 z-20">
-                                            <button onClick={() => setIsCreateUserOpen(false)} className="p-2 hover:bg-foreground/5 rounded-full transition-colors">
-                                                <X className="w-5 h-5 text-muted-foreground" />
-                                            </button>
-                                        </div>
-                                        <div className="p-6">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <div className="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-emerald-500">
-                                                    Admin Panel
+                                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary mb-6 border border-primary/10 group-hover:scale-110 transition-transform duration-500">
+                                                <Users className="w-8 h-8" />
+                                            </div>
+
+                                            <h3 className="text-xl font-black text-foreground tracking-tight group-hover:text-primary transition-colors">{group.name}</h3>
+                                            <p className="text-xs text-muted-foreground mt-2 line-clamp-2 font-medium opacity-60 italic">"{group.description || 'No sectoral mandate documented.'}"</p>
+
+                                            <div className="mt-8 pt-6 border-t border-foreground/5 flex items-center justify-between">
+                                                <div className="flex -space-x-3">
+                                                    {[...Array(Math.min(4, group._count?.users || 0))].map((_, i) => (
+                                                        <div key={i} className="w-8 h-8 rounded-xl border-2 border-background bg-foreground/10 flex items-center justify-center text-[10px] font-black text-primary shadow-sm overflow-hidden">
+                                                            <div className="w-full h-full bg-primary/20 backdrop-blur-sm flex items-center justify-center">
+                                                                {i + 1}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                    {(group._count?.users || 0) > 4 && (
+                                                        <div className="w-8 h-8 rounded-xl border-2 border-background bg-primary/20 flex items-center justify-center text-[9px] font-black text-primary backdrop-blur-md">
+                                                            +{(group._count?.users || 0) - 4}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <p className="text-xs text-muted-foreground uppercase tracking-wider">User Management (DBs: {databases?.length || 0})</p>
-                                            </div>
-                                            <div className="text-center mb-4">
-                                                <h2 className="text-xl font-black tracking-tight">CREATE <span className="text-primary">ACCOUNT</span></h2>
-                                                <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-1">Join the QueryX Network</p>
+                                                <div className="px-3 py-1 rounded-full bg-foreground/5 border border-foreground/5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                                                    {group._count?.users || 0} Assets
+                                                </div>
                                             </div>
 
-                                            <form onSubmit={async (e) => {
-                                                e.preventDefault()
-                                                const formData = new FormData(e.currentTarget)
-                                                const data = {
-                                                    firstName: formData.get('firstName') as string,
-                                                    lastName: formData.get('lastName') as string,
-                                                    name: formData.get('name') as string,
-                                                    email: formData.get('email') as string,
-                                                    password: formData.get('password') as string,
-                                                    confirmPassword: formData.get('confirmPassword') as string,
-                                                    securityQuestion1: formData.get('securityQuestion1') as string,
-                                                    securityAnswer1: formData.get('securityAnswer1') as string,
-                                                    securityQuestion2: formData.get('securityQuestion2') as string,
-                                                    securityAnswer2: formData.get('securityAnswer2') as string,
-                                                }
+                                            <button
+                                                onClick={() => setManageGroupModal({ isOpen: true, group })}
+                                                className="w-full mt-6 h-12 bg-foreground/[0.03] hover:bg-primary hover:text-primary-foreground border border-foreground/10 hover:border-primary rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300"
+                                            >
+                                                Configure Permissions
+                                            </button>
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
 
-                                                try {
-                                                    const response = await fetch('/api/auth/register', {
-                                                        method: 'POST',
-                                                        headers: { 'Content-Type': 'application/json' },
-                                                        body: JSON.stringify(data),
-                                                    })
-                                                    const result = await response.json()
+                                {groups.length === 0 && (
+                                    <div className="col-span-full py-32 text-center rounded-[3rem] border-2 border-dashed border-foreground/10 bg-foreground/[0.01]">
+                                        <div className="w-20 h-20 bg-foreground/5 rounded-full flex items-center justify-center mx-auto mb-6 opacity-20">
+                                            <Users className="w-10 h-10" />
+                                        </div>
+                                        <h3 className="text-lg font-black text-foreground uppercase tracking-widest mb-2">No security sectors detected</h3>
+                                        <button
+                                            onClick={() => setIsCreateGroupOpen(true)}
+                                            className="text-primary font-black uppercase tracking-[0.2em] text-[10px] hover:underline"
+                                        >
+                                            Establish New Sector Registry
+                                        </button>
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </div>
 
-                                                    if (response.ok) {
-                                                        const mappedNewUser = { ...result.user, access: ['Production DB'], groups: [] } as User
-                                                        setUsers(prev => [mappedNewUser, ...prev])
-                                                        toast({
-                                                            title: 'Success',
-                                                            description: 'User account created successfully.',
-                                                            type: 'success'
-                                                        })
-                                                        setIsCreateUserOpen(false)
-                                                    } else {
-                                                        toast({
-                                                            title: 'Error',
-                                                            description: result.error || 'Please try again.',
-                                                            type: 'error'
-                                                        })
-                                                    }
-                                                } catch (err) {
+            {/* Global Access Modals Container */}
+            <div className="z-[100]">
+                {/* User Role Change Confirmation */}
+                <SimpleConfirmationModal
+                    isOpen={roleChangeModal.isOpen}
+                    onClose={() => setRoleChangeModal({ isOpen: false, user: null, targetRole: null })}
+                    onConfirm={handleRoleChange}
+                    title="Promote / Demote Entity?"
+                    description={`Review the clearance modification for ${roleChangeModal.user?.name || roleChangeModal.user?.email}. New classification: ${roleChangeModal.targetRole}. This will redefine their cross-network privileges.`}
+                    confirmText="Finalize Permissions"
+                    type="warning"
+                />
+
+                {/* User Deletion Confirmation */}
+                <SimpleConfirmationModal
+                    isOpen={deleteModal.isOpen}
+                    onClose={() => setDeleteModal({ isOpen: false, user: null })}
+                    onConfirm={handleDeleteUser}
+                    title="Redact Node Permanently?"
+                    description={`This will purge ${deleteModal.user?.name || deleteModal.user?.email} from the IAM registry. This operation is irreversible and all spectral data will be lost.`}
+                    confirmText="Confirm Purge"
+                    type="danger"
+                />
+
+                {/* Group Deletion Confirmation */}
+                <SimpleConfirmationModal
+                    isOpen={deleteGroupModal.isOpen}
+                    onClose={() => setDeleteGroupModal({ isOpen: false, groupId: null })}
+                    onConfirm={handleDeleteGroup}
+                    title="Dissolve Sector?"
+                    description="Decommissioning this security sector will orphan all associated node assignments and reset their primary database clearance to NULL."
+                    confirmText="Proceed with Decommission"
+                    type="danger"
+                />
+
+                {/* Edit Group Name Modal */}
+                <Portal>
+                    <AnimatePresence>
+                        {editGroupModal.isOpen && (
+                            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+                                    onClick={() => setEditGroupModal({ isOpen: false, group: null })}
+                                />
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9, y: 30 }}
+                                    className="relative z-10 w-full max-w-md bg-background rounded-[2.5rem] shadow-2xl border border-foreground/10 p-10"
+                                    style={{ zoom: 0.9 }}
+                                >
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div>
+                                            <h3 className="text-2xl font-black tracking-tight text-foreground leading-tight italic">Rename <span className="text-primary not-italic">Sector</span></h3>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-1 opacity-50">IAM Management Console</p>
+                                        </div>
+                                    </div>
+                                    <form onSubmit={(e) => {
+                                        e.preventDefault()
+                                        const formData = new FormData(e.currentTarget)
+                                        const newName = formData.get('groupName') as string
+                                        if (newName) handleRenameGroup(newName)
+                                    }} className="space-y-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Updated Label</label>
+                                            <input
+                                                name="groupName"
+                                                type="text"
+                                                required
+                                                autoFocus
+                                                defaultValue={editGroupModal.group?.name}
+                                                className="w-full h-12 px-5 bg-foreground/5 border border-foreground/10 rounded-2xl text-sm font-bold focus:outline-none focus:border-primary/50 transition-all placeholder:opacity-30"
+                                                placeholder="e.g. CORE ANALYTICS"
+                                            />
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            className="w-full h-12 bg-primary text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/20 active:scale-[0.98]"
+                                        >
+                                            Authorize Change
+                                        </button>
+                                    </form>
+                                </motion.div>
+                            </div>
+                        )}
+                    </AnimatePresence>
+                </Portal>
+
+                {/* Provision User (Create Account) Modal */}
+                <Portal>
+                    <AnimatePresence>
+                        {isCreateUserOpen && (
+                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                                    onClick={() => setIsCreateUserOpen(false)}
+                                />
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95, y: 30 }}
+                                    className="relative z-10 w-full max-w-3xl bg-background rounded-3xl shadow-2xl border border-foreground/10"
+                                    style={{ zoom: 0.9 }}
+                                >
+                                    <div className="absolute top-4 right-4 z-20">
+                                        <button onClick={() => setIsCreateUserOpen(false)} className="p-2 hover:bg-foreground/5 rounded-full transition-colors">
+                                            <X className="w-5 h-5 text-muted-foreground" />
+                                        </button>
+                                    </div>
+                                    <div className="p-6">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <div className="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-emerald-500">
+                                                Registry Management
+                                            </div>
+                                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Node Provisioning</p>
+                                        </div>
+                                        <div className="text-center mb-4">
+                                            <h2 className="text-xl font-black tracking-tight">CREATE <span className="text-primary">ACCOUNT</span></h2>
+                                            <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-1">Initialize Network Clearance</p>
+                                        </div>
+
+                                        <form onSubmit={async (e) => {
+                                            e.preventDefault()
+                                            const formData = new FormData(e.currentTarget)
+                                            const data = Object.fromEntries(formData.entries())
+
+                                            try {
+                                                const response = await fetch('/api/auth/register', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify(data),
+                                                })
+                                                const result = await response.json()
+
+                                                if (response.ok) {
+                                                    const mappedNewUser = { ...result.user, access: [], groups: [] } as User
+                                                    setUsers(prev => [mappedNewUser, ...prev])
                                                     toast({
-                                                        title: 'Error',
-                                                        description: 'An error occurred. Please try again.',
+                                                        title: 'Node Provisioned',
+                                                        description: 'User account established successfully.',
+                                                        type: 'success'
+                                                    })
+                                                    setIsCreateUserOpen(false)
+                                                } else {
+                                                    toast({
+                                                        title: 'Provisioning Failed',
+                                                        description: result.error || 'Identity verification failed.',
                                                         type: 'error'
                                                     })
                                                 }
-                                            }} className="space-y-3">
-                                                <div className="grid grid-cols-3 gap-3">
-                                                    <div className="space-y-1">
-                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">First Name</label>
-                                                        <input name="firstName" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="John" />
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Last Name</label>
-                                                        <input name="lastName" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="Doe" />
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Username</label>
-                                                        <input name="name" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="johndoe" />
-                                                    </div>
+                                            } catch (err) {
+                                                toast({
+                                                    title: 'Fatal Error',
+                                                    description: 'Connection lost during handshake.',
+                                                    type: 'error'
+                                                })
+                                            }
+                                        }} className="space-y-3">
+                                            <div className="grid grid-cols-3 gap-3">
+                                                <div className="space-y-1">
+                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">First Name</label>
+                                                    <input name="firstName" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="John" />
                                                 </div>
-
-                                                <div className="grid grid-cols-3 gap-3">
-                                                    <div className="space-y-1">
-                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Email</label>
-                                                        <input name="email" type="email" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="john@example.com" />
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Password</label>
-                                                        <input name="password" type="password" required minLength={8} className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="••••••••" />
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Confirm</label>
-                                                        <input name="confirmPassword" type="password" required minLength={8} className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="••••••••" />
-                                                    </div>
+                                                <div className="space-y-1">
+                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Last Name</label>
+                                                    <input name="lastName" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="Doe" />
                                                 </div>
-
-                                                <div className="grid grid-cols-2 gap-3">
-                                                    <div className="space-y-1">
-                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Security Question 1</label>
-                                                        <select name="securityQuestion1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
-                                                            <option value="">Select a question</option>
-                                                            <option value="What was your first pet's name?">What was your first pet's name?</option>
-                                                            <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-                                                            <option value="What city were you born in?">What city were you born in?</option>
-                                                        </select>
-                                                        <input name="securityAnswer1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs mt-1" placeholder="Your answer" />
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Security Question 2</label>
-                                                        <select name="securityQuestion2" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
-                                                            <option value="">Select a question</option>
-                                                            <option value="What was the model of your first car?">What was the model of your first car?</option>
-                                                            <option value="What was the name of your elementary school?">What was the name of your elementary school?</option>
-                                                        </select>
-                                                        <input name="securityAnswer2" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs mt-1" placeholder="Your answer" />
-                                                    </div>
+                                                <div className="space-y-1">
+                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Username</label>
+                                                    <input name="name" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="johndoe" />
                                                 </div>
+                                            </div>
 
-                                                <div className="flex gap-3 pt-3">
-                                                    <button type="submit" className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all">
-                                                        Create Account
-                                                    </button>
-                                                    <button type="button" onClick={() => setIsCreateUserOpen(false)} className="flex-1 h-10 bg-foreground/5 border border-foreground/10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-foreground/10 transition-all">
-                                                        Cancel
-                                                    </button>
+                                            <div className="grid grid-cols-3 gap-3">
+                                                <div className="space-y-1">
+                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Email Address</label>
+                                                    <input name="email" type="email" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="john@example.com" />
                                                 </div>
-                                            </form>
-                                        </div>
-                                    </motion.div>
-                                </div>
-                            )}
-                        </AnimatePresence>
-                    </Portal>
+                                                <div className="space-y-1">
+                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Access Key</label>
+                                                    <input name="password" type="password" required minLength={8} className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="••••••••" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Verify Key</label>
+                                                    <input name="confirmPassword" type="password" required minLength={8} className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="••••••••" />
+                                                </div>
+                                            </div>
 
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div className="space-y-1">
+                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Security Challenge 1</label>
+                                                    <select name="securityQuestion1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
+                                                        <option value="">Select challenge...</option>
+                                                        <option value="What was your first pet's name?">What was your first pet's name?</option>
+                                                        <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                                                        <option value="What city were you born in?">What city were you born in?</option>
+                                                    </select>
+                                                    <input name="securityAnswer1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs mt-1" placeholder="Challenge Response" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Security Challenge 2</label>
+                                                    <select name="securityQuestion2" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
+                                                        <option value="">Select challenge...</option>
+                                                        <option value="What was the model of your first car?">What was the model of your first car?</option>
+                                                        <option value="What was the name of your elementary school?">What was the name of your elementary school?</option>
+                                                    </select>
+                                                    <input name="securityAnswer2" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs mt-1" placeholder="Challenge Response" />
+                                                </div>
+                                            </div>
 
-                </div>
-                {/* Modals - Outside zoomed container to prevent distortion, but scaled internally */}
-                <div className="z-[100]">
-                    <SimpleConfirmationModal
-                        isOpen={roleChangeModal.isOpen}
-                        onClose={() => setRoleChangeModal({ isOpen: false, user: null, targetRole: null })}
-                        onConfirm={handleRoleChange}
-                        title="Update Privileges?"
-                        description={`You are about to change the system permissions for ${roleChangeModal.user?.name || roleChangeModal.user?.email} to ${roleChangeModal.targetRole}. This change takes effect immediately.`}
-                        confirmText="Yes, Change Role"
-                        type="warning"
-                    />
+                                            <div className="flex gap-3 pt-3">
+                                                <button type="submit" className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+                                                    Establish Identity
+                                                </button>
+                                                <button type="button" onClick={() => setIsCreateUserOpen(false)} className="flex-1 h-10 bg-foreground/5 border border-foreground/10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-foreground/10 transition-all">
+                                                    Abort
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </motion.div>
+                            </div>
+                        )}
+                    </AnimatePresence>
+                </Portal>
 
-                    <SimpleConfirmationModal
-                        isOpen={deleteModal.isOpen}
-                        onClose={() => setDeleteModal({ isOpen: false, user: null })}
-                        onConfirm={handleDeleteUser}
-                        title="Terminate Account?"
-                        description={`This will permanently remove the account for ${deleteModal.user?.name || deleteModal.user?.email}. All associated settings and history will be lost.`}
-                        confirmText="Yes, Terminate"
-                        type="danger"
-                    />
+                {/* Create Group Modal */}
+                <CreateGroupModal
+                    isOpen={isCreateGroupOpen}
+                    onClose={() => setIsCreateGroupOpen(false)}
+                    initialUsers={users}
+                    initialDatabases={databases}
+                    onSuccess={(newGroup) => {
+                        setGroups(prev => [newGroup, ...prev])
+                        toast({
+                            title: 'Sector Registry Created',
+                            description: 'A new security sector has been established.',
+                            type: 'success'
+                        })
+                        if (newGroup.users?.length > 0) {
+                            const userIds = newGroup.users.map((u: any) => u.id)
+                            setUsers(prev => prev.map(u =>
+                                userIds.includes(u.id)
+                                    ? { ...u, groups: [...(u.groups || []), { id: newGroup.id, name: newGroup.name }] }
+                                    : u
+                            ))
+                        }
+                    }}
+                />
 
-                    <CreateGroupModal
-                        isOpen={isCreateGroupOpen}
-                        onClose={() => setIsCreateGroupOpen(false)}
-                        initialUsers={users}
-                        initialDatabases={databases}
-                        onSuccess={(newGroup) => {
-                            setGroups(prev => [newGroup, ...prev])
-                            toast({
-                                title: 'Group Established',
-                                description: 'The new user group has been successfully created.',
-                                type: 'success'
-                            })
-                            // If the new group has users, update the users state
-                            if (newGroup.users && newGroup.users.length > 0) {
-                                const userIds = newGroup.users.map((u: any) => u.id)
-                                setUsers(prev => prev.map(u =>
-                                    userIds.includes(u.id)
-                                        ? { ...u, groups: [...(u.groups || []), { id: newGroup.id, name: newGroup.name }] }
-                                        : u
-                                ))
-                            }
-                        }}
-                    />
+                {/* User Individual Permissions Editor */}
+                <PermissionEditor
+                    isOpen={permissionModal.isOpen}
+                    user={permissionModal.user}
+                    availableDatabases={databases}
+                    onClose={() => setPermissionModal({ isOpen: false, user: null })}
+                    onSave={handleSavePermissions}
+                />
 
-                    <PermissionEditor
-                        isOpen={permissionModal.isOpen}
-                        user={permissionModal.user}
-                        availableDatabases={databases}
-                        onClose={() => setPermissionModal({ isOpen: false, user: null })}
-                        onSave={handleSavePermissions}
-                    />
-
+                {/* Sector Access & Membership Manager */}
+                {manageGroupModal.isOpen && (
                     <ManageGroupAccessModal
                         isOpen={manageGroupModal.isOpen}
                         group={manageGroupModal.group}
@@ -1014,14 +997,11 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                         onClose={() => setManageGroupModal({ isOpen: false, group: null })}
                         onSuccess={(updatedGroup) => {
                             setGroups(prev => prev.map(g => g.id === updatedGroup.id ? { ...g, ...updatedGroup } : g))
-
-                            // Update user states based on group membership changes
                             const groupMemberIds = updatedGroup.users.map((u: any) => u.id)
                             setUsers(prev => prev.map(u => {
                                 const isInGroup = groupMemberIds.includes(u.id)
                                 const currentGroups = u.groups || []
                                 const groupExists = currentGroups.some(g => g.id === updatedGroup.id)
-
                                 if (isInGroup && !groupExists) {
                                     return { ...u, groups: [...currentGroups, { id: updatedGroup.id, name: updatedGroup.name }] }
                                 } else if (!isInGroup && groupExists) {
@@ -1030,17 +1010,18 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                 return u
                             }))
                             toast({
-                                title: 'Group Updated',
-                                description: 'Group access and members have been updated.',
+                                title: 'Registry Synchronized',
+                                description: 'Sector permissions and node memberships updated.',
                                 type: 'success'
                             })
                         }}
                     />
-                </div>
+                )}
             </div>
         </div>
     )
 }
+
 
 function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDatabases }: { isOpen: boolean, onClose: () => void, onSuccess: (group: any) => void, initialUsers?: User[], initialDatabases?: any[] }) {
     const [isLoading, setIsLoading] = useState(false)
@@ -1097,7 +1078,6 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
                             className="relative w-full max-w-4xl bg-background border border-foreground/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
-                            style={{ zoom: 0.9 }}
                         >
                             <div className="p-6 border-b border-foreground/5 flex items-center justify-between shrink-0">
                                 <div>
@@ -1244,14 +1224,20 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
     )
 }
 
-function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, databases }: { isOpen: boolean, group: any, onClose: () => void, onSuccess: (group: any) => void, users: User[], databases: any[] }) {
+function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, databases }: {
+    isOpen: boolean,
+    group: any,
+    onClose: () => void,
+    onSuccess: (group: any) => void,
+    users: User[],
+    databases: any[]
+}) {
     const [isLoading, setIsLoading] = useState(false)
-    const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-    const [selectedDatabases, setSelectedDatabases] = useState<string[]>([])
+    const [selectedUsers, setSelectedUsers] = useState<string[]>(group.users?.map((u: any) => u.id) || [])
+    const [selectedDatabases, setSelectedDatabases] = useState<string[]>(group.databases?.map((d: any) => d.id) || [])
     const [userSearchQuery, setUserSearchQuery] = useState('')
     const [dbSearchQuery, setDbSearchQuery] = useState('')
 
-    // Filter users and databases based on search queries
     const filteredUsers = users.filter(user =>
         user.name?.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
         user.email?.toLowerCase().includes(userSearchQuery.toLowerCase())
@@ -1261,20 +1247,8 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
         db.name.toLowerCase().includes(dbSearchQuery.toLowerCase())
     )
 
-    // Load initial state when group opens
-    React.useEffect(() => {
-        if (group && isOpen) {
-            // Need to fetch current group details if not fully present, but assuming group object has necessary connections or we reload
-            // For now, let's assume valid data or empty
-            // In a real app we'd fetch the group's current relations here
-            setSelectedUsers(group.users?.map((u: any) => u.id) || [])
-            setSelectedDatabases(group.databases?.map((d: any) => d.id) || [])
-        }
-    }, [group, isOpen])
-
     const handleSave = async () => {
         setIsLoading(true)
-        // Parallel updates
         const [usersRes, dbsRes] = await Promise.all([
             updateGroupUsers(group.id, selectedUsers),
             updateGroupDatabases(group.id, selectedDatabases)
@@ -1283,9 +1257,11 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
         if (usersRes.success && dbsRes.success) {
             onSuccess({
                 ...group,
-                users: users.filter(u => selectedUsers.includes(u.id)).map(u => ({ id: u.id, name: u.name, email: u.email })),
+                userIds: selectedUsers,
+                databaseIds: selectedDatabases,
+                users: users.filter(u => selectedUsers.includes(u.id)),
+                databases: databases.filter(d => selectedDatabases.includes(d.id)),
                 _count: { users: selectedUsers.length }
-                // databases: ... (if we store them on group object in client)
             })
             onClose()
         }
@@ -1297,8 +1273,8 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
     return (
         <Portal>
             <AnimatePresence>
-                {isOpen && group && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pb-24">
+                {isOpen && (
+                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -1311,7 +1287,6 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
                             className="relative w-full max-w-lg bg-background border border-foreground/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
-                            style={{ zoom: 0.9 }}
                         >
                             <div className="p-6 border-b border-foreground/5 flex items-center justify-between shrink-0">
                                 <div>

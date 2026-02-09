@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: 'Missing required parameters' }, { status: 400 })
         }
 
-        let testResult = { success: false, error: 'Unknown provider' }
+        let testResult: { success: boolean; error?: string; message?: string } = { success: false, error: 'Unknown provider' }
 
         switch (provider) {
             case 'openai':

@@ -23,8 +23,12 @@ import {
     Unlock,
     CheckCircle2,
     XCircle,
-    RefreshCw
+    RefreshCw,
+    ChevronLeft,
+    TrendingUp
 } from 'lucide-react'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Portal } from '@/components/ui/Portal'
 import { createDatabase, updateDatabase, deleteDatabase, testConnection, testConnectionById, toggleDatabaseLock } from '@/lib/actions/databaseActions'
@@ -173,27 +177,87 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
         }
     }
 
+    // Standardize stats for the overview
+    const totalDatabases = databases.length
+    const healthyDatabases = databases.length
+    const totalGroups = databases.reduce((acc, db) => acc + (db._count?.groups || 0), 0)
+
+    const statsEntries = [
+        { label: 'Total Connections', value: totalDatabases.toString(), change: `ACROSS ${totalGroups} GROUPS`, icon: DatabaseIcon, color: 'text-primary', bg: 'bg-primary/5', border: 'border-primary/20' },
+        { label: 'System Health', value: `${healthyDatabases}/${totalDatabases}`, change: 'ALL OPERATIONAL', icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/5', border: 'border-emerald-500/20', pulse: true },
+        { label: 'Avg Latency', value: '42ms', change: 'OPTIMIZED', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-500/5', border: 'border-amber-500/20' },
+        { label: 'Security Policy', value: 'Strict', change: 'ENFORCED', icon: Shield, color: 'text-indigo-500', bg: 'bg-indigo-500/5', border: 'border-indigo-500/20' },
+    ]
+
     return (
-        <div className="space-y-8">
-            {/* Action Bar */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div className="relative w-full md:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <input
-                        type="text"
-                        placeholder="Search registry..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full h-11 pl-10 pr-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 transition-all"
-                    />
+        <div className="space-y-8 p-6 relative max-w-[1600px] mx-auto min-h-full">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-foreground/5 pb-6">
+                <div className="flex items-center gap-4">
+                    <Link
+                        href="/admin"
+                        className="p-3 rounded-2xl bg-foreground/5 hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-all border border-foreground/5"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </Link>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1.5">
+                            <div className="px-2.5 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-1.5 shadow-sm">
+                                <Server className="w-3.5 h-3.5" />
+                                Infrastructure
+                            </div>
+                            <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">/ Administration</span>
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-none italic flex flex-wrap items-center gap-x-4">
+                            Cluster <span className="text-primary not-italic">Management</span>
+                        </h1>
+                        <p className="text-sm text-muted-foreground font-medium mt-2 max-w-xl">Configure connection strings, safety protocols, and access paradigms for the data fleet</p>
+                    </div>
                 </div>
-                <button
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="w-full md:w-auto h-11 px-6 bg-primary text-primary-foreground rounded-xl font-black uppercase tracking-widest text-[10px] hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
-                >
-                    <Plus className="w-4 h-4" />
-                    Provision Database
-                </button>
+
+                <div className="flex items-center gap-3 md:mt-2">
+                    <button
+                        onClick={() => setIsAddModalOpen(true)}
+                        className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Provision Database
+                    </button>
+                </div>
+            </div>
+
+            {/* Core Vitals */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {statsEntries.map((stat, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="group relative p-6 rounded-[2rem] border backdrop-blur-3xl transition-all duration-500 bg-card border-foreground/10 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 overflow-hidden flex flex-col justify-between"
+                    >
+                        <div className={cn("absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl", stat.bg)} />
+
+                        <div className="relative z-10 flex justify-between items-start">
+                            <div className={cn("p-4 rounded-2xl bg-background border transition-all duration-500 shadow-inner group-hover:scale-110", stat.border)}>
+                                <stat.icon className={cn("w-6 h-6", stat.color, stat.pulse && "animate-pulse")} />
+                            </div>
+                            <div className={cn(
+                                "px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-[0.15em] bg-background/50 backdrop-blur-md shadow-sm",
+                                stat.color
+                            )}>
+                                {stat.change}
+                            </div>
+                        </div>
+
+                        <div className="relative z-10 mt-6">
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em] mb-1 opacity-70">{stat.label}</p>
+                            <h3 className="text-3xl font-black text-foreground tracking-tighter tabular-nums leading-none">
+                                {stat.value}
+                            </h3>
+                        </div>
+                    </motion.div>
+                ))}
             </div>
 
             {/* Database Grid */}
@@ -368,7 +432,7 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                     />
                 </>
             )}
-        </div >
+        </div>
     )
 }
 

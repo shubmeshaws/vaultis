@@ -68,7 +68,7 @@ export default async function MeshyPage() {
                 </div>
             </div>
 
-            <MeshyClient databases={databases} userName={currentUser.name} />
+            <MeshyClient databases={databases} userName={currentUser.name || 'User'} />
         </div>
     )
 }

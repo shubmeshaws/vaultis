@@ -23,7 +23,7 @@ const Icons = {
         </svg>
     ),
     Activity: ({ className }: { className?: string }) => (
-        <svg classNameclassName={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
     ),
@@ -84,8 +84,8 @@ export function SystemHealth({ score, nodes }: SystemHealthProps) {
                                 </div>
                                 <div className="text-right space-y-2">
                                     <div className={`text-[10px] font-black uppercase px-2 py-0.5 rounded border ${node.status === 'online' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                                            node.status === 'warning' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
-                                                'bg-red-500/10 text-red-500 border-red-500/20'
+                                        node.status === 'warning' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                                            'bg-red-500/10 text-red-500 border-red-500/20'
                                         }`}>
                                         {node.status}
                                     </div>

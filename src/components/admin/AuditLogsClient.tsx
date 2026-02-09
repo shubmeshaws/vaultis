@@ -10,8 +10,11 @@ import {
     Database,
     Download,
     Eye,
-    X
+    X,
+    ChevronLeft,
+    FileText
 } from 'lucide-react'
+import Link from 'next/link'
 import { getAuditLogs } from '@/lib/actions/auditActions'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
 
@@ -121,7 +124,46 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
     }
 
     return (
-        <>
+        <div className="space-y-8 p-6 relative max-w-[1600px] mx-auto min-h-full">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-foreground/5 pb-6">
+                <div className="flex items-center gap-4">
+                    <Link
+                        href="/admin"
+                        className="p-3 rounded-2xl bg-foreground/5 hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-all border border-foreground/5"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </Link>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1.5">
+                            <div className="px-2.5 py-1 rounded bg-red-500/10 border border-red-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-red-500 flex items-center gap-1.5 shadow-sm">
+                                <FileText className="w-3.5 h-3.5" />
+                                Forensic Analysis
+                            </div>
+                            <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">/ Administration</span>
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-none italic flex flex-wrap items-center gap-x-4">
+                            Audit <span className="text-primary not-italic">Logs</span>
+                        </h1>
+                        <p className="text-sm text-muted-foreground font-medium mt-2 max-w-xl">Complete forensic record of all database operations across the infrastructure</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3 md:mt-2">
+                    <button
+                        className="h-10 px-6 bg-foreground/5 hover:bg-foreground/10 text-foreground border border-foreground/5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all"
+                    >
+                        <Download className="w-4 h-4" />
+                        Export Log
+                    </button>
+                    <button
+                        className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95"
+                    >
+                        <Eye className="w-4 h-4" />
+                        Live Stream
+                    </button>
+                </div>
+            </div>
             {/* Filters Bar */}
             <Card className="bg-card/50 backdrop-blur-xl border-foreground/10 shadow-sm relative z-20">
                 <CardContent className="p-4">
@@ -219,13 +261,13 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                             <table className="w-full">
                                 <thead className="bg-foreground/[0.02] border-b border-foreground/5">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Timestamp</th>
-                                        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">User</th>
-                                        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Database</th>
-                                        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Query Type</th>
-                                        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Query Preview</th>
-                                        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Risk</th>
-                                        <th className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Affected</th>
+                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Timestamp</th>
+                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">User</th>
+                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Database</th>
+                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Query Type</th>
+                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Query Preview</th>
+                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Risk</th>
+                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Affected</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-foreground/5">
@@ -236,7 +278,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                             className={`hover:bg-foreground/[0.02] transition-colors cursor-pointer group ${log.riskLevel === 'critical' || log.riskLevel === 'high' ? 'border-l-2 border-l-red-500/30' : ''
                                                 }`}
                                         >
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-2.5">
                                                 <div className="flex items-center gap-2">
                                                     <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                                                     <span className="text-sm font-mono text-foreground">
@@ -250,29 +292,29 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-2.5">
                                                 <div>
                                                     <p className="text-sm font-bold text-foreground">{log.userName}</p>
                                                     <p className="text-xs text-muted-foreground font-mono">{log.user}</p>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-2.5">
                                                 <div className="flex items-center gap-2">
                                                     <Database className="w-3.5 h-3.5 text-indigo-500" />
                                                     <span className="text-sm font-medium text-foreground">{log.database}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-2.5">
                                                 <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider border ${getQueryTypeColor(log.queryType)}`}>
                                                     {log.queryType}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-2.5">
                                                 <p className="text-sm font-mono text-muted-foreground truncate max-w-md">
                                                     {log.query}
                                                 </p>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-2.5">
                                                 <div className="flex items-center gap-2">
                                                     {(log.riskLevel === 'critical' || log.riskLevel === 'high') && (
                                                         <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
@@ -282,7 +324,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-2.5">
                                                 <span className="text-sm font-bold text-foreground">{log.affectedRows.toLocaleString()}</span>
                                                 <span className="text-xs text-muted-foreground ml-1">rows</span>
                                             </td>
@@ -515,6 +557,6 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                     </div>
                 </div>
             )}
-        </>
+        </div>
     )
 }

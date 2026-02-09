@@ -461,7 +461,7 @@ export default function SettingsClient() {
     }
 
     return (
-        <div className="max-w-5xl space-y-6">
+        <div className="space-y-6">
             {/* System Health Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="md:col-span-2 bg-card/50 backdrop-blur-sm border-foreground/10 overflow-hidden">
