@@ -2,7 +2,10 @@
 
 This directory contains detailed guides for deploying Vaultis in various environments.
 
-## Deployment Guides
+## 📘 **[Start Here: Complete Deployment Manual](./MANUAL.md)**
+**Beginners should read the Manual first.** It covers everything from installing Node.js to going into production.
+
+## Specific Guides
 
 | Target Environment | Guide |
 | :--- | :--- |
