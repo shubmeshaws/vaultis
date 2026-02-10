@@ -1,11 +1,11 @@
 # Kubernetes Deployment Guide
 
-Deploy QueryX to a Kubernetes cluster (EKS, GKE, or local K8s).
+Deploy Vaultis to a Kubernetes cluster (EKS, GKE, or local K8s).
 
 ## 1. Create Secrets
 Store your sensitive database strings:
 ```bash
-kubectl create secret generic queryx-secrets \
+kubectl create secret generic vaultis-secrets \
   --from-literal=DATABASE_URL="postgresql://user:pass@host:5432/db" \
   --from-literal=NEXTAUTH_SECRET="your-secret" \
   --from-literal=GITHUB_ID="your-id" \
@@ -21,28 +21,28 @@ kubectl create secret generic queryx-secrets \
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: queryx
+  name: vaultis
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: queryx
+      app: vaultis
   template:
     metadata:
       labels:
-        app: queryx
+        app: vaultis
     spec:
       containers:
-      - name: queryx
-        image: your-docker-hub/queryx:latest
+      - name: vaultis
+        image: your-docker-hub/vaultis:latest
         ports:
         - containerPort: 3000
         envFrom:
         - secretRef:
-            name: queryx-secrets
+            name: vaultis-secrets
         env:
         - name: NEXTAUTH_URL
-          value: "https://queryx.yourdomain.com"
+          value: "https://vaultis.yourdomain.com"
 ```
 
 ## 3. Service Manifest (`service.yaml`)
@@ -65,7 +65,7 @@ spec:
 
 ### Connecting to Supabase
 - Ensure your cluster white-lists Supabase IPs or allows public egress.
-- Pass the connection string via the `queryx-secrets`.
+- Pass the connection string via the `vaultis-secrets`.
 
 ### Internal PostgreSQL (StatefulSet)
 For a production-grade internal DB, use a Helm chart like `bitnami/postgresql`.
@@ -83,6 +83,6 @@ kubectl apply -f service.yaml
 ## 6. Database Initialization
 After the pods are running, run the following (once) to setup your schema and admin account:
 ```bash
-kubectl exec -it deployment/queryx -- npx prisma migrate deploy
-kubectl exec -it deployment/queryx -- npm run create-admin your@email.com yourpassword "Your Name"
+kubectl exec -it deployment/vaultis -- npx prisma migrate deploy
+kubectl exec -it deployment/vaultis -- npm run create-admin your@email.com yourpassword "Your Name"
 ```

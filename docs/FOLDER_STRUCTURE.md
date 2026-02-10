@@ -3,7 +3,7 @@
 ## Project Root
 
 ```
-queryx/
+vaultis/
 ├── .env.local                 # Local environment variables
 ├── .env.example               # Example env file
 ├── .gitignore

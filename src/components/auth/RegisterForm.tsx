@@ -93,7 +93,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       <div className="relative space-y-6">
         <div className="text-center space-y-1.5">
           <h1 className="text-2xl font-black tracking-tighter text-foreground uppercase italic leading-none">Create <span className="text-primary italic">Account</span></h1>
-          <p className="text-[9px] text-muted-foreground font-semibold uppercase tracking-[0.2em] opacity-80">Join the QueryX Network</p>
+          <p className="text-[9px] text-muted-foreground font-semibold uppercase tracking-[0.2em] opacity-80">Join the Vaultis Network</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

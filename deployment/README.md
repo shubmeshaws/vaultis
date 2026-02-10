@@ -1,6 +1,6 @@
-# QueryX Deployment Documentation
+# Vaultis Deployment Documentation
 
-This directory contains detailed guides for deploying QueryX in various environments.
+This directory contains detailed guides for deploying Vaultis in various environments.
 
 ## Deployment Guides
 

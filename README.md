@@ -101,7 +101,7 @@ npm run setup:supabase   # Supabase setup
 ## 🏗️ Project Structure
 
 ```
-queryx/
+vaultis/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── (dashboard)/        # Protected routes

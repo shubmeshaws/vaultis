@@ -1,6 +1,6 @@
 # EC2 Deployment Guide (AWS)
 
-Steps to deploy QueryX on an Amazon EC2 instance (Ubuntu 22.04 recommended).
+Steps to deploy Vaultis on an Amazon EC2 instance (Ubuntu 22.04 recommended).
 
 ## 1. Instance Setup
 1.  Launch an EC2 instance (t2.small or larger recommended).
@@ -18,8 +18,8 @@ sudo apt-get install -y nodejs
 
 1.  **Clone Repository:**
     ```bash
-    git clone https://github.com/your-repo/queryx.git
-    cd queryx
+    git clone https://github.com/your-repo/vaultis.git
+    cd vaultis
     npm install
     ```
 
@@ -35,7 +35,7 @@ sudo apt-get install -y nodejs
     ```bash
     npm run build
     sudo npm install -g pm2
-    pm2 start npm --name "queryx" -- start
+    pm2 start npm --name "vaultis" -- start
     pm2 save
     pm2 startup
 

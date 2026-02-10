@@ -1,6 +1,6 @@
 # Docker Deployment Guide
 
-This guide covers deploying QueryX using Docker and Docker Compose.
+This guide covers deploying Vaultis using Docker and Docker Compose.
 
 ## Prerequisites
 - Docker installed
@@ -60,8 +60,8 @@ Use this option if you are using **Supabase** or a managed **PostgreSQL** instan
 
 3.  **Build and Run:**
     ```bash
-    docker build -t queryx-app .
-    docker run -d -p 3000:3000 --env-file .env queryx-app
+    docker build -t vaultis-app .
+    docker run -d -p 3000:3000 --env-file .env vaultis-app
     ```
 
 ## Maintenance

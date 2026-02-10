@@ -11,7 +11,7 @@ const flexing = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'QueryFlow - Database Query Platform',
+  title: 'Vaultis - Database Query Platform',
   description: 'Execute and monitor database queries with ease',
 }
 

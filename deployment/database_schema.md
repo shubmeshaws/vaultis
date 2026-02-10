@@ -1,10 +1,10 @@
 # Database Schema & Queries
 
-This guide explains the data structure of QueryX and provides useful SQL queries for administration and maintenance.
+This guide explains the data structure of Vaultis and provides useful SQL queries for administration and maintenance.
 
 ## Core Schema Overview
 
-QueryX uses PostgreSQL as its primary metadata store, managed via Prisma ORM.
+Vaultis uses PostgreSQL as its primary metadata store, managed via Prisma ORM.
 
 ```mermaid
 erDiagram
