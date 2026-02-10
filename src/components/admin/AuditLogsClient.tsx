@@ -17,6 +17,8 @@ import {
 import Link from 'next/link'
 import { getAuditLogs } from '@/lib/actions/auditActions'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import { Portal } from '@/components/ui/Portal'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface AuditLog {
     id: string
@@ -62,6 +64,10 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
     const [endDate, setEndDate] = useState('')
     const [logs, setLogs] = useState<AuditLog[]>(initialLogs)
     const [isLoading, setIsLoading] = useState(false)
+    const [isLive, setIsLive] = useState(false)
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false)
+    const [exportRange, setExportRange] = useState({ start: '', end: '' })
+    const [isExporting, setIsExporting] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const rowsPerPage = 20
 
@@ -101,6 +107,82 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
 
         return () => clearTimeout(debounce)
     }, [searchQuery, userFilter, databaseFilter, queryTypeFilter, statusFilter, startDate, endDate])
+
+    // Live stream polling
+    useEffect(() => {
+        if (!isLive) return
+
+        const interval = setInterval(async () => {
+            const result = await getAuditLogs({
+                searchQuery,
+                userId: userFilter,
+                databaseId: databaseFilter,
+                queryType: queryTypeFilter,
+                status: statusFilter,
+                startDate,
+                endDate
+            })
+            if (result.success && result.logs) {
+                setLogs(result.logs as any)
+            }
+        }, 5000)
+
+        return () => clearInterval(interval)
+    }, [isLive, searchQuery, userFilter, databaseFilter, queryTypeFilter, statusFilter, startDate, endDate])
+
+    const handleExport = async () => {
+        setIsExporting(true)
+        try {
+            // Use selected export range or fall back to current filters if empty (though modal forces selection, initially empty means 'all time' or current)
+            // If exporting from modal, use exportRange. If direct button (legacy), use current.
+            // But we are moving to modal only.
+
+            // Fetch comprehensive logs for export based on the selected range
+            const result = await getAuditLogs({
+                searchQuery,
+                userId: userFilter,
+                databaseId: databaseFilter,
+                queryType: queryTypeFilter,
+                status: statusFilter,
+                startDate: exportRange.start || startDate,
+                endDate: exportRange.end || endDate
+            })
+
+            const logsToExport = result.success && result.logs ? result.logs : logs
+
+            const headers = ['Timestamp', 'User', 'Database', 'Query Type', 'Query', 'Risk Level', 'Affected Rows', 'Status', 'IP Address']
+            const csvContent = [
+                headers.join(','),
+                ...logsToExport.map((log: any) => [
+                    new Date(log.timestamp).toISOString(),
+                    log.user,
+                    log.database,
+                    log.queryType,
+                    `"${log.query.replace(/"/g, '""')}"`,
+                    log.riskLevel,
+                    log.affectedRows,
+                    log.status,
+                    log.ipAddress
+                ].join(','))
+            ].join('\n')
+
+            const blob = new Blob([csvContent], { type: 'text/csv' })
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `audit_logs_${new Date().toISOString()}.csv`
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            window.URL.revokeObjectURL(url)
+
+            setIsExportModalOpen(false)
+        } catch (error) {
+            console.error('Export failed:', error)
+        } finally {
+            setIsExporting(false)
+        }
+    }
 
     const getRiskColor = (level: string) => {
         switch (level) {
@@ -151,16 +233,24 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
 
                 <div className="flex items-center gap-3 mt-14 md:self-end">
                     <button
+                        onClick={() => {
+                            setExportRange({ start: startDate, end: endDate })
+                            setIsExportModalOpen(true)
+                        }}
                         className="h-10 px-6 bg-foreground/5 hover:bg-foreground/10 text-foreground border border-foreground/5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all"
                     >
                         <Download className="w-4 h-4" />
                         Export Log
                     </button>
                     <button
-                        className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95"
+                        onClick={() => setIsLive(!isLive)}
+                        className={`h-10 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl active:scale-95 ${isLive
+                            ? 'bg-red-500 text-white shadow-red-500/20'
+                            : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary/20'
+                            }`}
                     >
-                        <Eye className="w-4 h-4" />
-                        Live Stream
+                        <div className={`w-2 h-2 rounded-full ${isLive ? 'bg-white animate-pulse' : 'bg-white/50'}`} />
+                        {isLive ? 'Stop Stream' : 'Live Stream'}
                     </button>
                 </div>
             </div>
@@ -557,6 +647,69 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                     </div>
                 </div>
             )}
+
+            {/* Export Options Modal */}
+            <Portal>
+                <AnimatePresence>
+                    {isExportModalOpen && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsExportModalOpen(false)}
+                                className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                            />
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                                className="relative w-full max-w-2xl bg-background border border-foreground/10 rounded-3xl shadow-2xl flex flex-col p-8 space-y-8"
+                            >
+                                <div className="text-center">
+                                    <h2 className="text-xl font-black tracking-tight mb-2">Export Audit Logs</h2>
+                                    <p className="text-sm text-muted-foreground">Select a date range to generate your forensic report.</p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Time Range</label>
+                                    <DateRangePicker
+                                        initialStart={exportRange.start}
+                                        initialEnd={exportRange.end}
+                                        onRangeChange={setExportRange}
+                                    />
+                                </div>
+
+                                <div className="flex gap-3 pt-2">
+                                    <button
+                                        onClick={() => setIsExportModalOpen(false)}
+                                        className="flex-1 h-11 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-sm font-bold transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleExport}
+                                        disabled={isExporting}
+                                        className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                                    >
+                                        {isExporting ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                Preparing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Download className="w-4 h-4" />
+                                                Download CSV
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+            </Portal>
         </div>
     )
 }

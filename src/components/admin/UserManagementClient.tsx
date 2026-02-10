@@ -829,8 +829,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                     initial={{ opacity: 0, scale: 0.95, y: 30 }}
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95, y: 30 }}
-                                    className="relative z-10 w-full max-w-3xl bg-background rounded-3xl shadow-2xl border border-foreground/10"
-                                    style={{ zoom: 0.9 }}
+                                    className="relative z-10 w-full max-w-5xl bg-background rounded-3xl shadow-2xl border border-foreground/10"
                                 >
                                     <div className="absolute top-4 right-4 z-20">
                                         <button onClick={() => setIsCreateUserOpen(false)} className="p-2 hover:bg-foreground/5 rounded-full transition-colors">
@@ -1077,7 +1076,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="relative w-full max-w-4xl bg-background border border-foreground/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                            className="relative w-full max-w-5xl bg-background border border-foreground/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
                         >
                             <div className="p-6 border-b border-foreground/5 flex items-center justify-between shrink-0">
                                 <div>
