@@ -85,11 +85,11 @@ export function DownloadPanel({ items, onDownload, onArchive }: DownloadPanelPro
                                                 <h4 className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
                                                     {item.filename}
                                                 </h4>
-                                                <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${config.bg} ${config.color} border ${config.border}`}>
+                                                <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${config.bg} ${config.color} border ${config.border}`}>
                                                     {config.label}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-medium">
+                                            <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-normal">
                                                 <span className="flex items-center gap-1">
                                                     <Icons.Clock className="w-3 h-3 opacity-50" />
                                                     {item.timestamp}

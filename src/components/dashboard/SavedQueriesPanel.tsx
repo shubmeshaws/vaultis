@@ -74,7 +74,7 @@ export function SavedQueriesPanel({ queries, onDelete, onToggleFavorite, onRun, 
                 {queries.length === 0 ? (
                     <div className="col-span-full text-center py-16 px-4 rounded-2xl bg-foreground/[0.02] border border-foreground/5">
                         <Database className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
-                        <p className="text-sm font-medium text-muted-foreground">No saved queries yet</p>
+                        <p className="text-sm font-normal text-muted-foreground">No saved queries yet</p>
                         <p className="text-xs text-muted-foreground/70 mt-1">
                             Save your frequently used queries for quick access
                         </p>
@@ -114,7 +114,7 @@ export function SavedQueriesPanel({ queries, onDelete, onToggleFavorite, onRun, 
                                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                     <div className="flex items-center gap-1.5">
                                         <Database className="w-3 h-3" />
-                                        <span className="font-medium">{query.database}</span>
+                                        <span className="font-normal">{query.database}</span>
                                     </div>
                                     {query.lastExecuted && (
                                         <>

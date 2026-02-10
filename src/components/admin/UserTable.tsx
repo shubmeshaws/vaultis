@@ -69,11 +69,11 @@ export function UserTable({ users, onEditRole, onEditPermissions, onToggleStatus
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="border-b border-white/5 bg-white/[0.02]">
-                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">User</th>
-                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Role</th>
-                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Database Access</th>
-                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Status</th>
-                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground text-right">Actions</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">User</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Role</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Database Access</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Status</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -93,12 +93,12 @@ export function UserTable({ users, onEditRole, onEditPermissions, onToggleStatus
                                         </div>
                                         <div>
                                             <p className="text-sm font-bold text-foreground">{user.name}</p>
-                                            <p className="text-[10px] text-muted-foreground font-medium">{user.email}</p>
+                                            <p className="text-[10px] text-muted-foreground font-normal">{user.email}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${getRoleColor(user.role)}`}>
+                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${getRoleColor(user.role)}`}>
                                         {user.role}
                                     </span>
                                 </td>
@@ -116,7 +116,7 @@ export function UserTable({ users, onEditRole, onEditPermissions, onToggleStatus
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusColor(user.status)}`}>
+                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${getStatusColor(user.status)}`}>
                                         {user.status}
                                     </span>
                                 </td>
@@ -155,7 +155,7 @@ export function UserTable({ users, onEditRole, onEditPermissions, onToggleStatus
                     <div className="p-4 rounded-full bg-white/5 text-muted-foreground/20">
                         <Icons.Shield className="w-8 h-8" />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/30">No users found</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/30">No users found</p>
                 </div>
             )}
         </div>

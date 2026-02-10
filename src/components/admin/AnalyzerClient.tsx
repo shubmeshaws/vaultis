@@ -115,7 +115,7 @@ export function AnalyzerClient({ initialData }: AnalyzerClientProps) {
                 </div>
                 <div className="flex flex-col items-end">
                     <span className={cn(
-                        "text-xs font-mono font-black",
+                        "text-xs font-mono font-bold",
                         type === 'slowest' ? "text-amber-500" : "text-indigo-400"
                     )}>
                         {query.executionTime}
@@ -151,16 +151,16 @@ export function AnalyzerClient({ initialData }: AnalyzerClientProps) {
                     </Link>
                     <div>
                         <div className="flex items-center gap-2 mb-1.5">
-                            <div className="px-2.5 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-1.5 shadow-sm">
+                            <div className="px-2.5 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-1.5 shadow-sm">
                                 <BarChart3 className="w-3.5 h-3.5" />
-                                System Telemetry
+                                System Metrics
                             </div>
-                            <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">/ Administration</span>
+                            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest opacity-50">/ Administration</span>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">
-                            Query <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Analyzer</span>
+                        <h1 className="text-4xl font-bold tracking-tighter text-foreground leading-tight">
+                            Query <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Analysis</span>
                         </h1>
-                        <p className="text-sm text-muted-foreground font-medium mt-2 max-w-xl">Real-time performance metrics and query activity insights</p>
+                        <p className="text-sm text-muted-foreground font-normal mt-2 max-w-xl">Performance metrics and query insights</p>
                     </div>
                 </div>
 
@@ -183,7 +183,7 @@ export function AnalyzerClient({ initialData }: AnalyzerClientProps) {
                     <CardHeader className="border-b border-foreground/5 dark:border-white/5 pb-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-lg font-black flex items-center gap-2 text-amber-500/90">
+                                <CardTitle className="text-lg font-bold flex items-center gap-2 text-amber-500/90">
                                     <Zap className="w-5 h-5" />
                                     Performance Bottlenecks
                                 </CardTitle>
@@ -201,7 +201,7 @@ export function AnalyzerClient({ initialData }: AnalyzerClientProps) {
                                     size="sm"
                                     onClick={() => setIsDurationOpen(!isDurationOpen)}
                                     className={cn(
-                                        "h-8 px-2 text-[10px] font-black uppercase tracking-widest gap-2 bg-foreground/5 border-foreground/10 hover:border-amber-500/30 transition-all",
+                                        "h-8 px-2 text-[10px] font-bold uppercase tracking-widest gap-2 bg-foreground/5 border-foreground/10 hover:border-amber-500/30 transition-all",
                                         isDurationOpen && "border-amber-500/50 ring-2 ring-amber-500/10"
                                     )}
                                 >
@@ -237,7 +237,7 @@ export function AnalyzerClient({ initialData }: AnalyzerClientProps) {
                                                                 setIsDurationOpen(false)
                                                             }}
                                                             className={cn(
-                                                                "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-left transition-all",
+                                                                "px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest text-left transition-all",
                                                                 minDuration === opt.value
                                                                     ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20"
                                                                     : "hover:bg-foreground/5 text-muted-foreground hover:text-foreground"
@@ -280,7 +280,7 @@ export function AnalyzerClient({ initialData }: AnalyzerClientProps) {
                     <CardHeader className="border-b border-foreground/5 dark:border-white/5 pb-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-lg font-black flex items-center gap-2 text-indigo-400">
+                                <CardTitle className="text-lg font-bold flex items-center gap-2 text-indigo-400">
                                     <Clock className="w-5 h-5" />
                                     Recent Activity
                                 </CardTitle>

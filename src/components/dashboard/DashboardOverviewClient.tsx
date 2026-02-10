@@ -65,22 +65,22 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
             <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-foreground/5 pb-8">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                        <div className="px-2.5 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-1.5 shadow-sm">
+                        <div className="px-2.5 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-1.5 shadow-sm">
                             <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
                             Live System
                         </div>
-                        <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">/ Dashboard</span>
+                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest opacity-50">/ Dashboard</span>
                     </div>
-                    <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">
-                        Operational <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Overview</span>
+                    <h1 className="text-4xl font-bold tracking-tighter text-foreground leading-tight">
+                        Dashboard <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Overview</span>
                     </h1>
-                    <p className="text-muted-foreground font-medium">
+                    <p className="text-muted-foreground font-normal">
                         Welcome back, <span className="text-foreground font-bold">{user.name || user.email}</span>. Here's your system status.
                     </p>
                 </div>
 
                 <Link href="/meshy">
-                    <button className="group relative h-10 px-6 bg-foreground text-background rounded-2xl text-sm font-black uppercase tracking-widest flex items-center gap-3 transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-foreground/10 overflow-hidden">
+                    <button className="group relative h-10 px-6 bg-foreground text-background rounded-2xl text-sm font-bold uppercase tracking-widest flex items-center gap-3 transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-foreground/10 overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <span className="relative z-10 flex items-center gap-3">
                             <Plus className="w-4 h-4" />
@@ -116,7 +116,7 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                                 <stat.icon className={cn("w-5 h-5", stat.color)} />
                             </div>
                             <div className={cn(
-                                "flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border bg-background/50 backdrop-blur-md",
+                                "flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border bg-background/50 backdrop-blur-md",
                                 (stat.change.startsWith('+') || ['OPTIMAL', 'ACTIVE'].includes(stat.change)) ? "text-emerald-500 border-emerald-500/20" :
                                     stat.change.startsWith('-') ? "text-red-500 border-red-500/20" : "text-muted-foreground border-foreground/10"
                             )}>
@@ -126,8 +126,8 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                         </div>
 
                         <div className="relative z-10 space-y-1">
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em]">{stat.label}</p>
-                            <h3 className="text-3xl font-black text-foreground tracking-tighter tabular-nums leading-none">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.25em]">{stat.label}</p>
+                            <h3 className="text-3xl font-bold text-foreground tracking-tighter tabular-nums leading-none">
                                 {stat.value}
                             </h3>
                         </div>
@@ -146,11 +146,11 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                     <Card className="border-foreground/10 bg-white dark:bg-foreground/[0.02] backdrop-blur-3xl rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/5">
                         <CardHeader className="flex flex-row items-center justify-between p-8 border-b border-foreground/5 bg-foreground/[0.01]">
                             <div className="space-y-1">
-                                <CardTitle className="text-2xl font-black tracking-tight">Recent Activity</CardTitle>
-                                <CardDescription className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">Forensic Query History</CardDescription>
+                                <CardTitle className="text-2xl font-bold tracking-tight">Recent Activity</CardTitle>
+                                <CardDescription className="text-xs font-normal uppercase tracking-[0.1em] text-muted-foreground">Recent Query History</CardDescription>
                             </div>
                             <Link href="/queries?tab=history">
-                                <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-[10px] font-black uppercase tracking-widest transition-all">
+                                <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-[10px] font-bold uppercase tracking-widest transition-all">
                                     Archive <ArrowUpRight className="w-3.5 h-3.5" />
                                 </button>
                             </Link>
@@ -165,7 +165,7 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-3 mb-1.5 overflow-hidden">
-                                                    <code className="text-xs font-black text-foreground/80 font-mono bg-foreground/5 px-2.5 py-1 rounded-lg truncate group-hover:text-indigo-500 transition-colors">
+                                                    <code className="text-xs font-bold text-foreground/80 font-mono bg-foreground/5 px-2.5 py-1 rounded-lg truncate group-hover:text-indigo-500 transition-colors">
                                                         {q.sql}
                                                     </code>
                                                 </div>
@@ -174,10 +174,10 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                                                         <Clock className="w-3 h-3" /> {formatDistanceToNow(new Date(q.timestamp), { addSuffix: true })}
                                                     </span>
                                                     <div className="w-1 h-1 rounded-full bg-foreground/10" />
-                                                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{q.databaseName}</span>
+                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{q.databaseName}</span>
                                                     <div className="w-1 h-1 rounded-full bg-foreground/10" />
                                                     <div className={cn(
-                                                        "flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter",
+                                                        "flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tighter",
                                                         q.status === 'SUCCESS' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'
                                                     )}>
                                                         <div className={cn("w-1 h-1 rounded-full animate-pulse", q.status === 'SUCCESS' ? 'bg-emerald-500' : 'bg-red-500')} />
@@ -195,8 +195,8 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                                         <div className="w-20 h-20 bg-foreground/5 rounded-full flex items-center justify-center mx-auto">
                                             <Database className="w-8 h-8 text-muted-foreground/20" />
                                         </div>
-                                        <p className="text-sm text-muted-foreground font-medium italic">Your telemetry is clear. No queries recorded.</p>
-                                        <Link href="/meshy" className="text-xs text-indigo-500 font-black uppercase tracking-[0.2em] pt-4 block hover:underline">Launch Explorer Session</Link>
+                                        <p className="text-sm text-muted-foreground font-normal italic">No queries recorded.</p>
+                                        <Link href="/meshy" className="text-xs text-indigo-500 font-bold uppercase tracking-[0.2em] pt-4 block hover:underline">Launch Explorer Session</Link>
                                     </div>
                                 )}
                             </div>
@@ -212,8 +212,8 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-700" />
                             <CardHeader className="py-6 px-8 flex flex-row items-center justify-between border-b border-indigo-500/10">
                                 <div>
-                                    <CardTitle className="text-sm font-black uppercase tracking-widest text-indigo-500">Entity Node</CardTitle>
-                                    <CardDescription className="text-[10px] font-bold text-muted-foreground uppercase italic tracking-tighter">Authenticated Session</CardDescription>
+                                    <CardTitle className="text-sm font-bold uppercase tracking-widest text-indigo-500">User Session</CardTitle>
+                                    <CardDescription className="text-[10px] font-bold text-muted-foreground uppercase italic tracking-tighter">Authenticated</CardDescription>
                                 </div>
                                 <div className="w-12 h-12 rounded-2xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 ring-4 ring-indigo-500/10">
                                     <Shield className="w-6 h-6 text-indigo-500-foreground" />
@@ -223,17 +223,17 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-1">Clearance Level</p>
-                                            <p className="text-3xl font-black text-foreground tracking-tighter">{user.role}</p>
+                                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Role</p>
+                                            <p className="text-3xl font-bold text-foreground tracking-tighter">{user.role}</p>
                                         </div>
-                                        <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-500 uppercase tracking-widest">
+                                        <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-500 uppercase tracking-widest">
                                             VERIFIED
                                         </div>
                                     </div>
 
                                     {isAdmin && (
                                         <Link href="/admin">
-                                            <button className="w-full py-4 bg-foreground text-background rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all hover:letter-spacing-[0.4em] active:scale-95 shadow-xl shadow-foreground/10 flex items-center justify-center gap-3">
+                                            <button className="w-full py-4 bg-foreground text-background rounded-2xl text-[10px] font-bold uppercase tracking-[0.3em] transition-all hover:letter-spacing-[0.4em] active:scale-95 shadow-xl shadow-foreground/10 flex items-center justify-center gap-3">
                                                 Enter Command Center <ArrowUpRight className="w-4 h-4" />
                                             </button>
                                         </Link>
@@ -247,7 +247,7 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                     <motion.div variants={itemVariants}>
                         <Card className="border-foreground/10 bg-white dark:bg-foreground/[0.01] backdrop-blur-3xl rounded-[2rem] overflow-hidden shadow-sm">
                             <CardHeader className="py-6 px-8 border-b border-foreground/5">
-                                <CardTitle className="text-sm font-black uppercase tracking-widest">Quick Navigation</CardTitle>
+                                <CardTitle className="text-sm font-bold uppercase tracking-widest">Quick Navigation</CardTitle>
                             </CardHeader>
                             <CardContent className="p-6 grid grid-cols-2 gap-3">
                                 {[
@@ -264,7 +264,7 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                                         <div className={cn("p-2.5 rounded-xl bg-background border border-foreground/5 transition-transform group-hover:scale-110 group-hover:rotate-6", action.color)}>
                                             <action.icon className="w-4 h-4" />
                                         </div>
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors">{action.label}</span>
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors">{action.label}</span>
                                     </Link>
                                 ))}
                             </CardContent>

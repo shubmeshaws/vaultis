@@ -77,7 +77,7 @@ export function SavedQueries({ queries, onRun, onLoad, onCopy }: SavedQueriesPro
                                                 {query.name}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-1">
-                                                <span className="flex items-center gap-1 text-[10px] font-medium text-primary/70">
+                                                <span className="flex items-center gap-1 text-[10px] font-normal text-primary/70">
                                                     <Icons.Database className="w-3 h-3" />
                                                     {query.database}
                                                 </span>
@@ -99,7 +99,7 @@ export function SavedQueries({ queries, onRun, onLoad, onCopy }: SavedQueriesPro
 
                                     {/* Footer: Metadata & Copy */}
                                     <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                                        <div className="flex items-center gap-3 text-[9px] text-muted-foreground font-medium uppercase tracking-wider">
+                                        <div className="flex items-center gap-3 text-[9px] text-muted-foreground font-normal uppercase tracking-wider">
                                             <span className="flex items-center gap-1">
                                                 <Icons.Clock className="w-2.5 h-2.5 opacity-50" />
                                                 {query.lastRun}

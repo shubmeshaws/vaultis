@@ -249,7 +249,7 @@ export function QueryResultsTable({
 
             {/* Pagination Footer */}
             <div className="px-4 py-3 border-t border-foreground/5 flex items-center justify-between bg-foreground/[0.02]">
-                <div className="text-xs text-muted-foreground font-medium">
+                <div className="text-xs text-muted-foreground font-normal">
                     Showing <span className="font-bold text-foreground">{startRow}</span> to <span className="font-bold text-foreground">{endRow}</span> of <span className="font-bold text-foreground">{totalRows}</span> results
                 </div>
 

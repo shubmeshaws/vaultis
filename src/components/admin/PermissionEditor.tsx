@@ -99,7 +99,7 @@ export function PermissionEditor({ user, isOpen, onClose, onSave, availableDatab
                                             <Icons.Shield className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-black text-foreground">Permissions</h3>
+                                            <h3 className="text-lg font-bold text-foreground">Permissions</h3>
                                             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Editing for {user.name}</p>
                                         </div>
                                     </div>
@@ -115,7 +115,7 @@ export function PermissionEditor({ user, isOpen, onClose, onSave, availableDatab
                                 <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
                                     {/* Database Selection - Mirroring CreateGroupModal structure */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Database Permissions</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Database Permissions</label>
                                         <div className="max-h-[60vh] overflow-y-auto border border-foreground/10 rounded-xl p-2 bg-foreground/5 space-y-1">
                                             {availableDatabases && availableDatabases.length > 0 ? (
                                                 availableDatabases.map(db => (
@@ -146,7 +146,7 @@ export function PermissionEditor({ user, isOpen, onClose, onSave, availableDatab
                                 <div className="px-6 py-5 border-t border-foreground/5 bg-foreground/[0.02] flex items-center gap-3 shrink-0">
                                     <button
                                         onClick={onClose}
-                                        className="flex-1 py-3 px-4 rounded-2xl bg-foreground/5 border border-foreground/10 text-sm font-black uppercase tracking-widest text-muted-foreground hover:bg-foreground/10 transition-all font-sans"
+                                        className="flex-1 py-3 px-4 rounded-2xl bg-foreground/5 border border-foreground/10 text-sm font-bold uppercase tracking-widest text-muted-foreground hover:bg-foreground/10 transition-all font-sans"
                                     >
                                         Cancel
                                     </button>
@@ -155,7 +155,7 @@ export function PermissionEditor({ user, isOpen, onClose, onSave, availableDatab
                                             onSave?.(user.id, selectedAccess)
                                             onClose()
                                         }}
-                                        className="flex-[2] py-3 px-4 rounded-2xl bg-primary text-primary-foreground text-sm font-black uppercase tracking-widest shadow-[0_8px_32px_rgba(var(--primary),0.3)] hover:shadow-[0_12px_48px_rgba(var(--primary),0.5)] transition-all flex items-center justify-center gap-2"
+                                        className="flex-[2] py-3 px-4 rounded-2xl bg-primary text-primary-foreground text-sm font-bold uppercase tracking-widest shadow-[0_8px_32px_rgba(var(--primary),0.3)] hover:shadow-[0_12px_48px_rgba(var(--primary),0.5)] transition-all flex items-center justify-center gap-2"
                                     >
                                         <Icons.Save className="w-4 h-4" />
                                         Apply Changes

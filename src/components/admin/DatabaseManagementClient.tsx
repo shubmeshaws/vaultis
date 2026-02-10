@@ -202,23 +202,23 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                     </Link>
                     <div>
                         <div className="flex items-center gap-2 mb-1.5">
-                            <div className="px-2.5 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-1.5 shadow-sm">
+                            <div className="px-2.5 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-1.5 shadow-sm">
                                 <Server className="w-3.5 h-3.5" />
                                 Infrastructure
                             </div>
-                            <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">/ Administration</span>
+                            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest opacity-50">/ Administration</span>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">
+                        <h1 className="text-4xl font-bold tracking-tighter text-foreground leading-tight">
                             Cluster <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Management</span>
                         </h1>
-                        <p className="text-sm text-muted-foreground font-medium mt-2 max-w-xl">Configure connection strings, safety protocols, and access paradigms for the data fleet</p>
+                        <p className="text-sm text-muted-foreground font-normal mt-2 max-w-xl">Configure connection strings, safety protocols, and access paradigms for the data fleet</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3 mt-14 md:self-end">
                     <button
                         onClick={() => setIsAddModalOpen(true)}
-                        className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95"
+                        className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95"
                     >
                         <Plus className="w-4 h-4" />
                         Provision Database
@@ -243,7 +243,7 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                                 <stat.icon className={cn("w-6 h-6", stat.color, stat.pulse && "animate-pulse")} />
                             </div>
                             <div className={cn(
-                                "px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-[0.15em] bg-background/50 backdrop-blur-md shadow-sm",
+                                "px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-[0.15em] bg-background/50 backdrop-blur-md shadow-sm",
                                 stat.color
                             )}>
                                 {stat.change}
@@ -251,8 +251,8 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                         </div>
 
                         <div className="relative z-10 mt-6">
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em] mb-1 opacity-70">{stat.label}</p>
-                            <h3 className="text-3xl font-black text-foreground tracking-tighter tabular-nums leading-none">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.25em] mb-1 opacity-70">{stat.label}</p>
+                            <h3 className="text-3xl font-bold text-foreground tracking-tighter tabular-nums leading-none">
                                 {stat.value}
                             </h3>
                         </div>
@@ -311,7 +311,7 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0 pr-12">
-                                    <CardTitle className="text-xl font-black truncate">{db.name}</CardTitle>
+                                    <CardTitle className="text-xl font-bold truncate">{db.name}</CardTitle>
                                     <CardDescription className="text-xs font-bold uppercase tracking-widest mt-0.5">
                                         {db.type} • v15.2
                                     </CardDescription>
@@ -323,7 +323,7 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                             <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
                                 <div className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full flex items-center gap-2">
                                     <Lock className="w-4 h-4 text-red-500" />
-                                    <span className="text-xs font-black uppercase tracking-widest text-red-500">Access Locked</span>
+                                    <span className="text-xs font-bold uppercase tracking-widest text-red-500">Access Locked</span>
                                 </div>
                             </div>
                         )}
@@ -336,11 +336,11 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                                 </div>
                                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                     <Globe className="w-4 h-4" />
-                                    <span className="font-medium">Direct Connection</span>
+                                    <span className="font-normal">Direct Connection</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                     <Shield className="w-4 h-4" />
-                                    <span className="font-medium">{db._count?.groups || 0} Groups assigned</span>
+                                    <span className="font-normal">{db._count?.groups || 0} Groups assigned</span>
                                 </div>
                             </div>
 
@@ -349,17 +349,17 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                                     {connectionStatus[db.id]?.connected ? (
                                         <>
                                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Connected</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Connected</span>
                                         </>
                                     ) : connectionStatus[db.id]?.connected === false ? (
                                         <>
                                             <XCircle className="w-3.5 h-3.5 text-red-500" />
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-red-500">Disconnected</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-red-500">Disconnected</span>
                                         </>
                                     ) : (
                                         <>
                                             <div className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-pulse" />
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Checking...</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Checking...</span>
                                         </>
                                     )}
                                 </div>
@@ -395,12 +395,12 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                                 <DatabaseIcon className="w-12 h-12 text-muted-foreground/20" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-black text-foreground">No databases found</h3>
+                                <h3 className="text-xl font-bold text-foreground">No databases found</h3>
                                 <p className="text-sm text-muted-foreground">Try adjusting your search or add a new connection</p>
                             </div>
                             <button
                                 onClick={() => setIsAddModalOpen(true)}
-                                className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                                className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-primary/20"
                             >
                                 Provision New Database
                             </button>
@@ -540,12 +540,12 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                             <div className="p-8 border-b border-foreground/5 flex items-center justify-between">
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
-                                        <div className="px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 text-[8px] font-black uppercase tracking-widest text-primary">
+                                        <div className="px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 text-[8px] font-bold uppercase tracking-widest text-primary">
                                             Step {step} of 3
                                         </div>
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">New Connection</p>
                                     </div>
-                                    <h2 className="text-2xl font-black tracking-tight text-foreground">
+                                    <h2 className="text-2xl font-bold tracking-tight text-foreground">
                                         {step === 1 ? 'Select Engine' : step === 2 ? 'General Info' : 'Connection Details'}
                                     </h2>
                                 </div>
@@ -578,7 +578,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                                         />
                                                     </div>
                                                     <div>
-                                                        <h3 className="font-black text-sm">{type.name}</h3>
+                                                        <h3 className="font-bold text-sm">{type.name}</h3>
                                                         <p className="text-[10px] text-muted-foreground mt-1">Managed instance</p>
                                                     </div>
                                                     {selectedType === type.name && (
@@ -593,7 +593,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-2 col-span-2">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Name of Database</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Name of Database</label>
                                                     <input
                                                         required
                                                         type="text"
@@ -604,7 +604,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                                     />
                                                 </div>
                                                 <div className="space-y-2 col-span-2">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Environment Name</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Environment Name</label>
                                                     <input
                                                         required
                                                         type="text"
@@ -615,7 +615,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                                     />
                                                 </div>
                                                 <div className="space-y-2 col-span-2">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Description</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Description</label>
                                                     <textarea
                                                         value={formData.description}
                                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -629,7 +629,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-2 col-span-2 md:col-span-1">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Hostname</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Hostname</label>
                                                     <input
                                                         required
                                                         type="text"
@@ -640,7 +640,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                                     />
                                                 </div>
                                                 <div className="space-y-2 col-span-2 md:col-span-1">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Port</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Port</label>
                                                     <input
                                                         required
                                                         type="number"
@@ -651,7 +651,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                                     />
                                                 </div>
                                                 <div className="space-y-2 col-span-2 md:col-span-1">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Username</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Username</label>
                                                     <input
                                                         required={selectedType !== 'Redis'}
                                                         type="text"
@@ -662,7 +662,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                                     />
                                                 </div>
                                                 <div className="space-y-2 col-span-2 md:col-span-1">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Password</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Password</label>
                                                     <input
                                                         required
                                                         type="password"
@@ -673,7 +673,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                                     />
                                                 </div>
                                                 <div className="space-y-2 col-span-2">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
                                                     <input
                                                         type="text"
                                                         value={formData.databaseName}
@@ -687,7 +687,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                                         type="button"
                                                         onClick={handleTestConnection}
                                                         disabled={isTesting}
-                                                        className="w-full h-10 border border-primary/20 bg-primary/5 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/10 transition-all flex items-center justify-center gap-2"
+                                                        className="w-full h-10 border border-primary/20 bg-primary/5 text-primary rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 transition-all flex items-center justify-center gap-2"
                                                     >
                                                         {isTesting ? (
                                                             <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -707,7 +707,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                         <button
                                             type="button"
                                             onClick={handleBack}
-                                            className="flex-1 h-14 bg-foreground/5 text-foreground rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-foreground/10 transition-all flex items-center justify-center gap-2"
+                                            className="flex-1 h-14 bg-foreground/5 text-foreground rounded-2xl font-bold uppercase tracking-widest text-[10px] hover:bg-foreground/10 transition-all flex items-center justify-center gap-2"
                                         >
                                             <ArrowLeft className="w-4 h-4" />
                                             Prev
@@ -717,7 +717,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                         type={step === 3 ? 'submit' : 'button'}
                                         onClick={step < 3 ? handleNext : undefined}
                                         disabled={isLoading || (step === 1 && !selectedType)}
-                                        className="flex-[2] h-14 bg-primary text-primary-foreground rounded-2xl font-black uppercase tracking-widest text-[10px] hover:opacity-90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
+                                        className="flex-[2] h-14 bg-primary text-primary-foreground rounded-2xl font-bold uppercase tracking-widest text-[10px] hover:opacity-90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
                                     >
                                         {isLoading ? 'Processing...' : step === 3 ? 'Register Database' : 'Continue'}
                                         {step < 3 && !isLoading && <ChevronRight className="w-4 h-4" />}
@@ -816,7 +816,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                             <div className="p-8 border-b border-foreground/5 flex items-center justify-between">
                                 <div>
                                     <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Configure Engine</p>
-                                    <h2 className="text-2xl font-black tracking-tight text-foreground">Edit Settings</h2>
+                                    <h2 className="text-2xl font-bold tracking-tight text-foreground">Edit Settings</h2>
                                 </div>
                                 <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded-xl transition-colors">
                                     <X className="w-6 h-6 text-muted-foreground" />
@@ -828,10 +828,10 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                     {/* Left Column: Basic Info */}
                                     <div className="space-y-6">
                                         <div className="space-y-4">
-                                            <h3 className="text-sm font-black uppercase tracking-widest text-foreground/50">Details</h3>
+                                            <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/50">Details</h3>
                                             <div className="grid gap-4">
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Display Name</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Display Name</label>
                                                     <input
                                                         required
                                                         type="text"
@@ -841,7 +841,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
                                                     <input
                                                         type="text"
                                                         value={formData.databaseName}
@@ -851,7 +851,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Environment</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Environment</label>
                                                     <input
                                                         required
                                                         type="text"
@@ -861,7 +861,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Description</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Description</label>
                                                     <textarea
                                                         value={formData.description}
                                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -875,11 +875,11 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                     {/* Right Column: Connection Info */}
                                     <div className="space-y-6">
                                         <div className="space-y-4">
-                                            <h3 className="text-sm font-black uppercase tracking-widest text-foreground/50">Connection</h3>
+                                            <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/50">Connection</h3>
                                             <div className="grid gap-4">
                                                 <div className="grid grid-cols-3 gap-4">
                                                     <div className="space-y-2 col-span-2">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Hostname</label>
+                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Hostname</label>
                                                         <input
                                                             required
                                                             type="text"
@@ -889,7 +889,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                                         />
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Port</label>
+                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Port</label>
                                                         <input
                                                             required
                                                             type="number"
@@ -900,7 +900,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Username</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Username</label>
                                                     <input
                                                         required
                                                         type="text"
@@ -910,7 +910,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">Password</label>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Password</label>
                                                     <input
                                                         type="password"
                                                         value={formData.password}
@@ -946,7 +946,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                         <button
                                             type="submit"
                                             disabled={isLoading}
-                                            className="px-8 py-2.5 bg-primary text-primary-foreground rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="px-8 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             {isLoading ? (
                                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -1015,7 +1015,7 @@ function DeleteDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen:
                                     <div className="p-2 rounded-xl bg-red-500/10 border border-red-500/20">
                                         <Trash2 className="w-5 h-5" />
                                     </div>
-                                    <h2 className="text-xl font-black tracking-tight">Decommission Database</h2>
+                                    <h2 className="text-xl font-bold tracking-tight">Decommission Database</h2>
                                 </div>
                                 <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded-xl transition-colors">
                                     <X className="w-6 h-6 text-muted-foreground" />
@@ -1024,12 +1024,12 @@ function DeleteDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen:
 
                             <div className="p-8 space-y-6">
                                 <p className="text-sm text-muted-foreground leading-relaxed">
-                                    You are about to permanently disconnect <span className="font-black text-foreground">{database.name}</span>.
+                                    You are about to permanently disconnect <span className="font-bold text-foreground">{database.name}</span>.
                                     This will revoke access for all associated groups and users. This action is <span className="text-red-500 font-bold">irreversible</span>.
                                 </p>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground pl-1">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">
                                         Type <span className="text-foreground">"{database.name}"</span> to confirm termination
                                     </label>
                                     <input
@@ -1045,14 +1045,14 @@ function DeleteDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen:
                             <div className="p-8 border-t border-foreground/5 flex gap-4">
                                 <button
                                     onClick={onClose}
-                                    className="flex-1 h-12 bg-foreground/5 text-foreground rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-foreground/10 transition-all"
+                                    className="flex-1 h-12 bg-foreground/5 text-foreground rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-foreground/10 transition-all"
                                 >
                                     Abort
                                 </button>
                                 <button
                                     disabled={confirmName !== database.name || isLoading}
                                     onClick={handleDelete}
-                                    className="flex-[2] h-12 bg-red-600 text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-red-500 transition-all shadow-lg shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-[2] h-12 bg-red-600 text-white rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-red-500 transition-all shadow-lg shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isLoading ? 'Processing...' : 'Delete Connection'}
                                 </button>

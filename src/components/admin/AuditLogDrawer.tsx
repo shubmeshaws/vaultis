@@ -68,7 +68,7 @@ export function AuditLogDrawer({ entry, isOpen, onClose }: AuditLogDrawerProps) 
                                     <Icons.Shield className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-foreground uppercase tracking-tight italic">Forensic <span className="text-muted-foreground not-italic">Inspector</span></h3>
+                                    <h3 className="text-xl font-bold text-foreground uppercase tracking-tight italic">Audit <span className="text-muted-foreground not-italic">Inspector</span></h3>
                                     <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mt-0.5">Entry ID: {entry.id}</p>
                                 </div>
                             </div>
@@ -82,7 +82,7 @@ export function AuditLogDrawer({ entry, isOpen, onClose }: AuditLogDrawerProps) 
                             {/* Metadata Grid */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
-                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">Identity Context</p>
+                                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">User Context</p>
                                     <div className="flex items-center gap-2 pt-1">
                                         <Icons.User className="w-3.5 h-3.5 text-primary" />
                                         <span className="text-xs font-bold text-foreground">{entry.user.name}</span>
@@ -90,7 +90,7 @@ export function AuditLogDrawer({ entry, isOpen, onClose }: AuditLogDrawerProps) 
                                     <p className="text-[10px] text-muted-foreground pl-5">{entry.user.email}</p>
                                 </div>
                                 <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
-                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">Timestamp (UTC)</p>
+                                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Timestamp (UTC)</p>
                                     <div className="flex items-center gap-2 pt-1">
                                         <Icons.Clock className="w-3.5 h-3.5 text-primary" />
                                         <span className="text-xs font-mono font-bold text-foreground">{entry.timestamp}</span>
@@ -101,7 +101,7 @@ export function AuditLogDrawer({ entry, isOpen, onClose }: AuditLogDrawerProps) 
 
                             {/* Execution Details */}
                             <div className="space-y-4">
-                                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/50 flex items-center gap-2">
+                                <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/50 flex items-center gap-2">
                                     <div className="h-px flex-1 bg-white/5" />
                                     Execution Payload
                                     <div className="h-px flex-1 bg-white/5" />
@@ -118,22 +118,22 @@ export function AuditLogDrawer({ entry, isOpen, onClose }: AuditLogDrawerProps) 
 
                             {/* Forensic Stats */}
                             <div className="space-y-4">
-                                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/50">Telemetrics</h4>
+                                <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/50">Telemetrics</h4>
                                 <div className="grid grid-cols-3 gap-3">
                                     <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 flex flex-col items-center justify-center text-center">
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Latency</p>
-                                        <p className="text-lg font-mono font-black text-foreground">{entry.duration}<span className="text-[10px] text-muted-foreground">ms</span></p>
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Latency</p>
+                                        <p className="text-lg font-mono font-bold text-foreground">{entry.duration}<span className="text-[10px] text-muted-foreground">ms</span></p>
                                     </div>
                                     <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 flex flex-col items-center justify-center text-center">
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Status</p>
-                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border ${entry.status === 'Success' ? 'text-emerald-400 border-emerald-400/20 bg-emerald-400/5' : 'text-red-400 border-red-400/20 bg-red-400/5'
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Status</p>
+                                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-lg border ${entry.status === 'Success' ? 'text-emerald-400 border-emerald-400/20 bg-emerald-400/5' : 'text-red-400 border-red-400/20 bg-red-400/5'
                                             }`}>
                                             {entry.status}
                                         </span>
                                     </div>
                                     <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 flex flex-col items-center justify-center text-center">
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Risk Weight</p>
-                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border ${entry.risk === 'Critical' ? 'text-red-400 border-red-400/20 bg-red-400/5' : 'text-primary border-primary/20 bg-primary/5'
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Risk Weight</p>
+                                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-lg border ${entry.risk === 'Critical' ? 'text-red-400 border-red-400/20 bg-red-400/5' : 'text-primary border-primary/20 bg-primary/5'
                                             }`}>
                                             {entry.risk}
                                         </span>
@@ -148,8 +148,8 @@ export function AuditLogDrawer({ entry, isOpen, onClose }: AuditLogDrawerProps) 
                                         <Icons.Shield className="w-5 h-5 text-red-400" />
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-sm font-black text-red-400 uppercase tracking-tight">Anomalous Operation Detected</p>
-                                        <p className="text-[11px] text-red-400/60 leading-relaxed font-medium">
+                                        <p className="text-sm font-bold text-red-400 uppercase tracking-tight">Anomalous Operation Detected</p>
+                                        <p className="text-[11px] text-red-400/60 leading-relaxed font-normal">
                                             This entry represents a destructive schema operation. Security protocols recommend cross-referencing this timestamp with concurrent authentication logs.
                                         </p>
                                     </div>
@@ -160,12 +160,12 @@ export function AuditLogDrawer({ entry, isOpen, onClose }: AuditLogDrawerProps) 
                         {/* Footer */}
                         <div className="px-8 py-6 border-t border-white/5 bg-white/[0.02] flex items-center justify-between">
                             <div className="flex flex-col">
-                                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">Log Integrity Vector</p>
+                                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Log Integrity Vector</p>
                                 <p className="text-[9px] font-mono text-muted-foreground/40 mt-0.5">SHA256: {Math.random().toString(36).substring(7).toUpperCase()}...AUTHORIZED</p>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-foreground hover:bg-white/10 transition-all"
+                                className="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-foreground hover:bg-white/10 transition-all"
                             >
                                 Close Inspector
                             </button>

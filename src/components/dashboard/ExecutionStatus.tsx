@@ -130,7 +130,7 @@ export function ExecutionStatus({ status, executionTime, affectedRows, error }: 
                 <motion.div
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-[10px] font-medium text-red-600 dark:text-red-400/80 italic max-w-xs truncate"
+                    className="text-[10px] font-normal text-red-600 dark:text-red-400/80 italic max-w-xs truncate"
                 >
                     {error}
                 </motion.div>

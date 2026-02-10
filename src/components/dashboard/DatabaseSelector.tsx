@@ -103,7 +103,7 @@ export function DatabaseSelector({ databases, selectedId, onSelect }: DatabaseSe
                         className="absolute top-[calc(100%+8px)] left-0 w-[calc(100%+20px)] -ml-[10px] bg-popover/95 dark:bg-[#0A0A0E]/90 backdrop-blur-2xl border border-foreground/10 dark:border-white/10 rounded-2xl shadow-2xl p-2 z-50 overflow-hidden ring-1 ring-black/5 dark:ring-black/50"
                     >
                         {/* Header */}
-                        <div className="px-2 py-1 mb-0.5 flex items-center justify-between text-[7.5px] font-black text-foreground/40 dark:text-white/40 uppercase tracking-[0.15em] border-b border-foreground/5 dark:border-white/5">
+                        <div className="px-2 py-1 mb-0.5 flex items-center justify-between text-[7.5px] font-bold text-foreground/40 dark:text-white/40 uppercase tracking-[0.15em] border-b border-foreground/5 dark:border-white/5">
                             <span className="whitespace-nowrap">Select Database</span>
                             <span className="opacity-60 whitespace-nowrap">{databases.length} Available</span>
                         </div>

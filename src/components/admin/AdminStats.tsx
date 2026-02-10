@@ -75,7 +75,7 @@ export function AdminStats({ stats }: AdminStatsProps) {
                                 <div className={`p-2.5 rounded-xl ${classes.bg} ${classes.text} border ${classes.border}`}>
                                     <Icon className="w-5 h-5" />
                                 </div>
-                                <div className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-1 ${stat.trend === 'up' ? 'text-emerald-500' : stat.trend === 'down' ? 'text-red-500' : 'text-muted-foreground'}`}>
+                                <div className={`text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 ${stat.trend === 'up' ? 'text-emerald-500' : stat.trend === 'down' ? 'text-red-500' : 'text-muted-foreground'}`}>
                                     {stat.trend === 'up' ? '↗' : stat.trend === 'down' ? '↘' : '→'}
                                     {stat.change}
                                 </div>
@@ -83,7 +83,7 @@ export function AdminStats({ stats }: AdminStatsProps) {
 
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
-                                <h3 className="text-3xl font-black text-foreground tracking-tight">{stat.value}</h3>
+                                <h3 className="text-3xl font-bold text-foreground tracking-tight">{stat.value}</h3>
                             </div>
 
                             {/* Sparkline visualization */}

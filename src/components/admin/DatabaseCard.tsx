@@ -103,18 +103,18 @@ export function DatabaseCard({ database, onTestConnection, onEditPermissions, on
                         <Icons.Database className="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors">{database.name}</h3>
+                        <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">{database.name}</h3>
                         <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{database.type}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{database.type}</span>
                             <span className="w-1 h-1 rounded-full bg-white/10" />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1">
                                 <Icons.Globe className="w-3 h-3" />
                                 {database.host}
                             </span>
                         </div>
                     </div>
                 </div>
-                <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] border ${getEnvStyles(database.environment)}`}>
+                <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-[0.2em] border ${getEnvStyles(database.environment)}`}>
                     {database.environment}
                 </span>
             </div>
@@ -129,9 +129,9 @@ export function DatabaseCard({ database, onTestConnection, onEditPermissions, on
                             <span className={`relative inline-flex rounded-full h-2 w-2 ${database.status === 'healthy' ? 'bg-emerald-500' : 'bg-primary'
                                 }`}></span>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Connectivity</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Connectivity</span>
                     </div>
-                    <span className="text-[10px] font-black text-foreground">{database.latency}ms</span>
+                    <span className="text-[10px] font-bold text-foreground">{database.latency}ms</span>
                 </div>
                 <div className="flex items-center gap-1.5 h-6">
                     {Array.from({ length: 24 }).map((_, i) => (
@@ -164,7 +164,7 @@ export function DatabaseCard({ database, onTestConnection, onEditPermissions, on
                     )}
                 </div>
                 <div className="text-right">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Last Backup</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">Last Backup</p>
                     <p className="text-xs font-bold text-foreground">{database.lastBackup}</p>
                 </div>
             </div>
@@ -173,14 +173,14 @@ export function DatabaseCard({ database, onTestConnection, onEditPermissions, on
             <div className="flex gap-2">
                 <button
                     onClick={() => handleTestConnection(database.id)}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-400/20 transition-all font-sans"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-400/20 transition-all font-sans"
                 >
                     <Icons.Zap className="w-3.5 h-3.5" />
                     Test Signal
                 </button>
                 <button
                     onClick={() => onEditPermissions?.(database.id)}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all font-sans"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all font-sans"
                 >
                     <Icons.Shield className="w-3.5 h-3.5" />
                     Access Mgmt

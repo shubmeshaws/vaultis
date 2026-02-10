@@ -24,7 +24,7 @@ export function DatabasesGrid({ databases, onTestConnection, onEditPermissions, 
                         <div className="flex items-center gap-4 px-1">
                             <h2 className="text-[10px] font-extrabold uppercase tracking-[0.4em] text-muted-foreground/50">{env} Clusters</h2>
                             <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
-                            <span className="text-[10px] font-black text-muted-foreground/30">{envDatabases.length} Node{envDatabases.length !== 1 ? 's' : ''}</span>
+                            <span className="text-[10px] font-bold text-muted-foreground/30">{envDatabases.length} Node{envDatabases.length !== 1 ? 's' : ''}</span>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

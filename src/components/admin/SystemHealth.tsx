@@ -54,8 +54,8 @@ export function SystemHealth({ score, nodes }: SystemHealthProps) {
                         />
                     </svg>
                     <div className="absolute flex flex-col items-center">
-                        <span className="text-5xl font-black text-foreground">{score}</span>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Global Health</span>
+                        <span className="text-5xl font-bold text-foreground">{score}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Global Health</span>
                     </div>
 
                     {/* Animated Pulse */}
@@ -65,9 +65,9 @@ export function SystemHealth({ score, nodes }: SystemHealthProps) {
                 {/* Node Status Grid */}
                 <div className="flex-1 w-full space-y-6">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
                             <Icons.Server className="w-4 h-4" />
-                            Infrastructure Nodes
+                            Infrastructure Status
                         </h3>
                         <div className="flex items-center gap-1">
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -83,7 +83,7 @@ export function SystemHealth({ score, nodes }: SystemHealthProps) {
                                     <p className="text-[10px] text-muted-foreground font-mono uppercase">{node.uptime}</p>
                                 </div>
                                 <div className="text-right space-y-2">
-                                    <div className={`text-[10px] font-black uppercase px-2 py-0.5 rounded border ${node.status === 'online' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                    <div className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${node.status === 'online' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
                                         node.status === 'warning' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
                                             'bg-red-500/10 text-red-500 border-red-500/20'
                                         }`}>

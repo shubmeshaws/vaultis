@@ -97,7 +97,7 @@ export function QueryStatusPanel({ stats }: QueryStatusPanelProps) {
                 <div className="flex items-start justify-between relative z-10">
                     <div>
                         <p className={cn("text-xs font-bold uppercase tracking-widest mb-1", config.color)}>Status</p>
-                        <h2 className="text-2xl font-black text-foreground tracking-tight">{config.label}</h2>
+                        <h2 className="text-2xl font-bold text-foreground tracking-tight">{config.label}</h2>
                     </div>
                     <div className={cn("p-2 rounded-xl bg-background/20 backdrop-blur-md", config.color)}>
                         <StatusIcon className={cn("w-6 h-6", stats.status === 'running' && "animate-spin")} />

@@ -53,12 +53,12 @@ export function AuditLogTable({ entries, onSelectEntry }: AuditLogTableProps) {
             <table className="w-full text-left border-collapse table-fixed">
                 <thead>
                     <tr className="border-b border-white/5 bg-white/[0.02]">
-                        <th className="w-[200px] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground font-mono">Timestamp (UTC)</th>
-                        <th className="w-[180px] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Identity</th>
-                        <th className="w-[140px] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground font-mono">Operation</th>
-                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Resource Path</th>
-                        <th className="w-[120px] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Risk Audit</th>
-                        <th className="w-[100px] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground text-right font-mono">Duration</th>
+                        <th className="w-[200px] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground font-mono">Timestamp (UTC)</th>
+                        <th className="w-[180px] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">User</th>
+                        <th className="w-[140px] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground font-mono">Operation</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Resource Path</th>
+                        <th className="w-[120px] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Risk Audit</th>
+                        <th className="w-[100px] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground text-right font-mono">Duration</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -88,7 +88,7 @@ export function AuditLogTable({ entries, onSelectEntry }: AuditLogTableProps) {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className={`font-mono text-[10px] font-black ${isDangerous(entry.operation) ? 'text-red-400' : 'text-primary'
+                                    <span className={`font-mono text-[10px] font-bold ${isDangerous(entry.operation) ? 'text-red-400' : 'text-primary'
                                         }`}>
                                         {entry.operation}
                                     </span>
@@ -100,7 +100,7 @@ export function AuditLogTable({ entries, onSelectEntry }: AuditLogTableProps) {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${getRiskStyles(entry.risk)}`}>
+                                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest border ${getRiskStyles(entry.risk)}`}>
                                         {entry.risk}
                                     </span>
                                 </td>
@@ -118,7 +118,7 @@ export function AuditLogTable({ entries, onSelectEntry }: AuditLogTableProps) {
                     <div className="inline-flex p-4 rounded-3xl bg-white/5 border border-white/10 text-muted-foreground mb-4">
                         <Icons.Term className="w-8 h-8 opacity-20" />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/30">No forensic logs found</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/30">No audit logs found</p>
                 </div>
             )}
         </div>

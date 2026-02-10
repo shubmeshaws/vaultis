@@ -313,30 +313,30 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                     </Link>
                     <div>
                         <div className="flex items-center gap-2 mb-1.5">
-                            <div className="px-2.5 py-1 rounded bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-1.5 shadow-sm">
+                            <div className="px-2.5 py-1 rounded bg-primary/10 border border-primary/20 text-[10px] font-bold uppercase tracking-[0.2em] text-primary flex items-center gap-1.5 shadow-sm">
                                 <Users className="w-3.5 h-3.5" />
-                                Personnel Registry
+                                Users Directory
                             </div>
-                            <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">/ Administration</span>
+                            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest opacity-50">/ Administration</span>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">
-                            IAM <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Manager</span>
+                        <h1 className="text-4xl font-bold tracking-tighter text-foreground leading-tight">
+                            User <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Management</span>
                         </h1>
-                        <p className="text-sm text-muted-foreground font-medium mt-2 max-w-xl">Identity, Access & Permission orchestration platform for QueryX nodes</p>
+                        <p className="text-sm text-muted-foreground font-normal mt-2 max-w-xl">Manage users, groups, and access permissions</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3 mt-8 md:self-end">
                     <button
                         onClick={() => setIsCreateGroupOpen(true)}
-                        className="h-10 px-6 bg-foreground/5 hover:bg-foreground/10 text-foreground border border-foreground/5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all"
+                        className="h-10 px-6 bg-foreground/5 hover:bg-foreground/10 text-foreground border border-foreground/5 rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-3 transition-all"
                     >
                         <Users className="w-4 h-4" />
                         Create Group
                     </button>
                     <button
                         onClick={() => setIsCreateUserOpen(true)}
-                        className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95"
+                        className="h-10 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl shadow-primary/20 active:scale-95"
                     >
                         <UserPlus className="w-4 h-4" />
                         Provision User
@@ -347,7 +347,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
             {/* Stats Overview - Premium Glow Version */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {[
-                    { label: 'Total Node Population', value: stats.total, icon: Users, color: 'text-cyan-500', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' },
+                    { label: 'Total Users', value: stats.total, icon: Users, color: 'text-cyan-500', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' },
                     { label: 'Active Sessions', value: stats.active, icon: CheckCircle, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
                     { label: 'Privileged Entities', value: stats.admins, icon: Shield, color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
                 ].map((stat, i) => (
@@ -363,13 +363,13 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                             <div className={cn("p-4 rounded-2xl bg-background border transition-all duration-500 shadow-inner group-hover:scale-110", stat.border)}>
                                 <stat.icon className={cn("w-6 h-6", stat.color)} />
                             </div>
-                            <div className="px-3 py-1 rounded-full border border-foreground/10 bg-background/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground shadow-sm">
+                            <div className="px-3 py-1 rounded-full border border-foreground/10 bg-background/50 text-[10px] font-bold uppercase tracking-widest text-muted-foreground shadow-sm">
                                 Vitals
                             </div>
                         </div>
                         <div className="relative z-10 mt-6">
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em] mb-1 opacity-70">{stat.label}</p>
-                            <h3 className="text-3xl font-black text-foreground tracking-tighter tabular-nums leading-none">{stat.value}</h3>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.25em] mb-1 opacity-70">{stat.label}</p>
+                            <h3 className="text-3xl font-bold text-foreground tracking-tighter tabular-nums leading-none">{stat.value}</h3>
                         </div>
                     </motion.div>
                 ))}
@@ -381,16 +381,16 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                     <div className="flex gap-6">
                         <button
                             onClick={() => setActiveTab('users')}
-                            className={`pb-4 px-1 text-xs font-black uppercase tracking-[0.3em] transition-all relative ${activeTab === 'users' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`pb-4 px-1 text-xs font-bold uppercase tracking-[0.3em] transition-all relative ${activeTab === 'users' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            Node Directory
+                            Users Directory
                             {activeTab === 'users' && <motion.div layoutId="tab-underline" className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-primary shadow-[0_0_15px_rgba(var(--primary),0.6)]" />}
                         </button>
                         <button
                             onClick={() => setActiveTab('groups')}
-                            className={`pb-4 px-1 text-xs font-black uppercase tracking-[0.3em] transition-all relative ${activeTab === 'groups' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`pb-4 px-1 text-xs font-bold uppercase tracking-[0.3em] transition-all relative ${activeTab === 'groups' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            Security Sectors
+                            User Groups
                             {activeTab === 'groups' && <motion.div layoutId="tab-underline" className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-primary shadow-[0_0_15px_rgba(var(--primary),0.6)]" />}
                         </button>
                     </div>
@@ -400,7 +400,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/30" />
                             <input
                                 type="text"
-                                placeholder={activeTab === 'users' ? "Search entities..." : "Search sectors..."}
+                                placeholder={activeTab === 'users' ? "Search users..." : "Search groups..."}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full h-10 pl-14 pr-6 bg-foreground/[0.03] border border-foreground/10 rounded-2xl text-xs font-bold uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all placeholder:text-muted-foreground/30 focus:bg-background"
@@ -412,11 +412,11 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                 <select
                                     value={roleFilter}
                                     onChange={(e) => setRoleFilter(e.target.value as Role | 'ALL')}
-                                    className="h-10 pl-12 pr-10 bg-foreground/[0.03] border border-foreground/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 cursor-pointer hover:bg-foreground/[0.05] transition-all appearance-none shadow-sm"
+                                    className="h-10 pl-12 pr-10 bg-foreground/[0.03] border border-foreground/10 rounded-2xl text-[10px] font-bold uppercase tracking-[0.15em] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 cursor-pointer hover:bg-foreground/[0.05] transition-all appearance-none shadow-sm"
                                 >
-                                    <option value="ALL">All Clearances</option>
-                                    <option value="USER">User Clearance</option>
-                                    <option value="ADMIN">Admin Overlord</option>
+                                    <option value="ALL">All Roles</option>
+                                    <option value="USER">User</option>
+                                    <option value="ADMIN">Admin</option>
                                 </select>
                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
                             </div>
@@ -440,12 +440,12 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                         <table className="w-full text-left relative border-collapse min-w-[1000px]">
                                             <thead className="bg-background/80 backdrop-blur-3xl border-b border-foreground/10 sticky top-0 z-10">
                                                 <tr>
-                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Identity & Signature</th>
-                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Clearance Level</th>
-                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Assignments</th>
-                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Individual Access</th>
-                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">System Status</th>
-                                                    <th className="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground text-right">Directives</th>
+                                                    <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">User & Email</th>
+                                                    <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Role</th>
+                                                    <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Assignments</th>
+                                                    <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Individual Access</th>
+                                                    <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">System Status</th>
+                                                    <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground text-right">Directives</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-foreground/5">
@@ -462,7 +462,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                                 <div className="flex items-center gap-4">
                                                                     <div className="relative">
                                                                         <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                                        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-sm font-black text-primary border border-primary/10 shadow-inner">
+                                                                        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-sm font-bold text-primary border border-primary/10 shadow-inner">
                                                                             {user.name ? (
                                                                                 <span className="tracking-tighter">{user.name.substring(0, 2).toUpperCase()}</span>
                                                                             ) : (
@@ -471,7 +471,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                                         </div>
                                                                     </div>
                                                                     <div>
-                                                                        <p className="text-sm font-black text-foreground tracking-tight group-hover:text-primary transition-colors">{user.name || 'Anonymous Node'}</p>
+                                                                        <p className="text-sm font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">{user.name || 'Anonymous User'}</p>
                                                                         <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase opacity-60 mt-0.5">{user.email}</p>
                                                                     </div>
                                                                 </div>
@@ -485,14 +485,14 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                                         targetRole: e.target.value as Role
                                                                     })}
                                                                     className={cn(
-                                                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all cursor-pointer focus:ring-2 focus:ring-primary/20",
+                                                                        "px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest border transition-all cursor-pointer focus:ring-2 focus:ring-primary/20",
                                                                         user.role === 'ADMIN'
                                                                             ? 'bg-purple-500/10 text-purple-500 border-purple-500/20 hover:bg-purple-500/20 shadow-lg shadow-purple-500/5'
                                                                             : 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20 hover:bg-cyan-500/20 shadow-lg shadow-cyan-500/5'
                                                                     )}
                                                                 >
-                                                                    <option value="USER">User Clearance</option>
-                                                                    <option value="ADMIN">Admin Overlord</option>
+                                                                    <option value="USER">User</option>
+                                                                    <option value="ADMIN">Admin</option>
                                                                 </select>
                                                             </td>
                                                             <td className="px-6 py-3.5 border-transparent">
@@ -500,20 +500,20 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                                     {user.groups?.length > 0 ? (
                                                                         <>
                                                                             {user.groups.slice(0, 2).map((group, i) => (
-                                                                                <span key={i} className="px-2.5 py-1 rounded-lg bg-primary/5 border border-primary/10 text-[9px] font-black uppercase tracking-wider text-primary shadow-sm">
+                                                                                <span key={i} className="px-2.5 py-1 rounded-lg bg-primary/5 border border-primary/10 text-[9px] font-bold uppercase tracking-wider text-primary shadow-sm">
                                                                                     {group.name}
                                                                                 </span>
                                                                             ))}
                                                                             {user.groups.length > 2 && (
                                                                                 <Tooltip content={user.groups.slice(2).map(g => g.name).join(', ')}>
-                                                                                    <span className="px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-black uppercase tracking-wider text-muted-foreground cursor-help hover:bg-foreground/10 transition-colors">
+                                                                                    <span className="px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-bold uppercase tracking-wider text-muted-foreground cursor-help hover:bg-foreground/10 transition-colors">
                                                                                         +{user.groups.length - 2} More
                                                                                     </span>
                                                                                 </Tooltip>
                                                                             )}
                                                                         </>
                                                                     ) : (
-                                                                        <span className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-30">Unassigned</span>
+                                                                        <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-30">Unassigned</span>
                                                                     )}
                                                                 </div>
                                                             </td>
@@ -522,20 +522,20 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                                     {user.access && user.access.length > 0 ? (
                                                                         <>
                                                                             {user.access.slice(0, 2).map((db, i) => (
-                                                                                <span key={i} className="px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-black uppercase tracking-wider text-muted-foreground shadow-sm">
+                                                                                <span key={i} className="px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-bold uppercase tracking-wider text-muted-foreground shadow-sm">
                                                                                     {databases?.find(d => d.id === db)?.name || db}
                                                                                 </span>
                                                                             ))}
                                                                             {user.access.length > 2 && (
                                                                                 <Tooltip content={user.access.map(a => databases?.find(d => d.id === a)?.name || a).join(', ')}>
-                                                                                    <span className="px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-black uppercase tracking-wider text-muted-foreground cursor-help hover:bg-foreground/10 transition-colors">
+                                                                                    <span className="px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-bold uppercase tracking-wider text-muted-foreground cursor-help hover:bg-foreground/10 transition-colors">
                                                                                         +{user.access.length - 2} More
                                                                                     </span>
                                                                                 </Tooltip>
                                                                             )}
                                                                         </>
                                                                     ) : (
-                                                                        <span className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-30">Universal Access</span>
+                                                                        <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-30">Universal Access</span>
                                                                     )}
                                                                 </div>
                                                             </td>
@@ -551,10 +551,10 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                                             : "bg-red-500 border-red-500/20 shadow-[0_0_12px_rgba(239,68,68,0.5)]"
                                                                     )} />
                                                                     <span className={cn(
-                                                                        "text-[10px] font-black uppercase tracking-[0.15em]",
+                                                                        "text-[10px] font-bold uppercase tracking-[0.15em]",
                                                                         user.isActive ? "text-emerald-500" : "text-red-500"
                                                                     )}>
-                                                                        {user.isActive ? 'Active Node' : 'Deactivated'}
+                                                                        {user.isActive ? 'Active User' : 'Deactivated'}
                                                                     </span>
                                                                 </button>
                                                             </td>
@@ -595,7 +595,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
 
                                     {/* Table Footer / Pagination */}
                                     <div className="px-8 py-6 bg-background/50 backdrop-blur-3xl border-t border-foreground/10 flex items-center justify-between">
-                                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                                             Displaying <span className="text-foreground">{startRow}-{endRow}</span> of <span className="text-primary">{filteredUsers.length}</span> Entities
                                         </div>
                                         <div className="flex items-center gap-2">
@@ -612,7 +612,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                         key={p}
                                                         onClick={() => setCurrentPage(p)}
                                                         className={cn(
-                                                            "w-9 h-9 rounded-xl text-[10px] font-black transition-all border",
+                                                            "w-9 h-9 rounded-xl text-[10px] font-bold transition-all border",
                                                             currentPage === p
                                                                 ? "bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20"
                                                                 : "bg-foreground/5 border-foreground/5 text-muted-foreground hover:bg-foreground/10 hover:text-foreground"
@@ -669,32 +669,32 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                 <Users className="w-8 h-8" />
                                             </div>
 
-                                            <h3 className="text-xl font-black text-foreground tracking-tight group-hover:text-primary transition-colors">{group.name}</h3>
-                                            <p className="text-xs text-muted-foreground mt-2 line-clamp-2 font-medium opacity-60 italic">"{group.description || 'No sectoral mandate documented.'}"</p>
+                                            <h3 className="text-xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">{group.name}</h3>
+                                            <p className="text-xs text-muted-foreground mt-2 line-clamp-2 font-normal opacity-60 italic">"{group.description || 'No description provided.'}"</p>
 
                                             <div className="mt-8 pt-6 border-t border-foreground/5 flex items-center justify-between">
                                                 <div className="flex -space-x-3">
                                                     {[...Array(Math.min(4, group._count?.users || 0))].map((_, i) => (
-                                                        <div key={i} className="w-8 h-8 rounded-xl border-2 border-background bg-foreground/10 flex items-center justify-center text-[10px] font-black text-primary shadow-sm overflow-hidden">
+                                                        <div key={i} className="w-8 h-8 rounded-xl border-2 border-background bg-foreground/10 flex items-center justify-center text-[10px] font-bold text-primary shadow-sm overflow-hidden">
                                                             <div className="w-full h-full bg-primary/20 backdrop-blur-sm flex items-center justify-center">
                                                                 {i + 1}
                                                             </div>
                                                         </div>
                                                     ))}
                                                     {(group._count?.users || 0) > 4 && (
-                                                        <div className="w-8 h-8 rounded-xl border-2 border-background bg-primary/20 flex items-center justify-center text-[9px] font-black text-primary backdrop-blur-md">
+                                                        <div className="w-8 h-8 rounded-xl border-2 border-background bg-primary/20 flex items-center justify-center text-[9px] font-bold text-primary backdrop-blur-md">
                                                             +{(group._count?.users || 0) - 4}
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="px-3 py-1 rounded-full bg-foreground/5 border border-foreground/5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                                                <div className="px-3 py-1 rounded-full bg-foreground/5 border border-foreground/5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                                                     {group._count?.users || 0} Assets
                                                 </div>
                                             </div>
 
                                             <button
                                                 onClick={() => setManageGroupModal({ isOpen: true, group })}
-                                                className="w-full mt-6 h-12 bg-foreground/[0.03] hover:bg-primary hover:text-primary-foreground border border-foreground/10 hover:border-primary rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300"
+                                                className="w-full mt-6 h-12 bg-foreground/[0.03] hover:bg-primary hover:text-primary-foreground border border-foreground/10 hover:border-primary rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-300"
                                             >
                                                 Configure Permissions
                                             </button>
@@ -707,12 +707,12 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                         <div className="w-20 h-20 bg-foreground/5 rounded-full flex items-center justify-center mx-auto mb-6 opacity-20">
                                             <Users className="w-10 h-10" />
                                         </div>
-                                        <h3 className="text-lg font-black text-foreground uppercase tracking-widest mb-2">No security sectors detected</h3>
+                                        <h3 className="text-lg font-bold text-foreground uppercase tracking-widest mb-2">No user groups detected</h3>
                                         <button
                                             onClick={() => setIsCreateGroupOpen(true)}
-                                            className="text-primary font-black uppercase tracking-[0.2em] text-[10px] hover:underline"
+                                            className="text-primary font-bold uppercase tracking-[0.2em] text-[10px] hover:underline"
                                         >
-                                            Establish New Sector Registry
+                                            Create New Group
                                         </button>
                                     </div>
                                 )}
@@ -729,8 +729,8 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                     isOpen={roleChangeModal.isOpen}
                     onClose={() => setRoleChangeModal({ isOpen: false, user: null, targetRole: null })}
                     onConfirm={handleRoleChange}
-                    title="Promote / Demote Entity?"
-                    description={`Review the clearance modification for ${roleChangeModal.user?.name || roleChangeModal.user?.email}. New classification: ${roleChangeModal.targetRole}. This will redefine their cross-network privileges.`}
+                    title="Change User Role?"
+                    description={`Review the role modification for ${roleChangeModal.user?.name || roleChangeModal.user?.email}. New role: ${roleChangeModal.targetRole}. This will update their permissions.`}
                     confirmText="Finalize Permissions"
                     type="warning"
                 />
@@ -740,8 +740,8 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                     isOpen={deleteModal.isOpen}
                     onClose={() => setDeleteModal({ isOpen: false, user: null })}
                     onConfirm={handleDeleteUser}
-                    title="Redact Node Permanently?"
-                    description={`This will purge ${deleteModal.user?.name || deleteModal.user?.email} from the IAM registry. This operation is irreversible and all spectral data will be lost.`}
+                    title="Delete User Permanently?"
+                    description={`This will purge ${deleteModal.user?.name || deleteModal.user?.email} from the user directory. This operation is irreversible.`}
                     confirmText="Confirm Purge"
                     type="danger"
                 />
@@ -751,8 +751,8 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                     isOpen={deleteGroupModal.isOpen}
                     onClose={() => setDeleteGroupModal({ isOpen: false, groupId: null })}
                     onConfirm={handleDeleteGroup}
-                    title="Dissolve Sector?"
-                    description="Decommissioning this security sector will orphan all associated node assignments and reset their primary database clearance to NULL."
+                    title="Delete Group?"
+                    description="Deleting this group will remove all associated user assignments."
                     confirmText="Proceed with Decommission"
                     type="danger"
                 />
@@ -778,8 +778,8 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                 >
                                     <div className="flex items-center justify-between mb-8">
                                         <div>
-                                            <h3 className="text-2xl font-black tracking-tight text-foreground leading-tight italic">Rename <span className="text-primary not-italic">Sector</span></h3>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-1 opacity-50">IAM Management Console</p>
+                                            <h3 className="text-2xl font-bold tracking-tight text-foreground leading-tight italic">Rename <span className="text-primary not-italic">Group</span></h3>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1 opacity-50">User Management Console</p>
                                         </div>
                                     </div>
                                     <form onSubmit={(e) => {
@@ -789,7 +789,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                         if (newName) handleRenameGroup(newName)
                                     }} className="space-y-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Updated Label</label>
+                                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Updated Label</label>
                                             <input
                                                 name="groupName"
                                                 type="text"
@@ -802,7 +802,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                         </div>
                                         <button
                                             type="submit"
-                                            className="w-full h-12 bg-primary text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/20 active:scale-[0.98]"
+                                            className="w-full h-12 bg-primary text-primary-foreground rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/20 active:scale-[0.98]"
                                         >
                                             Authorize Change
                                         </button>
@@ -838,13 +838,13 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                     </div>
                                     <div className="p-6">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <div className="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-emerald-500">
+                                            <div className="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-widest text-emerald-500">
                                                 Registry Management
                                             </div>
                                             <p className="text-xs text-muted-foreground uppercase tracking-wider">Node Provisioning</p>
                                         </div>
                                         <div className="text-center mb-4">
-                                            <h2 className="text-xl font-black tracking-tight">CREATE <span className="text-primary">ACCOUNT</span></h2>
+                                            <h2 className="text-xl font-bold tracking-tight">CREATE <span className="text-primary">ACCOUNT</span></h2>
                                             <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-1">Initialize Network Clearance</p>
                                         </div>
 
@@ -887,37 +887,37 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                         }} className="space-y-3">
                                             <div className="grid grid-cols-3 gap-3">
                                                 <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">First Name</label>
+                                                    <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground">First Name</label>
                                                     <input name="firstName" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="John" />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Last Name</label>
+                                                    <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground">Last Name</label>
                                                     <input name="lastName" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="Doe" />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Username</label>
+                                                    <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground">Username</label>
                                                     <input name="name" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="johndoe" />
                                                 </div>
                                             </div>
 
                                             <div className="grid grid-cols-3 gap-3">
                                                 <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Email Address</label>
+                                                    <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground">Email Address</label>
                                                     <input name="email" type="email" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="john@example.com" />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Access Key</label>
+                                                    <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground">Access Key</label>
                                                     <input name="password" type="password" required minLength={8} className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="••••••••" />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Verify Key</label>
+                                                    <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground">Verify Key</label>
                                                     <input name="confirmPassword" type="password" required minLength={8} className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs" placeholder="••••••••" />
                                                 </div>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Security Challenge 1</label>
+                                                    <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground">Security Challenge 1</label>
                                                     <select name="securityQuestion1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
                                                         <option value="">Select challenge...</option>
                                                         <option value="What was your first pet's name?">What was your first pet's name?</option>
@@ -927,7 +927,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                     <input name="securityAnswer1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs mt-1" placeholder="Challenge Response" />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Security Challenge 2</label>
+                                                    <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground">Security Challenge 2</label>
                                                     <select name="securityQuestion2" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
                                                         <option value="">Select challenge...</option>
                                                         <option value="What was the model of your first car?">What was the model of your first car?</option>
@@ -938,10 +938,10 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                             </div>
 
                                             <div className="flex gap-3 pt-3">
-                                                <button type="submit" className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-primary/20">
-                                                    Establish Identity
+                                                <button type="submit" className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl font-bold text-[10px] uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+                                                    Create User
                                                 </button>
-                                                <button type="button" onClick={() => setIsCreateUserOpen(false)} className="flex-1 h-10 bg-foreground/5 border border-foreground/10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-foreground/10 transition-all">
+                                                <button type="button" onClick={() => setIsCreateUserOpen(false)} className="flex-1 h-10 bg-foreground/5 border border-foreground/10 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-foreground/10 transition-all">
                                                     Abort
                                                 </button>
                                             </div>
@@ -962,8 +962,8 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                     onSuccess={(newGroup) => {
                         setGroups(prev => [newGroup, ...prev])
                         toast({
-                            title: 'Sector Registry Created',
-                            description: 'A new security sector has been established.',
+                            title: 'Group Created',
+                            description: 'A new user group has been created.',
                             type: 'success'
                         })
                         if (newGroup.users?.length > 0) {
@@ -1009,8 +1009,8 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                 return u
                             }))
                             toast({
-                                title: 'Registry Synchronized',
-                                description: 'Sector permissions and node memberships updated.',
+                                title: 'Group Synced',
+                                description: 'Group permissions and members updated.',
                                 type: 'success'
                             })
                         }}
@@ -1080,7 +1080,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
                         >
                             <div className="p-6 border-b border-foreground/5 flex items-center justify-between shrink-0">
                                 <div>
-                                    <h2 className="text-xl font-black tracking-tight text-foreground">Create User Group</h2>
+                                    <h2 className="text-xl font-bold tracking-tight text-foreground">Create User Group</h2>
                                     <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Access Control</p>
                                 </div>
                                 <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded-lg transition-colors">
@@ -1091,7 +1091,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
                                 {/* Left Column: Details */}
                                 <div className="p-6 space-y-4 flex-1 overflow-y-auto custom-scrollbar border-r border-foreground/5">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Group Name</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Group Name</label>
                                         <input
                                             required
                                             type="text"
@@ -1102,7 +1102,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Description</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Description</label>
                                         <textarea
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -1113,7 +1113,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="w-full h-12 bg-primary text-primary-foreground rounded-xl font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all shadow-lg shadow-primary/20 mt-8"
+                                        className="w-full h-12 bg-primary text-primary-foreground rounded-xl font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-all shadow-lg shadow-primary/20 mt-8"
                                     >
                                         {isLoading ? 'Creating Group...' : 'Create Group'}
                                     </button>
@@ -1123,7 +1123,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
                                 <div className="p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar bg-foreground/[0.02]">
                                     {/* Database Selection */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Default Databases</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Default Databases</label>
                                         <div className="relative mb-2">
                                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                             <input
@@ -1155,7 +1155,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
                                                             else setSelectedDatabases(selectedDatabases.filter(id => id !== db.id))
                                                         }}
                                                     />
-                                                    <span className="text-sm font-medium">{db.name}</span>
+                                                    <span className="text-sm font-normal">{db.name}</span>
                                                 </label>
                                             ))}
                                             {filteredDatabases.length === 0 && (
@@ -1168,7 +1168,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
 
                                     {/* Member Selection */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Add Members</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Add Members</label>
                                         <div className="relative mb-2">
                                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                             <input
@@ -1201,7 +1201,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, initialUsers, initialDat
                                                         }}
                                                     />
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-medium">{user.name || user.email}</span>
+                                                        <span className="text-sm font-normal">{user.name || user.email}</span>
                                                         <span className="text-[10px] text-muted-foreground">{user.email}</span>
                                                     </div>
                                                 </label>
@@ -1289,7 +1289,7 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
                         >
                             <div className="p-6 border-b border-foreground/5 flex items-center justify-between shrink-0">
                                 <div>
-                                    <h2 className="text-xl font-black tracking-tight text-foreground">Manage Access</h2>
+                                    <h2 className="text-xl font-bold tracking-tight text-foreground">Manage Access</h2>
                                     <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{group.name}</p>
                                 </div>
                                 <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded-lg transition-colors">
@@ -1301,8 +1301,8 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
                                 {/* Database Access */}
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Database Permissions</label>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-primary">{selectedDatabases.length} Selected</span>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Database Permissions</label>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-primary">{selectedDatabases.length} Selected</span>
                                     </div>
                                     <div className="relative mb-2">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -1352,8 +1352,8 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
                                 {/* Member Management */}
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Group Members</label>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-primary">{selectedUsers.length} Selected</span>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Group Members</label>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-primary">{selectedUsers.length} Selected</span>
                                     </div>
                                     <div className="relative mb-2">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -1403,7 +1403,7 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
                                 <button
                                     onClick={handleSave}
                                     disabled={isLoading}
-                                    className="w-full h-12 bg-primary text-primary-foreground rounded-xl font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all shadow-lg shadow-primary/20"
+                                    className="w-full h-12 bg-primary text-primary-foreground rounded-xl font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-all shadow-lg shadow-primary/20"
                                 >
                                     {isLoading ? 'Saving Changes...' : 'Save Changes'}
                                 </button>

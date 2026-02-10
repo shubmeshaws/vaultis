@@ -81,7 +81,7 @@ export function SqlEditor({ initialValue = '', onRun }: SqlEditorProps) {
         // 4. Keywords (Dangerous)
         DANGEROUS.forEach(kw => {
             const regex = new RegExp(`\\b(${kw})\\b`, 'gi')
-            escaped = escaped.replace(regex, '<span class="text-red-500 font-black bg-red-500/10 px-1 rounded animate-pulse">$1</span>')
+            escaped = escaped.replace(regex, '<span class="text-red-500 font-bold bg-red-500/10 px-1 rounded animate-pulse">$1</span>')
         })
 
         return escaped
@@ -128,7 +128,7 @@ export function SqlEditor({ initialValue = '', onRun }: SqlEditorProps) {
                             <div className="w-2 h-2 rounded-full bg-emerald-500/40" />
                         </div>
                         <div className="h-3 w-[1px] bg-foreground/20 dark:bg-white/40" />
-                        <div className="flex items-center gap-2 text-[10px] font-black text-foreground/60 dark:text-muted-foreground uppercase tracking-widest">
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/60 dark:text-muted-foreground uppercase tracking-widest">
                             <EditorIcons.Terminal className="w-2.5 h-2.5" />
                             SQL Editor
                         </div>
@@ -148,7 +148,7 @@ export function SqlEditor({ initialValue = '', onRun }: SqlEditorProps) {
                                 </motion.div>
                             )}
                         </AnimatePresence>
-                        <div className="text-[10px] text-muted-foreground font-medium hidden sm:block">
+                        <div className="text-[10px] text-muted-foreground font-normal hidden sm:block">
                             UTF-8 | PostgreSQL
                         </div>
                     </div>

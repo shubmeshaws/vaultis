@@ -8,6 +8,7 @@ html {
 
 @layer base {
   :root {
+    --font-sans: Verdana, sans-serif;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -57,6 +58,7 @@ html {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }

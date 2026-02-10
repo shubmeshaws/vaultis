@@ -218,16 +218,16 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                     </Link>
                     <div>
                         <div className="flex items-center gap-2 mb-1.5">
-                            <div className="px-2.5 py-1 rounded bg-red-500/10 border border-red-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-red-500 flex items-center gap-1.5 shadow-sm">
+                            <div className="px-2.5 py-1 rounded bg-red-500/10 border border-red-500/20 text-[10px] font-bold uppercase tracking-[0.2em] text-red-500 flex items-center gap-1.5 shadow-sm">
                                 <FileText className="w-3.5 h-3.5" />
-                                Forensic Analysis
+                                Log Analysis
                             </div>
-                            <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-50">/ Administration</span>
+                            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest opacity-50">/ Administration</span>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">
+                        <h1 className="text-4xl font-bold tracking-tighter text-foreground leading-tight">
                             Audit <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Logs</span>
                         </h1>
-                        <p className="text-sm text-muted-foreground font-medium mt-2 max-w-xl">Complete forensic record of all database operations across the infrastructure</p>
+                        <p className="text-sm text-muted-foreground font-normal mt-2 max-w-xl">View history of all database operations</p>
                     </div>
                 </div>
 
@@ -237,14 +237,14 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                             setExportRange({ start: startDate, end: endDate })
                             setIsExportModalOpen(true)
                         }}
-                        className="h-10 px-6 bg-foreground/5 hover:bg-foreground/10 text-foreground border border-foreground/5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all"
+                        className="h-10 px-6 bg-foreground/5 hover:bg-foreground/10 text-foreground border border-foreground/5 rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-3 transition-all"
                     >
                         <Download className="w-4 h-4" />
                         Export Log
                     </button>
                     <button
                         onClick={() => setIsLive(!isLive)}
-                        className={`h-10 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl active:scale-95 ${isLive
+                        className={`h-10 px-6 rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-3 transition-all shadow-xl active:scale-95 ${isLive
                             ? 'bg-red-500 text-white shadow-red-500/20'
                             : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary/20'
                             }`}
@@ -271,7 +271,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                         <select
                             value={userFilter}
                             onChange={(e) => setUserFilter(e.target.value)}
-                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
+                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-normal cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
                         >
                             <option value="all">All Users</option>
                             {users.map(user => (
@@ -283,7 +283,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                         <select
                             value={databaseFilter}
                             onChange={(e) => setDatabaseFilter(e.target.value)}
-                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
+                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-normal cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
                         >
                             <option value="all">All Databases</option>
                             {databases.map(db => (
@@ -295,7 +295,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                         <select
                             value={queryTypeFilter}
                             onChange={(e) => setQueryTypeFilter(e.target.value)}
-                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
+                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-normal cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
                         >
                             <option value="all">All Query Types</option>
                             <option value="SELECT">SELECT</option>
@@ -310,7 +310,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-medium cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
+                            className="h-10 px-4 bg-foreground/5 border border-foreground/10 rounded-lg text-sm font-normal cursor-pointer hover:bg-foreground/10 hover:border-indigo-500/30 transition-all focus:outline-none focus:border-indigo-500/50"
                         >
                             <option value="all">All Status</option>
                             <option value="success">Success</option>
@@ -351,13 +351,13 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                             <table className="w-full">
                                 <thead className="bg-foreground/[0.02] border-b border-foreground/5">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Timestamp</th>
-                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">User</th>
-                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Database</th>
-                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Query Type</th>
-                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Query Preview</th>
-                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Risk</th>
-                                        <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-wider text-muted-foreground">Affected</th>
+                                        <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">Timestamp</th>
+                                        <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">User</th>
+                                        <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">Database</th>
+                                        <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">Query Type</th>
+                                        <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">Query Preview</th>
+                                        <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">Risk</th>
+                                        <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">Affected</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-foreground/5">
@@ -391,11 +391,11 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                             <td className="px-6 py-2.5">
                                                 <div className="flex items-center gap-2">
                                                     <Database className="w-3.5 h-3.5 text-indigo-500" />
-                                                    <span className="text-sm font-medium text-foreground">{log.database}</span>
+                                                    <span className="text-sm font-normal text-foreground">{log.database}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-2.5">
-                                                <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider border ${getQueryTypeColor(log.queryType)}`}>
+                                                <span className={`px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider border ${getQueryTypeColor(log.queryType)}`}>
                                                     {log.queryType}
                                                 </span>
                                             </td>
@@ -409,7 +409,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                                     {(log.riskLevel === 'critical' || log.riskLevel === 'high') && (
                                                         <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
                                                     )}
-                                                    <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider border ${getRiskColor(log.riskLevel)}`}>
+                                                    <span className={`px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider border ${getRiskColor(log.riskLevel)}`}>
                                                         {log.riskLevel}
                                                     </span>
                                                 </div>
@@ -433,7 +433,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
-                                    className="px-3 py-1.5 rounded-lg bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    className="px-3 py-1.5 rounded-lg bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-sm font-normal disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 >
                                     Previous
                                 </button>
@@ -453,7 +453,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                             <button
                                                 key={pageNum}
                                                 onClick={() => setCurrentPage(pageNum)}
-                                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${currentPage === pageNum
+                                                className={`px-3 py-1.5 rounded-lg text-sm font-normal transition-colors ${currentPage === pageNum
                                                     ? 'bg-primary text-primary-foreground'
                                                     : 'bg-foreground/5 hover:bg-foreground/10 border border-foreground/10'
                                                     }`}
@@ -466,7 +466,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                     disabled={currentPage === totalPages}
-                                    className="px-3 py-1.5 rounded-lg bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    className="px-3 py-1.5 rounded-lg bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-sm font-normal disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 >
                                     Next
                                 </button>
@@ -491,14 +491,14 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="flex items-center gap-2 mb-2">
-                                        <div className="px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-[10px] font-black uppercase tracking-widest text-red-500">
-                                            Forensic Detail
+                                        <div className="px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-[10px] font-bold uppercase tracking-widest text-red-500">
+                                            Audit Detail
                                         </div>
-                                        <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider border ${getRiskColor(selectedLog.riskLevel)}`}>
+                                        <span className={`px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider border ${getRiskColor(selectedLog.riskLevel)}`}>
                                             {selectedLog.riskLevel} Risk
                                         </span>
                                     </div>
-                                    <h2 className="text-2xl font-black text-foreground">Query Execution Record</h2>
+                                    <h2 className="text-2xl font-bold text-foreground">Query Execution Record</h2>
                                     <p className="text-sm text-muted-foreground mt-1">ID: {selectedLog.id}</p>
                                 </div>
                                 <button
@@ -558,11 +558,11 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                 <CardContent className="space-y-3">
                                     <div className="flex items-center justify-between">
                                         <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Database</span>
-                                        <span className="text-sm font-medium text-foreground">{selectedLog.database}</span>
+                                        <span className="text-sm font-normal text-foreground">{selectedLog.database}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Query Type</span>
-                                        <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider border ${getQueryTypeColor(selectedLog.queryType)}`}>
+                                        <span className={`px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider border ${getQueryTypeColor(selectedLog.queryType)}`}>
                                             {selectedLog.queryType}
                                         </span>
                                     </div>
@@ -608,7 +608,7 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                 <CardContent className="space-y-3">
                                     <div className="flex items-center justify-between">
                                         <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Risk Level</span>
-                                        <span className={`px-3 py-1.5 rounded text-xs font-black uppercase tracking-wider border ${getRiskColor(selectedLog.riskLevel)}`}>
+                                        <span className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider border ${getRiskColor(selectedLog.riskLevel)}`}>
                                             {selectedLog.riskLevel}
                                         </span>
                                     </div>
@@ -667,12 +667,12 @@ export function AuditLogsClient({ initialLogs, users, databases }: AuditLogsClie
                                 className="relative w-full max-w-2xl bg-background border border-foreground/10 rounded-3xl shadow-2xl flex flex-col p-8 space-y-8"
                             >
                                 <div className="text-center">
-                                    <h2 className="text-xl font-black tracking-tight mb-2">Export Audit Logs</h2>
-                                    <p className="text-sm text-muted-foreground">Select a date range to generate your forensic report.</p>
+                                    <h2 className="text-xl font-bold tracking-tight mb-2">Export Audit Logs</h2>
+                                    <p className="text-sm text-muted-foreground">Select a date range to generate your audit report.</p>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Time Range</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Time Range</label>
                                     <DateRangePicker
                                         initialStart={exportRange.start}
                                         initialEnd={exportRange.end}

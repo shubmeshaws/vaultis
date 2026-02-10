@@ -201,17 +201,17 @@ export function QueriesPageClient() {
                     </Link>
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <div className="px-2 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-500 flex items-center gap-1">
+                            <div className="px-2 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-1">
                                 <Sparkles className="w-3 h-3" />
                                 SQL Runner
                             </div>
                             <p className="text-xs text-muted-foreground uppercase tracking-wider">Database Tool</p>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">
-                            Query <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Explorer</span>
+                        <h1 className="text-4xl font-bold tracking-tighter text-foreground leading-tight">
+                            SQL <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Editor</span>
                         </h1>
-                        <p className="text-sm text-muted-foreground font-medium mt-1">
-                            Write, execute, and analyze database operations
+                        <p className="text-sm text-muted-foreground font-normal mt-1">
+                            Run and save your SQL queries
                         </p>
                     </div>
                 </div>
@@ -344,7 +344,7 @@ export function QueriesPageClient() {
                         </div>
                     ) : (
                         <div className="text-center py-16 px-4 rounded-2xl bg-foreground/[0.02] border border-foreground/5">
-                            <p className="text-sm font-medium text-muted-foreground">No History</p>
+                            <p className="text-sm font-normal text-muted-foreground">No History</p>
                             <p className="text-xs text-muted-foreground/70 mt-1">
                                 Your executed queries will appear here.
                             </p>

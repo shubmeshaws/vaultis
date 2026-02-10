@@ -97,7 +97,7 @@ export function ResultsTable({ data, columns, onExport }: ResultsTableProps) {
                                 {columns.map((col) => (
                                     <th
                                         key={col.key}
-                                        className="px-6 py-4 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] relative group/th"
+                                        className="px-6 py-4 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] relative group/th"
                                         style={{ width: col.width }}
                                     >
                                         <div className="flex items-center justify-between">
@@ -122,7 +122,7 @@ export function ResultsTable({ data, columns, onExport }: ResultsTableProps) {
                                     >
                                         {columns.map((col) => (
                                             <td key={`${idx}-${col.key}`} className="px-6 py-4">
-                                                <div className="text-sm text-foreground/80 group-hover/tr:text-foreground transition-colors font-medium">
+                                                <div className="text-sm text-foreground/80 group-hover/tr:text-foreground transition-colors font-normal">
                                                     {col.key === 'id' ? (
                                                         <span className="font-mono text-xs text-primary/70">{row[col.key]}</span>
                                                     ) : (

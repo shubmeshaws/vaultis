@@ -70,7 +70,7 @@ export function DownloadHistoryPanel({
                 {downloads.length === 0 ? (
                     <div className="text-center py-12 px-4 rounded-2xl bg-foreground/[0.02] border border-foreground/5">
                         <Download className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
-                        <p className="text-sm font-medium text-muted-foreground">No exports yet</p>
+                        <p className="text-sm font-normal text-muted-foreground">No exports yet</p>
                         <p className="text-xs text-muted-foreground/70 mt-1">
                             Run a query and export results to see them here
                         </p>
@@ -111,7 +111,7 @@ export function DownloadHistoryPanel({
                                                 )}
                                             </div>
                                             <span className={cn(
-                                                "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wide whitespace-nowrap",
+                                                "px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wide whitespace-nowrap",
                                                 item.fileType === 'csv' && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
                                                 item.fileType === 'json' && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
                                                 item.fileType === 'excel' && "bg-green-500/10 text-green-600 dark:text-green-400"
