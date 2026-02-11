@@ -311,14 +311,37 @@ export function MeshyClient({ databases, userName }: MeshyClientProps) {
         const sqlMatch = content.match(/```sql\n([\s\S]*?)\n```/)
         const textToCopy = sqlMatch ? sqlMatch[1] : content
 
-        await navigator.clipboard.writeText(textToCopy)
-        setCopiedId(id)
-        toast({
-            title: 'Copied',
-            description: sqlMatch ? 'SQL query copied to clipboard' : 'Message copied to clipboard',
-            type: 'success'
-        })
-        setTimeout(() => setCopiedId(null), 2000)
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(textToCopy)
+            } else {
+                // Fallback for non-secure contexts
+                const textArea = document.createElement("textarea")
+                textArea.value = textToCopy
+                textArea.style.position = "fixed"
+                textArea.style.left = "-9999px"
+                document.body.appendChild(textArea)
+                textArea.focus()
+                textArea.select()
+                document.execCommand('copy')
+                document.body.removeChild(textArea)
+            }
+            
+            setCopiedId(id)
+            toast({
+                title: 'Copied',
+                description: sqlMatch ? 'SQL query copied to clipboard' : 'Message copied to clipboard',
+                type: 'success'
+            })
+            setTimeout(() => setCopiedId(null), 2000)
+        } catch (err) {
+            console.error('Failed to copy:', err)
+            toast({
+                title: 'Error',
+                description: 'Failed to copy to clipboard',
+                type: 'error'
+            })
+        }
     }
 
     const handleDatabaseSelect = (db: any) => {
