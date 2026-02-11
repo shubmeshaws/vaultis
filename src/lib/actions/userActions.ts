@@ -249,6 +249,29 @@ export async function renameGroup(groupId: string, name: string) {
     }
 }
 
+export async function updateGroupAccess(groupId: string, userIds: string[], databaseIds: string[]) {
+    try {
+        console.log(`Updating group ${groupId} access: ${userIds.length} users, ${databaseIds.length} databases`)
+        
+        await (prisma as any).group.update({
+            where: { id: groupId },
+            data: {
+                users: {
+                    set: userIds.map(id => ({ id }))
+                },
+                databases: {
+                    set: databaseIds.map(id => ({ id }))
+                }
+            },
+        })
+        revalidatePath('/admin/users')
+        return { success: true }
+    } catch (error: any) {
+        console.error('Error updating group access:', error)
+        return { success: false, error: 'Failed to update group access' }
+    }
+}
+
 export async function getUserStatus() {
     try {
         const session = await getServerSession(authOptions)

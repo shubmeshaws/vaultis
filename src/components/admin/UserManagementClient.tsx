@@ -42,7 +42,8 @@ import {
     renameGroup,
     updateUserPermissions,
     updateGroupDatabases,
-    updateGroupUsers
+    updateGroupUsers,
+    updateGroupAccess
 } from '@/lib/actions/userActions'
 import { Role } from '@prisma/client'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -1231,6 +1232,7 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
     users: User[],
     databases: any[]
 }) {
+    const { toast } = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [selectedUsers, setSelectedUsers] = useState<string[]>(group.users?.map((u: any) => u.id) || [])
     const [selectedDatabases, setSelectedDatabases] = useState<string[]>(group.databases?.map((d: any) => d.id) || [])
@@ -1248,12 +1250,9 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
 
     const handleSave = async () => {
         setIsLoading(true)
-        const [usersRes, dbsRes] = await Promise.all([
-            updateGroupUsers(group.id, selectedUsers),
-            updateGroupDatabases(group.id, selectedDatabases)
-        ])
+        const res = await updateGroupAccess(group.id, selectedUsers, selectedDatabases)
 
-        if (usersRes.success && dbsRes.success) {
+        if (res.success) {
             onSuccess({
                 ...group,
                 userIds: selectedUsers,
@@ -1263,6 +1262,12 @@ function ManageGroupAccessModal({ isOpen, group, onClose, onSuccess, users, data
                 _count: { users: selectedUsers.length }
             })
             onClose()
+        } else {
+             toast({
+                title: 'Update Failed',
+                description: res.error || 'Failed to update group permissions.',
+                type: 'error'
+            })
         }
         setIsLoading(false)
     }

@@ -106,12 +106,13 @@ env:
   ALLOWED_DOMAINS: "gmail.com,prismforce.ai"
   NEXT_PUBLIC_ALLOWED_DOMAINS_MSG: "Access denied. Only @gmail.com or @prismforce.ai domains are allowed."
 
-  # --- Secrets (Do NOT commit values here) ---
-  # These should be provided via the 'externalSecretName' or a SealedSecret.
-  # If you must test locally, uncomment and set values, but do not push to git.
-  # DATABASE_URL: ""
-  # NEXTAUTH_SECRET: ""
-  # GITHUB_ID: ""
-  # GITHUB_SECRET: ""
-  # GOOGLE_ID: ""
-  # GOOGLE_SECRET: ""
+  # --- Secrets (Ensure these are passed via Helm or Secrets) ---
+  DATABASE_URL: "postgresql://user:password@postgres:5432/vaultis"
+  NEXTAUTH_SECRET: "changeme-production-secret-key"
+  NEXTAUTH_URL: "https://your-domain.com"
+
+  # OAuth Providers
+  GOOGLE_ID: "your-google-client-id"
+  GOOGLE_SECRET: "your-google-client-secret"
+  GITHUB_ID: "your-github-client-id"
+  GITHUB_SECRET: "your-github-client-secret"
