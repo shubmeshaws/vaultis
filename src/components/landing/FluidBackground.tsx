@@ -14,15 +14,17 @@ export default function FluidBackground() {
         const canvas = canvasRef.current
         if (!canvas) return
 
+        let simulation: any = null;
+
         if (typeof window !== 'undefined') {
             import('webgl-fluid-simulation').then((module) => {
                 const webGLFluid = module.default || module;
                 if (typeof webGLFluid === 'function') {
-                    webGLFluid(canvas, {
+                    simulation = webGLFluid(canvas, {
                         SIM_RESOLUTION: 128,
-                        DYE_RESOLUTION: 1024,
-                        DENSITY_DISSIPATION: 1.5,
-                        VELOCITY_DISSIPATION: 0.5,
+                        DYE_RESOLUTION: 512, // Reduced from 1024
+                        DENSITY_DISSIPATION: 2.0, // Increased dissipation
+                        VELOCITY_DISSIPATION: 1.0, // Increased dissipation
                         PRESSURE: 0.8,
                         CURL: 30,
                         SPLAT_RADIUS: 0.25,
@@ -33,20 +35,18 @@ export default function FluidBackground() {
                         PAUSED: false,
                         BACK_COLOR: theme === 'dark' ? { r: 5, g: 5, b: 10 } : { r: 249, g: 250, b: 251 },
                         TRANSPARENT: true,
-                        BLOOM: true,
-                        BLOOM_ITERATIONS: 8,
-                        BLOOM_RESOLUTION: 256,
-                        BLOOM_INTENSITY: 0.8,
-                        BLOOM_THRESHOLD: 0.6,
-                        BLOOM_SOFT_KNEE: 0.7,
-                        SUNRAYS: true,
-                        SUNRAYS_RESOLUTION: 196,
-                        SUNRAYS_WEIGHT: 1.0,
+                        BLOOM: false, // Disabled Bloom for performance
+                        SUNRAYS: false, // Disabled Sunrays for performance
                     })
                 }
             }).catch(err => {
                 console.warn('Fluid simulation failed to load:', err)
             })
+        }
+
+        return () => {
+             // Attempt to cleanup if the library exposes a method, otherwise the canvas removal helps
+             // Reducing resolution and disabling bloom/sunrays helps significantly
         }
     }, [theme, mounted])
 

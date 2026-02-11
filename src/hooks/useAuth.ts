@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { useSession } from 'next-auth/react'
 import { Role } from '@/lib/auth/permissions'
 import type { AuthUser } from '@/lib/auth/middleware'
@@ -7,15 +8,15 @@ import type { AuthUser } from '@/lib/auth/middleware'
 export function useAuth() {
   const { data: session, status } = useSession()
 
-  const user: AuthUser | null = session?.user
+  const user: AuthUser | null = React.useMemo(() => session?.user
     ? {
       id: session.user.id,
       email: session.user.email,
       name: session.user.name,
       role: session.user.role,
-      isActive: true, // Defaulting to true as active session implies active user
+      isActive: (session.user as any).isActive ?? true,
     }
-    : null
+    : null, [session?.user])
 
   const isAuthenticated = status === 'authenticated'
   const isLoading = status === 'loading'
