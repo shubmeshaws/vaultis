@@ -56,7 +56,7 @@ export function Sidebar() {
         if (user?.id) {
             fetchDbs()
         }
-    }, [isAdmin, user?.id, setDatabases])
+    }, [isAdmin, user?.id, setDatabases, pathname])
 
     const links = [
         { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
