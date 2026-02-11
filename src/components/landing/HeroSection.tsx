@@ -82,23 +82,23 @@ export default function HeroSection() {
                     <motion.div
                         className="lg:col-span-5 relative perspective-1000 hidden lg:block mt-20"
                         style={{
-                            rotateX: -mousePos.y * 0.4,
-                            rotateY: mousePos.x * 0.4,
+                            rotateX: -mousePos.y * 0.2, // Reduced sensitivity
+                            rotateY: mousePos.x * 0.2, // Reduced sensitivity
                             transformStyle: "preserve-3d"
                         }}
                     >
                         {/* The Visual Stage */}
                         <div className="relative w-full aspect-[4/5] max-w-[380px] mx-auto group">
                             {/* Layer 0: Deep Glow */}
-                            <div className="absolute inset-[-10%] bg-primary/20 rounded-full blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                            <div className="absolute inset-[-10%] bg-primary/20 rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
 
                             {/* Layer 1: Base Glass Plate */}
-                            <div className="absolute inset-0 bg-background/40 backdrop-blur-[50px] rounded-[40px] border border-foreground/15 shadow-2xl transform translate-z-[15px]" />
+                            <div className="absolute inset-0 bg-background/40 backdrop-blur-md rounded-[40px] border border-foreground/15 shadow-2xl transform translate-z-[15px]" />
 
                             {/* Layer 2: Glowing Core with Circular Border */}
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 transform translate-z-[100px]">
-                                <div className="absolute inset-0 bg-primary/30 rounded-full blur-2xl animate-pulse" />
-                                <div className="relative w-full h-full flex items-center justify-center bg-background/80 backdrop-blur-xl border border-primary/50 rounded-full shadow-[0_0_40px_rgba(var(--primary),0.2)]">
+                                <div className="absolute inset-0 bg-primary/30 rounded-full blur-xl animate-pulse" />
+                                <div className="relative w-full h-full flex items-center justify-center bg-background/80 backdrop-blur-md border border-primary/50 rounded-full shadow-[0_0_40px_rgba(var(--primary),0.2)]">
                                     <Activity className="w-10 h-10 text-primary" />
                                 </div>
                             </div>
@@ -126,7 +126,7 @@ export default function HeroSection() {
                                         z: card.z,
                                         transformStyle: 'preserve-3d'
                                     }}
-                                    className="p-3.5 rounded-xl bg-background/70 backdrop-blur-2xl border border-foreground/15 shadow-xl min-w-[120px]"
+                                    className="p-3.5 rounded-xl bg-background/70 backdrop-blur-md border border-foreground/15 shadow-xl min-w-[120px]"
                                 >
                                     <div className="flex items-center gap-1.5 mb-1">
                                         <card.icon className={`w-3 h-3 ${card.color}`} />
@@ -167,7 +167,7 @@ export default function HeroSection() {
                                                 <motion.div
                                                     animate={{ rotateZ: -360 }}
                                                     transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                                                    className="w-12 h-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl flex items-center justify-center p-2 shadow-xl hover:scale-110 transition-transform"
+                                                    className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center p-2 shadow-xl hover:scale-110 transition-transform"
                                                 >
                                                     <img src={logo.src} alt="DB Logo" className="w-full h-full object-contain filter drop-shadow-lg" />
                                                 </motion.div>
