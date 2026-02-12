@@ -1030,7 +1030,7 @@ function DeleteDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen:
 
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">
-                                        Type <span className="text-foreground">"{database.name}"</span> to confirm termination
+                                        Type <span className="text-foreground">&quot;{database.name}&quot;</span> to confirm termination
                                     </label>
                                     <input
                                         type="text"

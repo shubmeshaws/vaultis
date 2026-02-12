@@ -671,7 +671,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                             </div>
 
                                             <h3 className="text-xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">{group.name}</h3>
-                                            <p className="text-xs text-muted-foreground mt-2 line-clamp-2 font-normal opacity-60 italic">"{group.description || 'No description provided.'}"</p>
+                                            <p className="text-xs text-muted-foreground mt-2 line-clamp-2 font-normal opacity-60 italic">&quot;{group.description || 'No description provided.'}&quot;</p>
 
                                             <div className="mt-8 pt-6 border-t border-foreground/5 flex items-center justify-between">
                                                 <div className="flex -space-x-3">
