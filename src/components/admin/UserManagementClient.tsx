@@ -473,7 +473,7 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                                     </div>
                                                                     <div>
                                                                         <p className="text-sm font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">{user.name || 'Anonymous User'}</p>
-                                                                        <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase opacity-60 mt-0.5">{user.email}</p>
+                                                                        <p className="text-[10px] text-muted-foreground mt-0.5">Define who can access this group&apos;s resources.</p>
                                                                     </div>
                                                                 </div>
                                                             </td>
@@ -921,8 +921,8 @@ export function UserManagementClient({ initialUsers, initialGroups, initialDatab
                                                     <label className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground">Security Challenge 1</label>
                                                     <select name="securityQuestion1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs">
                                                         <option value="">Select challenge...</option>
-                                                        <option value="What was your first pet's name?">What was your first pet's name?</option>
-                                                        <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                                                        <option value="What was your first pet&apos;s name?">What was your first pet&apos;s name?</option>
+                                                        <option value="What is your mother&apos;s maiden name?">What is your mother&apos;s maiden name?</option>
                                                         <option value="What city were you born in?">What city were you born in?</option>
                                                     </select>
                                                     <input name="securityAnswer1" required className="w-full h-9 px-3 bg-foreground/5 border border-foreground/10 rounded-lg text-xs mt-1" placeholder="Challenge Response" />

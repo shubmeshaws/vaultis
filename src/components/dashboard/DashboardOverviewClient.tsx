@@ -75,7 +75,7 @@ export function DashboardOverviewClient({ user, stats, recentQueries }: Dashboar
                         Dashboard <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Overview</span>
                     </h1>
                     <p className="text-muted-foreground font-normal">
-                        Welcome back, <span className="text-foreground font-bold">{user.name || user.email}</span>. Here's your system status.
+                        Welcome back, <span className="text-foreground font-bold">{user.name || user.email}</span>. Here&apos;s your system status.
                     </p>
                 </div>
 

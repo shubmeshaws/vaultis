@@ -538,7 +538,7 @@ export function MeshyClient({ databases, userName }: MeshyClientProps) {
                         )}
 
                         <p className="text-sm text-muted-foreground mb-6 max-w-md">
-                            I'll help you build secure, read-only SQL queries. Try one of these examples:
+                            I&apos;ll help you build secure, read-only SQL queries. Try one of these examples:
                         </p>
                         <div className="grid gap-2 w-full max-w-2xl">
                             {EXAMPLE_PROMPTS.map((example, idx) => (

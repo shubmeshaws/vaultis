@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 import './globals.css'
 import { Providers } from './providers'
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 const flexing = localFont({
@@ -24,7 +25,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} ${flexing.variable}`}>
         <Providers>{children}</Providers>
-        <script src="https://js.puter.com/v2/"></script>
+        <Script src="https://js.puter.com/v2/" strategy="beforeInteractive" />
       </body>
     </html>
   )

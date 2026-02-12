@@ -100,7 +100,7 @@ export function DangerousActionModal({
                                 <div className="space-y-4 pt-4 border-t border-white/5">
                                     <div className="flex flex-col items-center gap-1.5 text-center">
                                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Verification Protocol</p>
-                                        <p className="text-sm font-medium text-foreground italic">Type <span className="text-red-500 font-black not-italic px-1.5 py-0.5 rounded-lg bg-red-500/10 ring-1 ring-red-500/20">"{confirmKeyword.toUpperCase()}"</span> to authorize execution</p>
+                                        <p className="text-sm font-medium text-foreground italic">Type <span className="text-red-500 font-black not-italic px-1.5 py-0.5 rounded-lg bg-red-500/10 ring-1 ring-red-500/20">&quot;{confirmKeyword.toUpperCase()}&quot;</span> to authorize execution</p>
                                     </div>
                                     <input
                                         type="text"
