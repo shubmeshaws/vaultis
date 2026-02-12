@@ -1,44 +1,42 @@
-import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token
-    const isAdmin = token?.role === 'ADMIN'
-    const isUser = token?.role === 'USER'
-    const isAuthPage = req.nextUrl.pathname.startsWith('/login') || 
-                       req.nextUrl.pathname.startsWith('/register')
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req })
+  const isAdmin = token?.role === 'ADMIN'
+  const isAuthPage = req.nextUrl.pathname.startsWith('/login') || 
+                     req.nextUrl.pathname.startsWith('/register')
 
-    // Redirect authenticated users away from auth pages
-    if (isAuthPage && token) {
+  // Redirect authenticated users away from auth pages
+  if (isAuthPage && token) {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
+  }
+
+  // Protect admin routes
+  if (req.nextUrl.pathname.startsWith('/admin')) {
+    if (!isAdmin) {
       return NextResponse.redirect(new URL('/dashboard', req.url))
     }
-
-    // Protect admin routes
-    if (req.nextUrl.pathname.startsWith('/admin')) {
-      if (!isAdmin) {
-        return NextResponse.redirect(new URL('/dashboard', req.url))
-      }
-    }
-
-    return NextResponse.next()
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        // Allow access to auth pages without token
-        if (req.nextUrl.pathname.startsWith('/login') || 
-            req.nextUrl.pathname.startsWith('/register')) {
-          return true
-        }
-
-        // Require token for all other routes
-        return !!token
-      },
-    },
   }
-)
+
+  // Protect other protected routes if acceptable
+  // The original middleware had a callback that checked !!token for all other routes
+  // We should replicate that behavior for protected routes
+  const isProtectedRoute = 
+    req.nextUrl.pathname.startsWith('/dashboard') ||
+    req.nextUrl.pathname.startsWith('/queries') ||
+    req.nextUrl.pathname.startsWith('/connections') ||
+    req.nextUrl.pathname.startsWith('/settings')
+
+  if (isProtectedRoute && !token) {
+    const loginUrl = new URL('/login', req.url)
+    loginUrl.searchParams.set('callbackUrl', req.nextUrl.pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: [
