@@ -588,7 +588,7 @@ export default function SettingsClient() {
                         {renderProviderCard('anthropic', 'Anthropic', 'Claude 3.5 Sonnet, Claude 3', ['claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307'])}
 
                         {/* Google Card */}
-                        {renderProviderCard('google', 'Google AI', 'Gemini 1.5 Pro, Flash', ['gemini-1.5-flash-001', 'gemini-1.5-pro-001', 'gemini-1.0-pro'])}
+                        {renderProviderCard('google', 'Google AI', 'Gemini 2.5 Pro, 3.1 Flash, 1.5 Pro/Flash', ['gemini-3.1-flash-preview', 'gemini-2.5-pro', 'gemini-1.5-flash-001', 'gemini-1.5-pro-001', 'gemini-1.0-pro'])}
 
                         {/* Groq Card */}
                         {renderProviderCard(
@@ -613,7 +613,7 @@ export default function SettingsClient() {
                             'puter',
                             'Puter.js',
                             'Free client-side AI via Puter.com',
-                            ['gpt-4o', 'gpt-4o-mini', 'claude-sonnet-4.5', 'claude-haiku-4.5', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash']
+                            ['gpt-4o', 'gpt-4o-mini', 'claude-sonnet-4.5', 'claude-haiku-4.5', 'gemini-3.1-flash', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3.1-flash-lite']
                         )}
                     </div>
                 </CardContent>
