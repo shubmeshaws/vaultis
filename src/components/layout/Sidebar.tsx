@@ -26,7 +26,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { signOut } from 'next-auth/react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
-import { DatabaseSelector, DatabaseOption } from '@/components/dashboard/DatabaseSelector'
+import { DatabaseSelector, DatabaseOption, DbType } from '@/components/dashboard/DatabaseSelector'
 import { getUserDatabases } from '@/lib/actions/databaseActions'
 import { useDatabase } from '@/contexts/DatabaseContext'
 
@@ -42,14 +42,23 @@ export function Sidebar() {
         const fetchDbs = async () => {
             const result = await getUserDatabases()
             if (result.success && result.databases) {
-                const formattedDbs: DatabaseOption[] = result.databases.map((db: any) => ({
-                    id: db.id,
-                    name: db.name,
-                    type: (db.type?.toLowerCase() as any) || 'postgres',
-                    region: db.environment || 'us-east-1',
-                    status: db.isLocked ? 'locked' : 'online',
-                    permission: db.isLocked ? 'no_access' : (isAdmin ? 'admin' : 'read_write')
-                }))
+                const formattedDbs: DatabaseOption[] = result.databases.map((db: any) => {
+                    let type: DbType = 'postgres'
+                    const dbType = db.type?.toLowerCase()
+                    if (dbType === 'mongodb' || dbType === 'mongo') type = 'mongo'
+                    else if (dbType === 'redis') type = 'redis'
+                    else if (dbType === 'mysql') type = 'mysql'
+                    else type = 'postgres'
+
+                    return {
+                        id: db.id,
+                        name: db.name,
+                        type,
+                        region: db.environment || 'us-east-1',
+                        status: db.isLocked ? 'locked' : 'online',
+                        permission: db.isLocked ? 'no_access' : (isAdmin ? 'admin' : 'read_write')
+                    }
+                })
                 setDatabases(formattedDbs)
             }
         }

@@ -9,7 +9,7 @@ import { getCurrentUser } from '@/lib/auth/middleware'
 import { getClientIP, getUserAgent } from '@/lib/utils/clientInfo'
 import { revalidatePath } from 'next/cache'
 
-export async function executeQuery(databaseId: string, sql: string) {
+export async function executeQuery(databaseId: string, sql: string, overrideDbName?: string) {
     const user = await getCurrentUser()
     if (!user) return { success: false, error: 'Unauthorized' }
 
@@ -63,8 +63,163 @@ export async function executeQuery(databaseId: string, sql: string) {
                 }
                 break
             }
-            default:
-                result = { success: false, error: `Direct execution not yet implemented for ${db.type}` }
+            case 'MongoDB': {
+                const url = (db as any).connectionString || (() => {
+                    const credentials = db.username && db.password ? `${encodeURIComponent(db.username)}:${encodeURIComponent(db.password)}@` : ''
+                    return `mongodb://${credentials}${db.host}:${db.port || 27017}`
+                })()
+                const client = new MongoClient(url, { serverSelectionTimeoutMS: 10000 })
+                await client.connect()
+                let data: any[] = []
+                let columns: any[] = []
+
+                let trimmedSql = sql.trim()
+                let targetDbName = overrideDbName || (db as any).databaseName || 'test'
+
+                // Check for "use databaseName" command
+                const useCommandMatch = trimmedSql.match(/^use\s+([a-zA-Z0-9_-]+)(?:\s*;?\s*)(?:\n|(?=\s*db\.)|(?=\s*\{)|$)/i)
+                if (useCommandMatch) {
+                    targetDbName = useCommandMatch[1]
+                    trimmedSql = trimmedSql.slice(useCommandMatch[0].length).trim()
+                }
+
+                const mongoDb = client.db(targetDbName)
+                
+                // Helper to try and parse "relaxed" JSON
+                const flexibleParse = (str: string) => {
+                    if (!str || str.trim() === '') return {}
+                    try {
+                        return JSON.parse(str)
+                    } catch (e) {
+                        try {
+                            const fixed = str
+                                .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
+                                .replace(/'/g, '"')
+                            return JSON.parse(fixed)
+                        } catch (e2) {
+                            throw new Error(`Invalid JSON format: ${str}. Hint: use double quotes for keys.`)
+                        }
+                    }
+                }
+
+                if (trimmedSql.toLowerCase() === 'show collections' || trimmedSql.toLowerCase() === 'show tables') {
+                    const collections = await mongoDb.listCollections().toArray()
+                    data = collections.map((c: any) => ({ 
+                        name: c.name, 
+                        type: c.type,
+                        info: c.options || {}
+                    }))
+                } else if (trimmedSql.startsWith('{')) {
+                    const command = flexibleParse(trimmedSql)
+                    const commandResult = await mongoDb.command(command)
+                    data = [commandResult]
+                } else if (trimmedSql.startsWith('db.')) {
+                    const match = trimmedSql.match(/db\.([^.]+)\.([a-zA-Z]+)\s*\(([\s\S]*)\)/)
+                    if (match) {
+                        const [, collectionName, method, queryStr] = match
+                        const query = flexibleParse(queryStr.trim())
+                        const collection = mongoDb.collection(collectionName)
+
+                        switch (method) {
+                            case 'find':
+                                data = await collection.find(query).limit(100).toArray()
+                                break
+                            case 'findOne':
+                                const one = await collection.findOne(query)
+                                data = one ? [one] : []
+                                break
+                            case 'count':
+                            case 'countDocuments':
+                                const count = await collection.countDocuments(query)
+                                data = [{ count }]
+                                break
+                            case 'stats':
+                                const stats = await mongoDb.command({ collStats: collectionName })
+                                data = [stats]
+                                break
+                            case 'listCollections':
+                                const colls = await mongoDb.listCollections().toArray()
+                                data = colls
+                                break
+                            default:
+                                throw new Error(`Unsupported MongoDB method: ${method}. Use find, findOne, count, or stats.`)
+                        }
+                    } else {
+                        throw new Error('Invalid db.collection.method syntax. Example: db.users.find({ age: 10 })')
+                    }
+                } else {
+                    throw new Error('Invalid MongoDB query format. Use "show collections", a JSON command, or db.collection.find({})')
+                }
+
+                await client.close()
+
+                if (data.length > 0) {
+                    const firstItem = data[0]
+                    columns = Object.keys(firstItem).map(key => ({ key, label: key.toUpperCase() }))
+                }
+
+                result = {
+                    success: true,
+                    data,
+                    columns,
+                    totalRows: data.length
+                }
+                break
+            }
+            case 'Redis': {
+                const credentials = db.password ? `:${encodeURIComponent(db.password)}@` : ''
+                const url = `redis://${credentials}${db.host}:${db.port || 6379}`
+                const client = createRedisClient({
+                    url,
+                    socket: { connectTimeout: 10000 }
+                })
+                await client.connect()
+
+                // Parse Redis command: GET key -> ['GET', 'key']
+                const parts = sql.trim().split(/\s+/)
+                const redisResult = await client.sendCommand(parts)
+                await client.quit()
+
+                // Helper to try to beautify a value if it's JSON
+                const beautifyValue = (val: any): string => {
+                    if (val === null || val === undefined) return 'null'
+                    const str = String(val)
+                    try {
+                        const parsed = JSON.parse(str)
+                        if (typeof parsed === 'object') {
+                            return JSON.stringify(parsed, null, 2)
+                        }
+                    } catch {}
+                    return str
+                }
+
+                let data: any[] = []
+                let columns: any[] = []
+
+                if (Array.isArray(redisResult)) {
+                    data = redisResult.map((val, i) => ({
+                        index: i,
+                        value: typeof val === 'object' && val !== null
+                            ? JSON.stringify(val, null, 2)
+                            : beautifyValue(val)
+                    }))
+                    columns = [{ key: 'index', label: '#' }, { key: 'value', label: 'VALUE' }]
+                } else if (typeof redisResult === 'object' && redisResult !== null) {
+                    data = [redisResult]
+                    columns = Object.keys(redisResult).map(key => ({ key, label: key.toUpperCase() }))
+                } else {
+                    data = [{ value: beautifyValue(redisResult) }]
+                    columns = [{ key: 'value', label: 'VALUE' }]
+                }
+
+                result = {
+                    success: true,
+                    data,
+                    columns,
+                    totalRows: data.length
+                }
+                break
+            }
         }
     } catch (error: any) {
         console.error('Execution failed:', error)

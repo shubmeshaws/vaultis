@@ -440,6 +440,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
     const { toast } = useToast()
     const [step, setStep] = useState(1)
     const [selectedType, setSelectedType] = useState<string | null>(null)
+    const [connectionMode, setConnectionMode] = useState<'fields' | 'string'>('fields')
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -449,6 +450,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
         username: '',
         password: '',
         databaseName: '',
+        connectionString: '',
     })
     const [isLoading, setIsLoading] = useState(false)
     const [isTesting, setIsTesting] = useState(false)
@@ -484,7 +486,8 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
             port: formData.port ? parseInt(formData.port) : undefined,
             type: selectedType!,
             username: formData.username,
-            password: formData.password
+            password: formData.password,
+            connectionString: connectionMode === 'string' ? formData.connectionString : undefined,
         })
 
         if (result.success) {
@@ -503,13 +506,15 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
         const result = await createDatabase({
             ...formData,
             port: formData.port ? parseInt(formData.port) : undefined,
-            type: selectedType
+            type: selectedType,
+            connectionString: connectionMode === 'string' ? formData.connectionString : undefined,
         })
 
         if (result.success && result.database) {
             onSuccess(result.database as any)
-            setFormData({ name: '', description: '', environment: '', host: '', port: '', username: '', password: '', databaseName: '' })
+            setFormData({ name: '', description: '', environment: '', host: '', port: '', username: '', password: '', databaseName: '', connectionString: '' })
             setSelectedType(null)
+            setConnectionMode('fields')
             setStep(1)
         } else {
             toast({ title: 'Operation failed', description: result.error || 'Failed to create database', type: 'error' })
@@ -627,61 +632,104 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
                                         </div>
                                     ) : (
                                         <div className="space-y-4">
+                                            {selectedType === 'MongoDB' && (
+                                                <div className="flex p-1 bg-foreground/5 rounded-xl border border-foreground/10 mb-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setConnectionMode('fields')}
+                                                        className={cn(
+                                                            "flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
+                                                            connectionMode === 'fields' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                                                        )}
+                                                    >
+                                                        Standard Fields
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setConnectionMode('string')}
+                                                        className={cn(
+                                                            "flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
+                                                            connectionMode === 'string' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                                                        )}
+                                                    >
+                                                        Connection String
+                                                    </button>
+                                                </div>
+                                            )}
+
                                             <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-2 col-span-2 md:col-span-1">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Hostname</label>
-                                                    <input
-                                                        required
-                                                        type="text"
-                                                        value={formData.host}
-                                                        onChange={(e) => setFormData({ ...formData, host: e.target.value })}
-                                                        placeholder={selectedType === 'MongoDB' ? 'cluster0.mongodb.net' : 'db.example.com'}
-                                                        className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2 col-span-2 md:col-span-1">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Port</label>
-                                                    <input
-                                                        required
-                                                        type="number"
-                                                        value={formData.port}
-                                                        onChange={(e) => setFormData({ ...formData, port: e.target.value })}
-                                                        placeholder={selectedType === 'PostgreSQL' ? '5432' : selectedType === 'MySQL' ? '3306' : selectedType === 'MongoDB' ? '27017' : '6379'}
-                                                        className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2 col-span-2 md:col-span-1">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Username</label>
-                                                    <input
-                                                        required={selectedType !== 'Redis'}
-                                                        type="text"
-                                                        value={formData.username}
-                                                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                                        placeholder={selectedType === 'PostgreSQL' ? 'postgres' : selectedType === 'MySQL' ? 'root' : 'admin'}
-                                                        className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2 col-span-2 md:col-span-1">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Password</label>
-                                                    <input
-                                                        required
-                                                        type="password"
-                                                        value={formData.password}
-                                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                                        placeholder="••••••••"
-                                                        className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2 col-span-2">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
-                                                    <input
-                                                        type="text"
-                                                        value={formData.databaseName}
-                                                        onChange={(e) => setFormData({ ...formData, databaseName: e.target.value })}
-                                                        placeholder={selectedType === 'PostgreSQL' ? 'postgres' : 'main_db'}
-                                                        className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                                    />
-                                                </div>
+                                                {connectionMode === 'string' && selectedType === 'MongoDB' ? (
+                                                    <div className="space-y-2 col-span-2 text-left">
+                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">MongoDB Connection String</label>
+                                                        <textarea
+                                                            required
+                                                            value={formData.connectionString}
+                                                            onChange={(e) => setFormData({ ...formData, connectionString: e.target.value })}
+                                                            placeholder="mongodb+srv://user:pass@cluster.mongodb.net/dbname"
+                                                            className="w-full h-32 p-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 resize-none font-mono"
+                                                        />
+                                                        <p className="text-[10px] text-muted-foreground pl-1 italic">
+                                                            Note: Using a connection string will override individual field values.
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="space-y-2 col-span-2 md:col-span-1 text-left">
+                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Hostname</label>
+                                                            <input
+                                                                required={connectionMode === 'fields'}
+                                                                type="text"
+                                                                value={formData.host}
+                                                                onChange={(e) => setFormData({ ...formData, host: e.target.value })}
+                                                                placeholder={selectedType === 'MongoDB' ? 'cluster0.mongodb.net' : 'db.example.com'}
+                                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2 col-span-2 md:col-span-1 text-left">
+                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Port</label>
+                                                            <input
+                                                                required={connectionMode === 'fields'}
+                                                                type="number"
+                                                                value={formData.port}
+                                                                onChange={(e) => setFormData({ ...formData, port: e.target.value })}
+                                                                placeholder={selectedType === 'PostgreSQL' ? '5432' : selectedType === 'MySQL' ? '3306' : selectedType === 'MongoDB' ? '27017' : '6379'}
+                                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2 col-span-2 md:col-span-1 text-left">
+                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Username</label>
+                                                            <input
+                                                                required={connectionMode === 'fields' && selectedType !== 'Redis'}
+                                                                type="text"
+                                                                value={formData.username}
+                                                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                                                placeholder={selectedType === 'PostgreSQL' ? 'postgres' : selectedType === 'MySQL' ? 'root' : 'admin'}
+                                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2 col-span-2 md:col-span-1 text-left">
+                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Password</label>
+                                                            <input
+                                                                required={connectionMode === 'fields'}
+                                                                type="password"
+                                                                value={formData.password}
+                                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                                placeholder="••••••••"
+                                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2 col-span-2 text-left">
+                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Database Name</label>
+                                                            <input
+                                                                type="text"
+                                                                value={formData.databaseName}
+                                                                onChange={(e) => setFormData({ ...formData, databaseName: e.target.value })}
+                                                                placeholder={selectedType === 'PostgreSQL' ? 'postgres' : 'main_db'}
+                                                                className="w-full h-12 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                            />
+                                                        </div>
+                                                    </>
+                                                )}
                                                 <div className="col-span-2 pt-2">
                                                     <button
                                                         type="button"
@@ -734,6 +782,7 @@ function AddDatabaseModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
 
 function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: boolean, database: Database, onClose: () => void, onSuccess: (db: Database) => void }) {
     const { toast } = useToast()
+    const [connectionMode, setConnectionMode] = useState<'fields' | 'string'>((database as any).connectionString ? 'string' : 'fields')
     const [formData, setFormData] = useState({
         name: database.name,
         description: database.description || '',
@@ -743,6 +792,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
         username: database.username || '',
         password: database.password || '',
         databaseName: database.databaseName || '',
+        connectionString: (database as any).connectionString || '',
         type: database.type || 'PostgreSQL'
     })
     const [isLoading, setIsLoading] = useState(false)
@@ -757,7 +807,8 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
             type: formData.type || 'PostgreSQL',
             username: formData.username,
             password: formData.password || undefined,
-            databaseName: formData.databaseName || undefined
+            databaseName: formData.databaseName || undefined,
+            connectionString: connectionMode === 'string' ? formData.connectionString : undefined,
         })
 
         if (result.success) {
@@ -784,6 +835,7 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
         const result = await updateDatabase(database.id, {
             ...formData,
             port: formData.port ? parseInt(formData.port) : undefined,
+            connectionString: connectionMode === 'string' ? formData.connectionString : undefined,
         })
 
         if (result.success && result.database) {
@@ -875,50 +927,95 @@ function EditDatabaseModal({ isOpen, database, onClose, onSuccess }: { isOpen: b
                                     {/* Right Column: Connection Info */}
                                     <div className="space-y-6">
                                         <div className="space-y-4">
-                                            <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/50">Connection</h3>
+                                            <div className="flex items-center justify-between">
+                                                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/50">Connection</h3>
+                                                {formData.type === 'MongoDB' && (
+                                                    <div className="flex p-0.5 bg-foreground/5 rounded-lg border border-foreground/10">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setConnectionMode('fields')}
+                                                            className={cn(
+                                                                "px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest transition-all",
+                                                                connectionMode === 'fields' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                                                            )}
+                                                        >
+                                                            Fields
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setConnectionMode('string')}
+                                                            className={cn(
+                                                                "px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest transition-all",
+                                                                connectionMode === 'string' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                                                            )}
+                                                        >
+                                                            String
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+
                                             <div className="grid gap-4">
-                                                <div className="grid grid-cols-3 gap-4">
-                                                    <div className="space-y-2 col-span-2">
-                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Hostname</label>
-                                                        <input
-                                                            required
-                                                            type="text"
-                                                            value={formData.host}
-                                                            onChange={(e) => setFormData({ ...formData, host: e.target.value })}
-                                                            className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                                        />
-                                                    </div>
+                                                {connectionMode === 'string' && formData.type === 'MongoDB' ? (
                                                     <div className="space-y-2">
-                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Port</label>
-                                                        <input
+                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">MongoDB Connection String</label>
+                                                        <textarea
                                                             required
-                                                            type="number"
-                                                            value={formData.port}
-                                                            onChange={(e) => setFormData({ ...formData, port: e.target.value })}
-                                                            className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                            value={formData.connectionString}
+                                                            onChange={(e) => setFormData({ ...formData, connectionString: e.target.value })}
+                                                            placeholder="mongodb+srv://user:pass@cluster.mongodb.net/dbname"
+                                                            className="w-full h-40 p-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50 resize-none font-mono"
                                                         />
+                                                        <p className="text-[10px] text-muted-foreground pl-1 italic">
+                                                            Using a connection string overrides individual fields.
+                                                        </p>
                                                     </div>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Username</label>
-                                                    <input
-                                                        required
-                                                        type="text"
-                                                        value={formData.username}
-                                                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                                        className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Password</label>
-                                                    <input
-                                                        type="password"
-                                                        value={formData.password}
-                                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                                        placeholder="Leave empty to keep current"
-                                                        className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
-                                                    />
-                                                </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="grid grid-cols-3 gap-4 text-left">
+                                                            <div className="space-y-2 col-span-2">
+                                                                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Hostname</label>
+                                                                <input
+                                                                    required={connectionMode === 'fields'}
+                                                                    type="text"
+                                                                    value={formData.host}
+                                                                    onChange={(e) => setFormData({ ...formData, host: e.target.value })}
+                                                                    className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2 text-left">
+                                                                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Port</label>
+                                                                <input
+                                                                    required={connectionMode === 'fields'}
+                                                                    type="number"
+                                                                    value={formData.port}
+                                                                    onChange={(e) => setFormData({ ...formData, port: e.target.value })}
+                                                                    className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="space-y-2 text-left">
+                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Username</label>
+                                                            <input
+                                                                required={connectionMode === 'fields' && formData.type !== 'Redis'}
+                                                                type="text"
+                                                                value={formData.username}
+                                                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                                                className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2 text-left">
+                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1">Password</label>
+                                                            <input
+                                                                type="password"
+                                                                value={formData.password}
+                                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                                placeholder="Leave empty to keep current"
+                                                                className="w-full h-11 px-4 bg-foreground/5 border border-foreground/10 rounded-xl text-sm focus:outline-none focus:border-primary/50"
+                                                            />
+                                                        </div>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

@@ -4,7 +4,11 @@ import React, { useState, useEffect } from 'react'
 import Editor from 'react-simple-code-editor'
 import { highlight, languages } from 'prismjs'
 import 'prismjs/components/prism-sql'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-bash'
+import 'prismjs/components/prism-mongodb'
 import { Play, AlertTriangle, Command, Save, Share2, Database } from 'lucide-react'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useDatabase } from '@/contexts/DatabaseContext'
@@ -16,14 +20,33 @@ interface QueryEditorProps {
     onSave?: (query: string) => void
     onShare?: (query: string) => void
     onCancel?: () => void
+    availableDatabases?: string[]
+    selectedDatabase?: string
+    onDatabaseChange?: (dbName: string) => void
 }
 
-export function QueryEditor({ initialValue = '', onRun, onSave, onShare, onCancel }: QueryEditorProps) {
+export function QueryEditor({ 
+    initialValue = '', 
+    onRun, 
+    onSave, 
+    onShare, 
+    onCancel,
+    availableDatabases = [],
+    selectedDatabase = '',
+    onDatabaseChange
+}: QueryEditorProps) {
     const { selectedDb } = useDatabase()
     const searchParams = useSearchParams()
     const urlQuery = searchParams.get('q')
 
-    const [code, setCode] = useState(urlQuery || initialValue || 'SELECT * FROM users LIMIT 10;')
+    const defaultQueries: Record<string, string> = {
+        redis: 'GET MESHRAM',
+        mongo: 'db.collection.find({})\n// Or JSON command: { "ping": 1 }',
+        postgres: 'SELECT * FROM MESHRAM LIMIT 10;',
+        mysql: 'SELECT * FROM MESHRAM LIMIT 10;',
+    }
+
+    const [code, setCode] = useState(urlQuery || initialValue || defaultQueries[selectedDb?.type || 'postgres'] || 'SELECT 1;')
 
     // Sync with URL query param changes
     useEffect(() => {
@@ -35,9 +58,13 @@ export function QueryEditor({ initialValue = '', onRun, onSave, onShare, onCance
 
     // Check for destructive keywords
     useEffect(() => {
-        const destructiveRegex = /\b(DROP|DELETE|TRUNCATE|ALTER)\b/i
+        const destructiveRegex = selectedDb?.type === 'redis'
+            ? /\b(FLUSHALL|FLUSHDB|DEL|EXPIRE)\b/i
+            : selectedDb?.type === 'mongo'
+                ? /\b(drop|remove|delete|update|dropDatabase|deleteMany|deleteOne|updateOne|updateMany)\b/i
+                : /\b(DROP|DELETE|TRUNCATE|ALTER)\b/i
         setIsDestructive(destructiveRegex.test(code))
-    }, [code])
+    }, [code, selectedDb?.type])
 
     // Custom Key Handler
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -64,9 +91,30 @@ export function QueryEditor({ initialValue = '', onRun, onSave, onShare, onCance
         if (onCancel) onCancel()
     }
 
-    // Custom SQL Highlighter with Danger Zone detection
+    // Map database type to Prism language
+    const getLanguage = () => {
+        switch (selectedDb?.type) {
+            case 'mongo': return languages.mongodb || languages.javascript
+            case 'redis': return languages.bash
+            default: return languages.sql
+        }
+    }
+
+    const getLanguageName = () => {
+        switch (selectedDb?.type) {
+            case 'postgres': return 'sql'
+            case 'mysql': return 'sql'
+            case 'mongo': return 'mongodb'
+            case 'redis': return 'bash'
+            default: return 'sql'
+        }
+    }
+
+    // Custom Highlighter with Danger Zone detection
     const highlightWithLineNumbers = (input: string) => {
-        const highlighted = highlight(input, languages.sql, 'sql')
+        const lang = getLanguage()
+        const langName = getLanguageName()
+        const highlighted = highlight(input, lang, langName)
             .split('\n')
             .map((line: string, i: number) =>
                 `<span class="line-number text-foreground/20 dark:text-white/20 select-none mr-4 text-[10px] font-mono w-5 inline-block text-right border-r border-foreground/5 dark:border-white/10 pr-2">${i + 1}</span>${line}`
@@ -94,18 +142,54 @@ export function QueryEditor({ initialValue = '', onRun, onSave, onShare, onCance
                             <div className="w-2 h-2 rounded-full bg-emerald-500/40 border border-emerald-500/60" />
                         </div>
                         <div className="h-3 w-px bg-foreground/10 dark:bg-white/10 mx-2" />
-                        <span className="text-[9px] font-mono text-foreground/40 dark:text-white/30 uppercase tracking-widest font-black">SQL Editor</span>
+                        <span className="text-[9px] font-mono text-foreground/40 dark:text-white/30 uppercase tracking-widest font-black">
+                            {selectedDb?.type?.toUpperCase() || 'DATABASE'} Editor
+                        </span>
                         {selectedDb && (
                             <>
                                 <div className="h-1 w-1 rounded-full bg-foreground/20 dark:bg-white/20 mx-1" />
                                 <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
-                                    <Database className="w-2.5 h-2.5 text-indigo-500" />
+                                    {(() => {
+                                        const logoMap: Record<string, string> = {
+                                            redis: '/database-logos/redis.svg',
+                                            mongo: '/database-logos/mongodb.svg',
+                                            mysql: '/database-logos/mysql.svg',
+                                            postgres: '/database-logos/postgresql.svg',
+                                        }
+                                        const logo = logoMap[selectedDb.type]
+                                        return logo
+                                            ? <Image src={logo} alt={selectedDb.type} width={14} height={14} className="object-contain" />
+                                            : <Database className="w-2.5 h-2.5 text-indigo-500" />
+                                    })()}
                                     <span className="text-[9px] font-bold text-indigo-500/80 tracking-tight">{selectedDb.name}</span>
                                 </div>
                                 <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 ml-1">
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                     <span className="text-[8px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Connected</span>
                                 </div>
+
+                                {availableDatabases.length > 0 && (
+                                    <div className="flex items-center ml-1">
+                                        <div className="h-3 w-px bg-foreground/10 dark:bg-white/10 mx-1.5" />
+                                        <select
+                                            value={selectedDatabase}
+                                            onChange={(e) => onDatabaseChange?.(e.target.value)}
+                                            className="bg-foreground/5 dark:bg-white/5 text-[9px] font-bold text-indigo-500/80 border border-indigo-500/20 rounded-full px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 cursor-pointer hover:bg-indigo-500/10 transition-all appearance-none pr-4 relative"
+                                            style={{
+                                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366f1' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`,
+                                                backgroundRepeat: 'no-repeat',
+                                                backgroundPosition: 'right 4px center',
+                                                backgroundSize: '8px'
+                                            }}
+                                        >
+                                            {availableDatabases.map(dbName => (
+                                                <option key={dbName} value={dbName} className="bg-background dark:bg-zinc-900 text-foreground text-xs">
+                                                    {dbName}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
@@ -123,6 +207,65 @@ export function QueryEditor({ initialValue = '', onRun, onSave, onShare, onCance
                             </motion.div>
                         )}
                         <div className="h-3 w-px bg-foreground/10 dark:bg-white/10 mx-1" />
+
+                        {/* Syntax Guide Button */}
+                        <div className="relative group/guide">
+                            <button
+                                className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/10 text-foreground/30 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors flex items-center gap-1.5"
+                            >
+                                <Command className="w-3 h-3" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider pr-1">Guide</span>
+                            </button>
+                            <div className="absolute right-0 top-full mt-2 w-72 p-4 bg-background dark:bg-black/90 border border-foreground/10 dark:border-white/10 rounded-xl shadow-2xl backdrop-blur-xl z-[110] opacity-0 invisible group-hover/guide:opacity-100 group-hover/guide:visible transition-all">
+                                <h4 className="text-[10px] font-black uppercase tracking-widest text-primary mb-3">Syntax Guide</h4>
+                                <div className="space-y-3">
+                                    {selectedDb?.type === 'mongo' && (
+                                        <>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-bold text-foreground/60">Discover Collections:</p>
+                                                <code className="block p-2 bg-foreground/5 dark:bg-white/5 rounded text-[11px] text-foreground/80">{"show collections"}</code>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-bold text-foreground/60">Switch Database:</p>
+                                                <code className="block p-2 bg-foreground/5 dark:bg-white/5 rounded text-[11px] text-foreground/80">{"use admin; db.users.find({})"}</code>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-bold text-foreground/60">Find documents:</p>
+                                                <code className="block p-2 bg-foreground/5 dark:bg-white/5 rounded text-[11px] text-foreground/80">{"db.users.find({ age: 10 })"}</code>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-bold text-foreground/60">Run command:</p>
+                                                <code className="block p-2 bg-foreground/5 dark:bg-white/5 rounded text-[11px] text-foreground/80">{'{ "ping": 1 }'}</code>
+                                            </div>
+                                        </>
+                                    )}
+                                    {selectedDb?.type === 'redis' && (
+                                        <>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-bold text-foreground/60">Get/Set values:</p>
+                                                <code className="block p-2 bg-foreground/5 dark:bg-white/5 rounded text-[11px] text-foreground/80">GET user_1</code>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-bold text-foreground/60">List keys:</p>
+                                                <code className="block p-2 bg-foreground/5 dark:bg-white/5 rounded text-[11px] text-foreground/80">KEYS *</code>
+                                            </div>
+                                        </>
+                                    )}
+                                    {(selectedDb?.type === 'postgres' || selectedDb?.type === 'mysql') && (
+                                        <>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-bold text-foreground/60">Select data:</p>
+                                                <code className="block p-2 bg-foreground/5 dark:bg-white/5 rounded text-[11px] text-foreground/80">SELECT * FROM table;</code>
+                                            </div>
+                                        </>
+                                    )}
+                                    <p className="text-[9px] text-muted-foreground italic mt-2">
+                                        Hint: Use Ctrl+Enter to run.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
                         <button
                             onClick={() => onSave?.(code)}
                             className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/10 text-foreground/30 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"
@@ -138,25 +281,26 @@ export function QueryEditor({ initialValue = '', onRun, onSave, onShare, onCance
                     </div>
                 </div>
 
-                {/* Code Area */}
-                <div className="relative min-h-[300px] font-mono text-sm leading-6">
+                {/* Code Area — auto-resizes with content */}
+                <div className="relative font-mono text-sm leading-6" style={{ minHeight: Math.min(Math.max(code.split('\n').length, 2) * 24 + 40, 500) }}>
                     <Editor
                         value={code}
                         onValueChange={setCode}
-                        highlight={input => highlight(input, languages.sql, 'sql')}
+                        highlight={input => highlight(input, getLanguage(), getLanguageName())}
                         padding={20}
                         onKeyDown={handleKeyDown}
                         className={cn(
-                            "font-mono text-[13px] bg-transparent !outline-none min-h-[300px]",
-                            "search-editor-textarea", // Custom class for global styles if needed
+                            "font-mono text-[13px] bg-transparent !outline-none",
+                            "search-editor-textarea",
                         )}
                         textareaClassName="focus:outline-none"
                         style={{
                             fontFamily: '"JetBrains Mono", "Fira Code", monospace',
                             fontSize: 13,
                             backgroundColor: 'transparent',
-                            color: isDestructive ? '#ef4444' : 'hsl(var(--foreground))', // Slight red tint if destructive
-                            textShadow: isDestructive ? '0 0 10px rgba(239,68,68,0.2)' : 'none'
+                            color: isDestructive ? '#ef4444' : 'hsl(var(--foreground))',
+                            textShadow: isDestructive ? '0 0 10px rgba(239,68,68,0.2)' : 'none',
+                            minHeight: Math.min(Math.max(code.split('\n').length, 5) * 26 + 40, 500)
                         }}
                     />
 

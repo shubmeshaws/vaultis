@@ -73,9 +73,10 @@ export async function createDatabase(data: {
     username?: string
     password?: string
     databaseName?: string
+    connectionString?: string
 }) {
     try {
-        const database = await prisma.database.create({
+        const database = await (prisma.database as any).create({
             data: {
                 name: data.name,
                 description: data.description,
@@ -86,6 +87,7 @@ export async function createDatabase(data: {
                 username: data.username,
                 password: data.password,
                 databaseName: data.databaseName,
+                connectionString: data.connectionString,
             },
         })
 
@@ -108,9 +110,10 @@ export async function updateDatabase(id: string, data: {
     password?: string
     isLocked?: boolean
     databaseName?: string
+    connectionString?: string
 }) {
     try {
-        const database = await prisma.database.update({
+        const database = await (prisma.database as any).update({
             where: { id },
             data: {
                 name: data.name,
@@ -123,6 +126,7 @@ export async function updateDatabase(id: string, data: {
                 password: data.password,
                 isLocked: data.isLocked,
                 databaseName: data.databaseName,
+                connectionString: data.connectionString,
             },
         })
 
@@ -147,14 +151,17 @@ export async function testConnection(data: {
     username?: string
     password?: string
     databaseName?: string
+    connectionString?: string
 }) {
-    if (!data.host) return { success: false, error: 'Hostname is required' }
+    if (!data.host && !data.connectionString) return { success: false, error: 'Hostname or Connection String is required' }
 
     const startTime = performance.now()
 
     try {
-        switch (data.type) {
-            case 'PostgreSQL': {
+        const type = data.type?.toLowerCase()
+        switch (type) {
+            case 'postgresql':
+            case 'postgres': {
                 const client = new PGClient({
                     host: data.host,
                     port: data.port || 5432,
@@ -167,7 +174,7 @@ export async function testConnection(data: {
                 await client.end()
                 break
             }
-            case 'MySQL': {
+            case 'mysql': {
                 const connection = await mysql.createConnection({
                     host: data.host,
                     port: data.port || 3306,
@@ -179,16 +186,19 @@ export async function testConnection(data: {
                 await connection.end()
                 break
             }
-            case 'MongoDB': {
-                const credentials = data.username && data.password ? `${encodeURIComponent(data.username)}:${encodeURIComponent(data.password)}@` : ''
-                const url = `mongodb://${credentials}${data.host}:${data.port || 27017}`
+            case 'mongodb':
+            case 'mongo': {
+                const url = data.connectionString || (() => {
+                    const credentials = data.username && data.password ? `${encodeURIComponent(data.username)}:${encodeURIComponent(data.password)}@` : ''
+                    return `mongodb://${credentials}${data.host}:${data.port || 27017}`
+                })()
                 const client = new MongoClient(url, { serverSelectionTimeoutMS: 5000 })
                 await client.connect()
                 await client.db('admin').command({ ping: 1 })
                 await client.close()
                 break
             }
-            case 'Redis': {
+            case 'redis': {
                 const credentials = data.password ? `:${encodeURIComponent(data.password)}@` : ''
                 const url = `redis://${credentials}${data.host}:${data.port || 6379}`
                 const client = createRedisClient({
@@ -413,8 +423,10 @@ export async function getDatabaseSchema(databaseId: string) {
             }
 
             case 'MongoDB': {
-                const credentials = db.username && db.password ? `${encodeURIComponent(db.username)}:${encodeURIComponent(db.password)}@` : ''
-                const url = `mongodb://${credentials}${db.host}:${db.port || 27017}`
+                const url = (db as any).connectionString || (() => {
+                    const credentials = db.username && db.password ? `${encodeURIComponent(db.username)}:${encodeURIComponent(db.password)}@` : ''
+                    return `mongodb://${credentials}${db.host}:${db.port || 27017}`
+                })()
                 const client = new MongoClient(url, { serverSelectionTimeoutMS: 10000 })
 
                 await client.connect()
@@ -488,3 +500,55 @@ export async function getDatabaseSchema(databaseId: string) {
     }
 }
 
+
+export async function listDatabases(databaseId: string) {
+    try {
+        const db = await prisma.database.findUnique({
+            where: { id: databaseId }
+        })
+
+        if (!db) return { success: false, error: 'Database not found' }
+
+        const type = db.type?.toLowerCase()
+        if (type === 'mongodb' || type === 'mongo') {
+            const url = (db as any).connectionString || (() => {
+                const credentials = db.username && db.password ? `${encodeURIComponent(db.username)}:${encodeURIComponent(db.password)}@` : ''
+                return `mongodb://${credentials}${db.host}:${db.port || 27017}`
+            })()
+            const client = new MongoClient(url, { serverSelectionTimeoutMS: 5000 })
+            await client.connect()
+            const admin = client.db('admin').admin()
+            const dbs = await admin.listDatabases()
+            await client.close()
+            return { success: true, databases: dbs.databases.map((d: any) => d.name) }
+        } else if (type === 'postgresql' || type === 'postgres') {
+            const client = new PGClient({
+                host: db.host || undefined,
+                port: db.port || undefined,
+                user: db.username || undefined,
+                password: db.password || undefined,
+                database: 'postgres',
+            })
+            await client.connect()
+            const res = await client.query('SELECT datname FROM pg_database WHERE datistemplate = false;')
+            await client.end()
+            return { success: true, databases: res.rows.map(r => r.datname) }
+        } else if (type === 'mysql') {
+            const mysql = require('mysql2/promise')
+            const connection = await mysql.createConnection({
+                host: db.host || undefined,
+                port: db.port || undefined,
+                user: db.username || undefined,
+                password: db.password || undefined,
+            })
+            const [rows]: any = await connection.query('SHOW DATABASES;')
+            await connection.end()
+            return { success: true, databases: rows.map((r: any) => r.Database) }
+        }
+
+        return { success: false, error: 'Database type not supported for listing' }
+    } catch (error: any) {
+        console.error('List databases failed:', error)
+        return { success: false, error: error.message || 'Failed to list databases' }
+    }
+}

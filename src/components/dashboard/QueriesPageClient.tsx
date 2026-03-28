@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useDatabase } from '@/contexts/DatabaseContext'
 import { executeQuery, saveQuery, getSavedQueries, deleteSavedQuery, toggleFavoriteQuery, getQueryHistory } from '@/lib/actions/queryActions'
+import { listDatabases } from '@/lib/actions/databaseActions'
 import { useToast } from '@/contexts/ToastContext'
 import { InputModal } from '@/components/ui/InputModal'
 import { SimpleConfirmationModal } from '@/components/ui/SimpleConfirmationModal'
@@ -50,6 +51,10 @@ export function QueriesPageClient() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     const [queryToDelete, setQueryToDelete] = useState<string | null>(null)
     const activeQueryRef = useRef<boolean>(false)
+    
+    // Database selection overrides
+    const [availableDatabases, setAvailableDatabases] = useState<string[]>([])
+    const [selectedDbOverride, setSelectedDbOverride] = useState<string>('')
 
     const fetchSavedQueries = useCallback(async () => {
         const result = await getSavedQueries()
@@ -65,6 +70,25 @@ export function QueriesPageClient() {
         if (activeTab === 'saved') fetchSavedQueries()
         if (activeTab === 'history') fetchHistory()
     }, [activeTab, fetchSavedQueries, fetchHistory])
+
+    useEffect(() => {
+        if (selectedDb) {
+            setSelectedDbOverride((selectedDb as any).databaseName || '')
+            const dbType = selectedDb.type?.toLowerCase()
+            if (['mongodb', 'mongo', 'postgresql', 'postgres', 'mysql'].includes(dbType || '')) {
+                listDatabases(selectedDb.id).then(res => {
+                    if (res.success) {
+                        setAvailableDatabases(res.databases || [])
+                    }
+                })
+            } else {
+                setAvailableDatabases([])
+            }
+        } else {
+            setAvailableDatabases([])
+            setSelectedDbOverride('')
+        }
+    }, [selectedDb])
 
     const handleCancelQuery = () => {
         if (activeQueryRef.current) {
@@ -88,7 +112,7 @@ export function QueriesPageClient() {
         setQueryResults(prev => ({ ...prev, status: 'loading', sql: query }))
 
         try {
-            const result = await executeQuery(selectedDb.id, query)
+            const result = await executeQuery(selectedDb.id, query, selectedDbOverride)
 
             // Check if cancelled
             if (!activeQueryRef.current) {
@@ -203,15 +227,15 @@ export function QueriesPageClient() {
                         <div className="flex items-center gap-2 mb-1">
                             <div className="px-2 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-1">
                                 <Sparkles className="w-3 h-3" />
-                                SQL Runner
+                                {selectedDb?.type?.toUpperCase() || 'DB'} Runner
                             </div>
                             <p className="text-xs text-muted-foreground uppercase tracking-wider">Database Tool</p>
                         </div>
                         <h1 className="text-4xl font-bold tracking-tighter text-foreground leading-tight">
-                            SQL <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Editor</span>
+                            {selectedDb?.type?.toUpperCase() || 'Query'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500">Explorer</span>
                         </h1>
                         <p className="text-sm text-muted-foreground font-normal mt-1">
-                            Run and save your SQL queries
+                            Run and save your {selectedDb?.type || 'database'} queries
                         </p>
                     </div>
                 </div>
@@ -258,6 +282,9 @@ export function QueriesPageClient() {
                                 onSave={handleSaveQueryRequest}
                                 onShare={handleShareQuery}
                                 onCancel={handleCancelQuery}
+                                availableDatabases={availableDatabases}
+                                selectedDatabase={selectedDbOverride}
+                                onDatabaseChange={setSelectedDbOverride}
                             />
                         </div>
 

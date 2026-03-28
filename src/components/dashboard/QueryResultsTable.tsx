@@ -190,8 +190,8 @@ export function QueryResultsTable({
             </div>
 
             {/* Table Container */}
-            <div className="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
-                <table className="w-full text-sm text-left">
+            <div className="overflow-x-auto overflow-y-auto max-h-[600px] custom-scrollbar" style={{ scrollbarGutter: 'stable' }}>
+                <table className="text-sm text-left" style={{ minWidth: '100%', width: 'max-content' }}>
                     {/* Sticky Header */}
                     <thead className="sticky top-0 z-10 bg-foreground/[0.08] backdrop-blur-xl border-b border-foreground/10">
                         <tr>
@@ -229,8 +229,16 @@ export function QueryResultsTable({
                                     >
                                         {typeof row[col.key] === 'object' ? (
                                             <span className="font-mono text-xs text-muted-foreground">
-                                                {JSON.stringify(row[col.key])}
+                                                {JSON.stringify(row[col.key], null, 2)}
                                             </span>
+                                        ) : typeof row[col.key] === 'string' && row[col.key].includes('\n') ? (
+                                            <pre className={cn(
+                                                "font-mono text-xs whitespace-pre text-foreground dark:text-emerald-300",
+                                                "bg-foreground/5 dark:bg-white/5 rounded-lg p-3 border border-foreground/10 dark:border-white/10",
+                                                "max-h-48 overflow-y-auto custom-scrollbar"
+                                            )}>
+                                                {row[col.key]}
+                                            </pre>
                                         ) : (
                                             <span className={cn(
                                                 col.key === 'id' && "font-mono text-xs opacity-70",
