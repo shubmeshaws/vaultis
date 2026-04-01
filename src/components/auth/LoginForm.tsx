@@ -74,7 +74,7 @@ export function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto space-y-6 p-6 relative">
+    <div className="w-full max-w-lg mx-auto space-y-6 p-10 relative">
       {/* Premium Glassmorphic Background Card */}
       <div className="absolute inset-0 bg-background/50 backdrop-blur-3xl rounded-[2rem] border border-foreground/15 shadow-xl -z-10" />
 

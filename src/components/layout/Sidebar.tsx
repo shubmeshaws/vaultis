@@ -106,12 +106,13 @@ export function Sidebar() {
         <aside className="fixed left-0 top-0 z-40 h-screen w-64 hidden lg:flex flex-col bg-background dark:bg-[#05050A] border-r border-foreground/5 dark:border-white/5 shadow-2xl z-[100] text-foreground dark:text-accent-foreground">
             {/* 1. Logo Area */}
             <div className="h-14 flex items-center px-4 border-b border-foreground/5 dark:border-white/5">
-                <Link href="/" className="flex items-center group relative">
-                    <div className="flex flex-col justify-center ml-8">
-                        <span className="text-4xl font-black tracking-[0.05em] text-foreground dark:text-white leading-none transition-all group-hover:text-indigo-500 font-[family-name:var(--font-flexing)]">
+                <Link href="/" className="flex items-center group relative gap-2.5">
+                    <img src="/vaultis_logo_icon.png" alt="Vaultis Logo" className="w-9 h-9 object-contain drop-shadow-md transition-transform group-hover:scale-105" />
+                    <div className="flex flex-col justify-center">
+                        <span className="text-3xl md:text-4xl font-black tracking-[0.05em] text-foreground dark:text-white leading-none transition-all group-hover:text-indigo-500 font-[family-name:var(--font-flexing)]">
                             VAULTIS
                         </span>
-                        <span className="text-[7px] font-bold tracking-[0.5px] text-muted-foreground/60 uppercase mt-[-6px] ml-[2px] group-hover:text-indigo-500 transition-colors">
+                        <span className="text-[8px] font-bold tracking-[0.5px] text-muted-foreground/60 uppercase mt-[-10px] ml-[0px] group-hover:text-indigo-500 transition-colors">
                             BY SHUBHAM MESHRAM
                         </span>
                     </div>

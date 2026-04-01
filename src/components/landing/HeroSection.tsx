@@ -35,7 +35,7 @@ export default function HeroSection() {
 
                     {/* Left: Content (7 cols) */}
                     <motion.div
-                        className="lg:col-span-7"
+                        className="lg:col-span-7 -ml-[20px] lg:-ml-[75px]"
                         style={{
                             rotateX: -mousePos.y * 0.1,
                             rotateY: mousePos.x * 0.1,
@@ -51,31 +51,14 @@ export default function HeroSection() {
                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Secure Infrastructure Gate</span>
                         </motion.div>
 
-                        <h1 className="text-6xl md:text-[5rem] font-black tracking-[-0.04em] leading-[0.8] text-foreground mb-8 text-shadow-xl">
+                        <h1 className="text-7xl md:text-[6.5rem] font-black tracking-[-0.04em] leading-[0.85] text-foreground mb-10 text-shadow-xl">
                             QUERY YOUR DATA WITH<br />
                             <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">CONFIDENCE.</span>
                         </h1>
 
-                        <p className="text-xl text-muted-foreground leading-relaxed max-w-xl mb-10 font-medium tracking-tight">
+                        <p className="text-2xl md:text-3xl text-muted-foreground leading-relaxed max-w-3xl mb-12 font-medium tracking-tight">
                             Accepts, rejects and monitor database queries in realtime. Built for teams who prioritize security and efficiency.
                         </p>
-
-                        <div className="flex flex-wrap items-center gap-6">
-                            <button
-                                onClick={() => setShowSignupModal(true)}
-                                className="group relative px-10 py-4.5 bg-primary text-primary-foreground font-black rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30 hover:shadow-primary/60 overflow-hidden active:scale-95"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
-                                <span className="relative z-10 text-base uppercase tracking-[0.1em]">GET STARTED</span>
-                            </button>
-                            <button
-                                onClick={() => setShowVideoModal(true)}
-                                className="group relative px-10 py-4.5 bg-primary text-primary-foreground font-black rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30 hover:shadow-primary/60 overflow-hidden active:scale-95"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
-                                <span className="relative z-10 text-base uppercase tracking-[0.1em]">LIVE DEMO</span>
-                            </button>
-                        </div>
                     </motion.div>
 
                     {/* Right: Advanced 3D Core Visual (5 cols) */}

@@ -89,6 +89,7 @@ model Database {
   password    String?
   databaseName String?
   connectionString String?
+  version          String?
   isLocked    Boolean  @default(false)
   groups      Group[]
   directAccessUsers User[] @relation("DirectAccess")

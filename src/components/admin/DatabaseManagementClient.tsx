@@ -47,6 +47,8 @@ interface Database {
     username: string | null
     password: string | null
     databaseName: string | null
+    connectionString: string | null
+    version: string | null
     isLocked: boolean
     createdAt: Date
     updatedAt: Date
@@ -130,6 +132,15 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                 lastChecked: new Date()
             }
         }))
+
+        // Update local database state with newly fetched version
+        if (result.success && result.version) {
+            setDatabases(prevDatabases => 
+                prevDatabases.map(d => 
+                    d.id === db.id ? { ...d, version: result.version } : d
+                )
+            )
+        }
 
         if (result.success) {
             toast({
@@ -313,7 +324,7 @@ export function DatabaseManagementClient({ initialDatabases }: DatabaseManagemen
                                 <div className="flex-1 min-w-0 pr-12">
                                     <CardTitle className="text-xl font-bold truncate">{db.name}</CardTitle>
                                     <CardDescription className="text-xs font-bold uppercase tracking-widest mt-0.5">
-                                        {db.type} • v15.2
+                                        {db.type} • {db.version || 'v1.0'}
                                     </CardDescription>
                                 </div>
                             </div>

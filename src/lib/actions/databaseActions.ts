@@ -158,6 +158,7 @@ export async function testConnection(data: {
     const startTime = performance.now()
 
     try {
+        let version = 'Unknown'
         const type = data.type?.toLowerCase()
         switch (type) {
             case 'postgresql':
@@ -171,6 +172,8 @@ export async function testConnection(data: {
                     connectionTimeoutMillis: 5000,
                 })
                 await client.connect()
+                const res = await client.query('SELECT version();')
+                version = res.rows[0].version.split(' ')[1] // e.g. "PostgreSQL 15.2..." -> "15.2"
                 await client.end()
                 break
             }
@@ -182,7 +185,8 @@ export async function testConnection(data: {
                     password: data.password,
                     connectTimeout: 5000,
                 })
-                await connection.ping()
+                const [rows]: any = await connection.query('SELECT version();')
+                version = rows[0]['version()']
                 await connection.end()
                 break
             }
@@ -194,7 +198,8 @@ export async function testConnection(data: {
                 })()
                 const client = new MongoClient(url, { serverSelectionTimeoutMS: 5000 })
                 await client.connect()
-                await client.db('admin').command({ ping: 1 })
+                const buildInfo = await client.db('admin').admin().buildInfo()
+                version = buildInfo.version
                 await client.close()
                 break
             }
@@ -206,7 +211,9 @@ export async function testConnection(data: {
                     socket: { connectTimeout: 5000 }
                 })
                 await client.connect()
-                await client.ping()
+                const info = await client.info('server')
+                const versionMatch = info.match(/redis_version:([0-9.]+)/)
+                version = versionMatch ? versionMatch[1] : 'Unknown'
                 await client.quit()
                 break
             }
@@ -217,7 +224,7 @@ export async function testConnection(data: {
         const endTime = performance.now()
         const latency = Math.round(endTime - startTime)
 
-        return { success: true, message: 'Connection established successfully!', latency }
+        return { success: true, message: 'Connection established successfully!', latency, version }
     } catch (error: any) {
         console.error(`Connection test failed for ${data.type}:`, error)
         return { success: false, error: error.message || 'Failed to connect to database' }
@@ -235,14 +242,28 @@ export async function testConnectionById(databaseId: string) {
             return { success: false, error: 'Database not found' }
         }
 
-        return await testConnection({
+        const result = await testConnection({
             host: db.host || undefined,
             port: db.port || undefined,
             type: db.type || 'PostgreSQL',
             username: db.username || undefined,
             password: db.password || undefined,
-            databaseName: (db as any).databaseName || undefined // Let testConnection handle the default ('postgres')
+            databaseName: (db as any).databaseName || undefined,
+            connectionString: (db as any).connectionString || undefined
         })
+
+        if (result.success && result.version) {
+            console.log(`Updating database ${databaseId} version to ${result.version}`);
+            try {
+                // Use raw SQL to bypass Prisma Client's argument validation for new fields
+                await prisma.$executeRaw`UPDATE "Database" SET version = ${result.version} WHERE id = ${databaseId}`;
+                console.log(`Successfully updated database ${databaseId} version`);
+            } catch (updateError) {
+                console.error(`Failed to update database version for ${databaseId}:`, updateError);
+            }
+        }
+
+        return result
     } catch (error: any) {
         return { success: false, error: error.message || 'Failed to test connection' }
     }

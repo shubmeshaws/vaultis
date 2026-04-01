@@ -33,7 +33,8 @@ export default function LandingHeader() {
         >
             <div className="w-full px-12 flex items-center justify-between">
                 {/* Vaultis Advanced Logo */}
-                <Link href="/" className="flex items-center group relative">
+                <Link href="/" className="flex items-center group relative gap-2.5">
+                    <img src="/vaultis_logo_icon.png" alt="Vaultis Logo" className="w-9 h-9 object-contain drop-shadow-lg transition-transform group-hover:scale-105" />
                     <div className="flex flex-col justify-center">
                         <span className="text-3xl md:text-4xl font-black tracking-[0.05em] text-foreground leading-none transition-all group-hover:text-primary font-[family-name:var(--font-flexing)]">
                             VAULTIS
@@ -45,20 +46,20 @@ export default function LandingHeader() {
                 </Link>
 
                 {/* desktop actions */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-5">
                     <button
                         onClick={toggleTheme}
-                        className="relative p-2.5 rounded-xl bg-foreground/5 border border-foreground/15 text-foreground/60 hover:text-foreground transition-all overflow-hidden group hover:border-primary/30 shadow-sm"
+                        className="relative p-3 rounded-xl bg-foreground/5 border border-foreground/15 text-foreground/60 hover:text-foreground transition-all overflow-hidden group hover:border-primary/30 shadow-sm"
                         aria-label="Toggle theme"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        {theme === 'dark' ? <Sun className="w-5 h-5 relative z-10" /> : <Moon className="w-5 h-5 relative z-10" />}
+                        {theme === 'dark' ? <Sun className="w-6 h-6 relative z-10" /> : <Moon className="w-6 h-6 relative z-10" />}
                     </button>
 
 
                     <Link
                         href="/login"
-                        className="relative px-6 py-2.5 text-[10px] font-black bg-foreground text-background rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 overflow-hidden group active:scale-95"
+                        className="relative px-7 py-3 text-xs font-black bg-foreground text-background rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 overflow-hidden group active:scale-95"
                     >
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
                         <span className="relative z-10 tracking-[0.1em]">SIGN IN</span>
@@ -66,7 +67,7 @@ export default function LandingHeader() {
 
                     <Link
                         href="/register"
-                        className="relative px-6 py-2.5 text-[10px] font-black bg-foreground text-background rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 overflow-hidden group active:scale-95"
+                        className="relative px-7 py-3 text-xs font-black bg-foreground text-background rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 overflow-hidden group active:scale-95"
                     >
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
                         <span className="relative z-10 tracking-[0.1em]">SIGN UP</span>
