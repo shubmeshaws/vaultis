@@ -1,0 +1,13 @@
+{{- if and .Values.postgresql.enabled .Values.postgresql.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "vaultis.pg.fullname" . }}
+  labels:
+    {{- include "vaultis.pg.labels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.postgresql.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "vaultis.pg.selectorLabels" . | nindent 6 }}
+{{- end }}

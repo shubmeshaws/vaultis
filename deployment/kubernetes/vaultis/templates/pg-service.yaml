@@ -1,0 +1,36 @@
+{{- if .Values.postgresql.enabled }}
+# Stable service for app connectivity (ClusterIP)
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vaultis.pg.fullname" . }}
+  labels:
+    {{- include "vaultis.pg.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.postgresql.service.type }}
+  ports:
+    - port: {{ .Values.postgresql.service.port }}
+      targetPort: tcp-pg
+      protocol: TCP
+      name: tcp-pg
+  selector:
+    {{- include "vaultis.pg.selectorLabels" . | nindent 4 }}
+---
+# Headless service required by StatefulSet for stable DNS
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vaultis.pg.fullname" . }}-headless
+  labels:
+    {{- include "vaultis.pg.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: {{ .Values.postgresql.service.port }}
+      targetPort: tcp-pg
+      protocol: TCP
+      name: tcp-pg
+  selector:
+    {{- include "vaultis.pg.selectorLabels" . | nindent 4 }}
+{{- end }}

@@ -1,0 +1,24 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vaultis.pg.fullname" . }}-config
+  labels:
+    {{- include "vaultis.pg.labels" . | nindent 4 }}
+data:
+  tune.sh: |
+    #!/bin/sh
+    # PostgreSQL performance tuning — executed on first init only
+    cat >> "$PGDATA/postgresql.conf" <<EOF
+
+    # --- Vaultis Helm Tuning ---
+    max_connections = {{ .Values.postgresql.config.maxConnections }}
+    shared_buffers = {{ .Values.postgresql.config.sharedBuffers }}
+    effective_cache_size = {{ .Values.postgresql.config.effectiveCacheSize }}
+    work_mem = {{ .Values.postgresql.config.workMem }}
+    wal_level = {{ .Values.postgresql.config.walLevel }}
+    max_wal_senders = {{ .Values.postgresql.config.maxWalSenders }}
+    log_statement = 'ddl'
+    log_min_duration_statement = 1000
+    EOF
+{{- end }}

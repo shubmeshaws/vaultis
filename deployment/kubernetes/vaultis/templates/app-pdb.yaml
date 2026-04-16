@@ -1,0 +1,13 @@
+{{- if .Values.app.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "vaultis.app.fullname" . }}
+  labels:
+    {{- include "vaultis.app.labels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.app.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "vaultis.app.selectorLabels" . | nindent 6 }}
+{{- end }}

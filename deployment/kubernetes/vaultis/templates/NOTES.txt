@@ -1,0 +1,38 @@
+============================================================
+  VAULTIS — Deployment Summary
+============================================================
+
+{{- if .Values.postgresql.enabled }}
+PostgreSQL:
+  StatefulSet : {{ include "vaultis.pg.fullname" . }}
+  Service     : {{ include "vaultis.pg.fullname" . }}:{{ .Values.postgresql.service.port }}
+  Database    : {{ .Values.postgresql.auth.database }}
+  User        : {{ .Values.postgresql.auth.username }}
+  Storage     : {{ .Values.postgresql.persistence.size }} (persistent)
+{{- end }}
+
+Application:
+  Deployment  : {{ include "vaultis.app.fullname" . }}
+  Replicas    : {{ .Values.app.replicaCount }}{{ if .Values.app.autoscaling.enabled }} (autoscaling {{ .Values.app.autoscaling.minReplicas }}-{{ .Values.app.autoscaling.maxReplicas }}){{ end }}
+  Service     : {{ include "vaultis.app.fullname" . }}:{{ .Values.app.service.port }}
+
+{{- if .Values.app.ingress.enabled }}
+Ingress:
+  {{- range .Values.app.ingress.hosts }}
+  URL         : https://{{ .host }}
+  {{- end }}
+{{- else }}
+
+Access via port-forward:
+
+  kubectl port-forward svc/{{ include "vaultis.app.fullname" . }} 3001:{{ .Values.app.service.port }} -n {{ .Release.Namespace }}
+
+  Then open: http://localhost:3001
+{{- end }}
+
+Run Prisma migrations (first deploy):
+
+  kubectl exec -it deploy/{{ include "vaultis.app.fullname" . }} -n {{ .Release.Namespace }} -- \
+    npx prisma db push
+
+============================================================

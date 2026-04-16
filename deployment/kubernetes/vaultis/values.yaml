@@ -1,0 +1,249 @@
+# ============================================================================
+#  VAULTIS — Production Helm Values
+# ============================================================================
+#  This file contains ALL configurable values for both the Vaultis web
+#  application and its internal PostgreSQL database.
+#
+#  Override per-environment with:
+#    helm install vaultis ./vaultis -f values-prod.yaml
+# ============================================================================
+
+global:
+  # Namespace is controlled by helm install --namespace, but this label
+  # is stamped on every resource for easy filtering.
+  environment: production
+
+# ============================================================================
+#  1. VAULTIS APPLICATION
+# ============================================================================
+app:
+  replicaCount: 3
+
+  image:
+    repository: ghcr.io/shubmeshaws/vaultis
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets: []
+  #  - name: ghcr-pull-secret
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 3000
+
+  ingress:
+    enabled: false
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: vaultis.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: vaultis-tls
+        hosts:
+          - vaultis.example.com
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  pdb:
+    enabled: true
+    minAvailable: 2
+
+  # Probes — hits the NextAuth providers endpoint (lightweight, no DB call)
+  livenessProbe:
+    httpGet:
+      path: /api/auth/providers
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /api/auth/providers
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  startupProbe:
+    httpGet:
+      path: /api/auth/providers
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    failureThreshold: 12
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  # Example pod anti-affinity (spread app pods across nodes):
+  #   podAntiAffinity:
+  #     preferredDuringSchedulingIgnoredDuringExecution:
+  #       - weight: 100
+  #         podAffinityTerm:
+  #           labelSelector:
+  #             matchLabels:
+  #               app.kubernetes.io/component: app
+  #           topologyKey: kubernetes.io/hostname
+
+  podAnnotations: {}
+  podLabels: {}
+
+  # Container-level security — run as non-root nextjs user (uid 1001)
+  securityContext:
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+
+  podSecurityContext:
+    fsGroup: 1001
+
+  # Update strategy
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+# ============================================================================
+#  2. POSTGRESQL DATABASE (StatefulSet)
+# ============================================================================
+postgresql:
+  enabled: true
+  replicaCount: 1      # Increase for HA with streaming replication
+
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+
+  auth:
+    database: vaultis
+    username: vaultis
+    # Password is stored in the Secret — override at install time:
+    #   --set postgresql.auth.password=<strong-password>
+    password: "CHANGE_ME_IN_PRODUCTION"
+    existingSecret: ""       # Set to use a pre-created Secret instead
+    secretPasswordKey: "postgresql-password"
+
+  service:
+    type: ClusterIP
+    port: 5432
+
+  persistence:
+    enabled: true
+    storageClass: ""         # Empty = use cluster default StorageClass
+    accessModes:
+      - ReadWriteOnce
+    size: 20Gi
+    annotations: {}
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+  pdb:
+    enabled: true
+    minAvailable: 1
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  # Container-level security
+  securityContext:
+    runAsUser: 999          # Default postgres user in alpine image
+    runAsGroup: 999
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+
+  podSecurityContext:
+    fsGroup: 999
+
+  # Tuning parameters injected into postgresql.conf via ConfigMap
+  config:
+    maxConnections: "200"
+    sharedBuffers: "512MB"
+    effectiveCacheSize: "1536MB"
+    workMem: "4MB"
+    walLevel: "replica"
+    maxWalSenders: "5"
+
+  # Backup CronJob (pg_dump to PVC)
+  backup:
+    enabled: false
+    schedule: "0 2 * * *"     # Daily at 02:00 UTC
+    retention: 7              # Keep last N backups
+    persistence:
+      storageClass: ""
+      size: 10Gi
+
+# ============================================================================
+#  3. SECRETS & CONFIGURATION
+# ============================================================================
+secrets:
+  # Values injected as env vars into the app pods via a K8s Secret.
+  # Override with --set or a values-secrets.yaml kept out of git.
+  nextauthSecret: "CHANGE_ME_GENERATE_WITH_OPENSSL_RAND_BASE64_32"
+  nextauthUrl: "https://vaultis.example.com"
+  # OAuth (leave empty to disable)
+  githubId: ""
+  githubSecret: ""
+  googleId: ""
+  googleSecret: ""
+
+config:
+  # Non-secret environment variables injected via ConfigMap.
+  nodeEnv: "production"
+  allowedDomains: "gmail.com"
+  allowedDomainsMsg: "Access denied. Only approved email domains are allowed."
+
+# ============================================================================
+#  4. SERVICE ACCOUNT & RBAC
+# ============================================================================
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+  # AWS IRSA example:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/vaultis
+
+# ============================================================================
+#  5. NETWORK POLICIES
+# ============================================================================
+networkPolicy:
+  enabled: true
+
+# ============================================================================
+#  6. NAMING OVERRIDES
+# ============================================================================
+nameOverride: ""
+fullnameOverride: ""

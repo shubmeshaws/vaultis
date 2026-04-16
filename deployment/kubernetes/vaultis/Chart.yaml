@@ -1,0 +1,18 @@
+apiVersion: v2
+name: vaultis
+description: |
+  Production Helm chart for Vaultis — a secure database query editor.
+  Deploys the Next.js application and a highly-available PostgreSQL
+  StatefulSet with persistent storage.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - vaultis
+  - database
+  - query-editor
+  - nextjs
+  - postgresql
+maintainers:
+  - name: Shubham Meshram
+    email: shubmeshaws@gmail.com

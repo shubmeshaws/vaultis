@@ -1,0 +1,15 @@
+.git
+.gitignore
+.next
+.env
+.env.*
+.DS_Store
+node_modules
+deployment
+docs
+Flexing
+*.md
+*.jpg
+*.png
+docker-compose.yml
+check_db.ts

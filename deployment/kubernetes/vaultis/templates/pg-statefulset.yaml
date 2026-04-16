@@ -1,0 +1,116 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "vaultis.pg.fullname" . }}
+  labels:
+    {{- include "vaultis.pg.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "vaultis.pg.fullname" . }}-headless
+  replicas: {{ .Values.postgresql.replicaCount }}
+  revisionHistoryLimit: 5
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "vaultis.pg.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "vaultis.pg.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "vaultis.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.postgresql.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: postgresql
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.postgresql.securityContext | nindent 12 }}
+          ports:
+            - name: tcp-pg
+              containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.postgresql.auth.database | quote }}
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresql.auth.username | quote }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "vaultis.pg.secretName" . }}
+                  key: {{ .Values.postgresql.auth.secretPasswordKey }}
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          {{- if .Values.postgresql.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            - name: pg-config
+              mountPath: /docker-entrypoint-initdb.d/tune.sh
+              subPath: tune.sh
+          {{- end }}
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U {{ .Values.postgresql.auth.username }} -d {{ .Values.postgresql.auth.database }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U {{ .Values.postgresql.auth.username }} -d {{ .Values.postgresql.auth.database }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
+      volumes:
+        - name: pg-config
+          configMap:
+            name: {{ include "vaultis.pg.fullname" . }}-config
+            defaultMode: 0755
+      {{- with .Values.postgresql.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.postgresql.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.postgresql.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if .Values.postgresql.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "vaultis.pg.selectorLabels" . | nindent 10 }}
+        {{- with .Values.postgresql.persistence.annotations }}
+        annotations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+          {{- toYaml .Values.postgresql.persistence.accessModes | nindent 10 }}
+        {{- if .Values.postgresql.persistence.storageClass }}
+        storageClassName: {{ .Values.postgresql.persistence.storageClass | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.postgresql.persistence.size | quote }}
+  {{- end }}
+{{- end }}
