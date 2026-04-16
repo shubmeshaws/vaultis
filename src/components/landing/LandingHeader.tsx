@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sun, Moon, ShieldCheck, Orbit } from 'lucide-react'
+import Image from 'next/image'
 import { useTheme } from 'next-themes'
 
 export default function LandingHeader() {
@@ -34,7 +35,7 @@ export default function LandingHeader() {
             <div className="w-full px-12 flex items-center justify-between">
                 {/* Vaultis Advanced Logo */}
                 <Link href="/" className="flex items-center group relative gap-2.5">
-                    <img src="/vaultis_logo_icon.png" alt="Vaultis Logo" className="w-9 h-9 object-contain drop-shadow-lg transition-transform group-hover:scale-105" />
+                    <Image src="/vaultis_logo_icon.png" alt="Vaultis Logo" width={36} height={36} className="object-contain drop-shadow-lg transition-transform group-hover:scale-105" />
                     <div className="flex flex-col justify-center">
                         <span className="text-3xl md:text-4xl font-black tracking-[0.05em] text-foreground leading-none transition-all group-hover:text-primary font-[family-name:var(--font-flexing)]">
                             VAULTIS

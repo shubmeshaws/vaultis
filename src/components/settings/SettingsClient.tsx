@@ -275,10 +275,8 @@ export default function SettingsClient() {
         fetchData()
         fetchAIConfigs()
 
-        // Real-time metadata health check every 10 seconds
         const healthInterval = setInterval(fetchHealth, 10000)
 
-        // Local uptime increment every second for real-time feel
         const uptimeInterval = setInterval(() => {
             setSystemInfo(prev => {
                 if (!prev) return null;
@@ -290,6 +288,7 @@ export default function SettingsClient() {
             clearInterval(healthInterval)
             clearInterval(uptimeInterval)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const renderProviderCard = (provider: string, name: string, description: string, models: string[], requiresEndpoint = false) => {

@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion'
 import { Terminal, Shield, Database, Cpu, Globe, Lock, Key, Activity, X, Play } from 'lucide-react'
+import Image from 'next/image'
 import { RegisterForm } from '@/components/auth/RegisterForm'
 
 export default function HeroSection() {
@@ -152,7 +153,7 @@ export default function HeroSection() {
                                                     transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
                                                     className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center p-2 shadow-xl hover:scale-110 transition-transform"
                                                 >
-                                                    <img src={logo.src} alt="DB Logo" className="w-full h-full object-contain filter drop-shadow-lg" />
+                                                    <Image src={logo.src} alt="DB Logo" width={48} height={48} unoptimized className="w-full h-full object-contain filter drop-shadow-lg" />
                                                 </motion.div>
                                             </motion.div>
                                         )

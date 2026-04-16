@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -107,7 +108,7 @@ export function Sidebar() {
             {/* 1. Logo Area */}
             <div className="h-14 flex items-center px-4 border-b border-foreground/5 dark:border-white/5">
                 <Link href="/" className="flex items-center group relative gap-2.5">
-                    <img src="/vaultis_logo_icon.png" alt="Vaultis Logo" className="w-9 h-9 object-contain drop-shadow-md transition-transform group-hover:scale-105" />
+                    <Image src="/vaultis_logo_icon.png" alt="Vaultis Logo" width={36} height={36} className="object-contain drop-shadow-md transition-transform group-hover:scale-105" />
                     <div className="flex flex-col justify-center">
                         <span className="text-3xl md:text-4xl font-black tracking-[0.05em] text-foreground dark:text-white leading-none transition-all group-hover:text-indigo-500 font-[family-name:var(--font-flexing)]">
                             VAULTIS

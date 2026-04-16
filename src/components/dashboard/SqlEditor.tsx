@@ -24,6 +24,9 @@ const EditorIcons = {
     ),
 }
 
+const KEYWORDS = ['SELECT', 'FROM', 'WHERE', 'JOIN', 'LEFT', 'RIGHT', 'INNER', 'ON', 'GROUP', 'BY', 'ORDER', 'HAVING', 'LIMIT', 'OFFSET', 'AS', 'AND', 'OR', 'IN', 'IS', 'NULL', 'NOT', 'UNION', 'ALL', 'INSERT', 'INTO', 'VALUES', 'SET']
+const DANGEROUS = ['DELETE', 'DROP', 'TRUNCATE', 'UPDATE']
+
 interface SqlEditorProps {
     initialValue?: string
     onRun?: (query: string) => void
@@ -35,22 +38,14 @@ export function SqlEditor({ initialValue = '', onRun }: SqlEditorProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const preRef = useRef<HTMLPreElement>(null)
 
-    const KEYWORDS = ['SELECT', 'FROM', 'WHERE', 'JOIN', 'LEFT', 'RIGHT', 'INNER', 'ON', 'GROUP', 'BY', 'ORDER', 'HAVING', 'LIMIT', 'OFFSET', 'AS', 'AND', 'OR', 'IN', 'IS', 'NULL', 'NOT', 'UNION', 'ALL', 'INSERT', 'INTO', 'VALUES', 'SET']
-    const DANGEROUS = ['DELETE', 'DROP', 'TRUNCATE', 'UPDATE']
-
-    // Sync state if initialValue changes externally (e.g., from saved queries)
     useEffect(() => {
-        if (initialValue !== code) {
-            setCode(initialValue)
-        }
+        setCode(initialValue)
     }, [initialValue])
 
-    // Update dangerous keywords in effect to avoid infinite re-renders
     useEffect(() => {
         const foundDangerous = DANGEROUS.filter(k =>
             new RegExp(`\\b${k}\\b`, 'gi').test(code)
         )
-        // Only update if the list has changed to optimize
         setDangerousKeywords(prev => {
             if (JSON.stringify(prev) === JSON.stringify(foundDangerous)) return prev
             return foundDangerous

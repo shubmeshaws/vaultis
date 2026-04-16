@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -188,7 +188,11 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         admin: 'Administration'
     }
 
-    // Handle internal keyboard navigation
+    const executeCommand = useCallback((command: CommandAction) => {
+        command.action()
+        onClose()
+    }, [onClose])
+
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (!isOpen) return
@@ -212,12 +216,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
         window.addEventListener('keydown', handleKeyDown)
         return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [isOpen, filteredCommands, selectedIndex, onClose])
-
-    const executeCommand = (command: CommandAction) => {
-        command.action()
-        onClose()
-    }
+    }, [isOpen, filteredCommands, selectedIndex, onClose, executeCommand])
 
     return (
         <AnimatePresence>
